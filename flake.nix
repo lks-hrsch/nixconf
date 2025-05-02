@@ -20,8 +20,17 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    hyprland = { url = "github:hyprwm/Hyprland"; };
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+    };
+    hyprland-contrib = {
+      url = "github:hyprwm/contrib";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hyprland-plugins = {
+      url = "github:hyprwm/hyprland-plugins";
+      inputs.hyprland.follows = "hyprland";
+    };
   };
 
   outputs = { nixpkgs, nixpkgs-unstable, home-manager, stylix, firefox-addons, ... }@inputs:

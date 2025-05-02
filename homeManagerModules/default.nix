@@ -1,8 +1,10 @@
-{ ... }: {
+{ ... }:
+{
 
   imports = [
     ./features/hyprland
     ./features/stylix.nix
+    ./features/xdg.nix
 
     ./cliPrograms/btop.nix
     ./cliPrograms/git.nix

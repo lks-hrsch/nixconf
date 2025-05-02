@@ -49,6 +49,34 @@
 
   systemd.network = {
     enable = true;
+    netdevs = {
+      "30-wg0" = {
+        netdevConfig = {
+          Kind = "wireguard";
+          Name = "wg0";
+          MTUBytes = "1420";
+        };
+
+        wireguardConfig = {
+          PrivateKeyFile = "/etc/nixos/secrets/wg0-private.key";
+        };
+
+        wireguardPeers = [
+          {
+            PublicKey = "eTYFEILoUH8pbFVU9WJpzdNGTPm4eLiDAQXmyO1M7wE=";
+            PresharedKeyFile = "/etc/nixos/secrets/wg0-preshared.key";
+            AllowedIPs = [ "10.10.1.1/32" ];
+            Endpoint = "mercury.lukashirsch.de:51821";
+          }
+          {
+            PublicKey = "65mINKiTOCgTIiGCSk5YpbSFdryFEnTrr9vGcHEL5yI=";
+            PresharedKeyFile = "/etc/nixos/secrets/wg0-preshared.key";
+            AllowedIPs = [ "10.10.1.3/32" ];
+            Endpoint = "earth.staudenstuebler.de:51821";
+          }
+        ];
+      };
+    };
     networks = {
       "10-lan" = {
         matchConfig.Name = "enp10s0";
@@ -63,6 +91,16 @@
       #   };
       #   linkConfig.RequiredForOnline = "no";
       # };
+      "30-wg0" = {
+        matchConfig.Name = "wg0";
+        address = [
+          "10.10.1.65/24"
+        ];
+        DHCP = "no";
+        dns = [ "10.10.1.1" "10.10.1.3" ];
+        linkConfig.RequiredForOnline = "no";
+      };
+
     };
   };
 
@@ -226,10 +264,6 @@
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system = {
     stateVersion = "24.11"; # Did you read the comment?
-    autoUpgrade = {
-      enable = true;
-      # allowReboot  = true;
-    };
   };
 }
 

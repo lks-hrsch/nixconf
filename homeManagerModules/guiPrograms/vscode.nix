@@ -1,4 +1,8 @@
 { pkgs, ... }: {
+  home.packages = with pkgs; [
+    nixfmt-rfc-style
+  ];
+
   programs.vscode = {
     enable = true;
     extensions = with pkgs.vscode-extensions; [
@@ -26,7 +30,7 @@
       "nix.serverSettings" = {
         "nil" = {
           "formatting" = {
-            "command" = [ "nixpkgs-fmt" ];
+            "command" = [ "nixfmt" ];
           };
         };
       };

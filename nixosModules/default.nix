@@ -1,4 +1,5 @@
-{ ... }: {
+{ ... }:
+{
 
   imports = [
     ./features/hyprland.nix
@@ -15,10 +16,10 @@
     ./services/openssh.nix
     ./services/pipewire.nix
     ./services/zfs.nix
+    ./services/syncthing.nix
     ./services/xserver.nix
 
     ./home-nas-mounts.nix
-    ./xdg.nix
   ];
 
 }

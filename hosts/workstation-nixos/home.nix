@@ -1,6 +1,8 @@
 { pkgs, lib, inputs, ... }: {
 
-  imports = [ inputs.self.outputs.homeManagerModules.default ];
+  imports = [
+    inputs.self.outputs.homeManagerModules.default
+  ];
 
   home = {
     stateVersion = "24.11";
@@ -20,7 +22,6 @@
       pkg-config
       nil
       rustdesk
-      obsidian
       osu-lazer
 
       # some dependencies

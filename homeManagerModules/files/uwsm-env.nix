@@ -8,6 +8,7 @@
       export EDITOR="alacritty"
       # export NIXOS_OZONE_WL="1"
       # export AQ_DRM_DEVICES="/dev/dri/card0:/dev/dri/card1"
+      export GRIMBLAST_HIDE_CURSOR=0
 
       # Input-method
       export XMODIFIERS="@im=fcitx"

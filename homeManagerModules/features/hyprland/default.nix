@@ -1,6 +1,7 @@
 { ... }: {
 
   imports = [
+    ./cliphist.nix
     ./dunst.nix
     ./hypridle.nix
     ./hyprland.nix
