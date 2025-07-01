@@ -1,12 +1,13 @@
-{ lib, config, pkgs, inputs, ... }: {
+{
+  lib,
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
+{
   environment.systemPackages = with pkgs; [
     uwsm
-    hyprpolkitagent
-    hyprlock
-    hypridle
-    hyprpaper
-    hyprsunset
-    hyprpicker
   ];
 
   services.greetd = {

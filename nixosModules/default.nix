@@ -10,6 +10,7 @@
     ./programs/steam.nix
     ./programs/tmux.nix
     ./programs/xwayland.nix
+    ./programs/zsh.nix
 
     ./services/avahi.nix
     ./services/flatpak.nix

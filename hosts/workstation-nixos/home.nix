@@ -1,4 +1,10 @@
-{ pkgs, lib, inputs, ... }: {
+{
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
+{
 
   imports = [
     inputs.self.outputs.homeManagerModules.default
@@ -10,9 +16,6 @@
     username = "lkshrsch";
 
     packages = with pkgs; [
-      # # Adds the 'hello' command to your environment. It prints a friendly
-      # # "Hello, world!" when run.
-      # hello
       nautilus
       pavucontrol
       jq
@@ -23,6 +26,7 @@
       nil
       rustdesk
       osu-lazer
+      gimp3
 
       # some dependencies
       gtk3
@@ -43,6 +47,21 @@
       })
       # cudatoolkit
       linuxPackages.nvidia_x11
+
+      # latex
+      (texliveSmall.withPackages (
+        ps: with ps; [
+          tudscr
+          luainputenc
+          fontaxes
+          lualatex-math
+          latexmk
+          datetime2
+          biblatex
+        ]
+      ))
+      ghostscript
+      biber
 
       # dev virtualization
       grub2

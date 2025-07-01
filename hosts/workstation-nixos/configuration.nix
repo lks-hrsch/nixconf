@@ -2,7 +2,12 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   # Nix settings
@@ -17,19 +22,29 @@
       automatic = true;
     };
     settings = {
-      trusted-users = [ "root" "lkshrsch" ];
-      substituters = [ "https://cache.nixos.org/" "https://nix-community.cachix.org" "https://hyprland.cachix.org" ];
-      trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
+      trusted-users = [
+        "root"
+        "lkshrsch"
+      ];
+      substituters = [
+        "https://cache.nixos.org/"
+        "https://nix-community.cachix.org"
+        "https://hyprland.cachix.org"
+      ];
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      ];
     };
   };
 
-  imports =
-    [
-      inputs.self.outputs.nixosModules.default
+  imports = [
+    inputs.self.outputs.nixosModules.default
 
-      # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -97,13 +112,15 @@
           "10.10.1.65/24"
         ];
         DHCP = "no";
-        dns = [ "10.10.1.1" "10.10.1.3" ];
+        dns = [
+          "10.10.1.1"
+          "10.10.1.3"
+        ];
         linkConfig.RequiredForOnline = "no";
       };
 
     };
   };
-
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
@@ -159,7 +176,7 @@
 
     # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
     # Enable this if you have graphical corruption issues or application crashes after waking
-    # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead 
+    # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead
     # of just the bare essentials.
     powerManagement.enable = true;
 
@@ -169,9 +186,9 @@
 
     # Use the NVidia open source kernel module (not to be confused with the
     # independent third-party "nouveau" open source driver).
-    # Support is limited to the Turing and later architectures. Full list of 
-    # supported GPUs is at: 
-    # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus 
+    # Support is limited to the Turing and later architectures. Full list of
+    # supported GPUs is at:
+    # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
     # Only available from driver 515.43.04+
     # Currently alpha-quality/buggy, so false is currently the recommended setting.
     open = false;
@@ -193,7 +210,13 @@
   users.users.lkshrsch = {
     isNormalUser = true;
     home = "/home/lkshrsch";
-    extraGroups = [ "wheel" "docker" "video" "games" ];
+    shell = pkgs.zsh;
+    extraGroups = [
+      "wheel"
+      "docker"
+      "video"
+      "games"
+    ];
   };
 
   # https://discourse.nixos.org/t/how-to-automatically-mount-external-hard-drive/15563
@@ -266,4 +289,3 @@
     stateVersion = "24.11"; # Did you read the comment?
   };
 }
-

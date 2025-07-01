@@ -1,6 +1,6 @@
 { ... }:
 {
-  services.dunst = {
+  services.hyprpolkitagent = {
     enable = true;
   };
 }

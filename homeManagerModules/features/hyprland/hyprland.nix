@@ -12,9 +12,10 @@
 
   wayland.windowManager.hyprland = {
     enable = true; # enable Hyprland
-    systemd.enable = true;
+    systemd.enable = false;
     # set the flake package
-    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+    package = null; # use the NixOS package
+    portalPackage = null; # use the NixOS package
     plugins = with inputs.hyprland-plugins.packages.${pkgs.system}; [
       hyprexpo
     ];
@@ -50,9 +51,26 @@
         kb_options = "grp:alt_shift_toggle";
 
         follow_mouse = 1;
-
-        sensitivity = 0; # -1.0 to 1.0, 0 means no modification.
         force_no_accel = 1;
+
+        touchpad = {
+          natural_scroll = true;
+          scroll_factor = 0.5;
+          tap-to-click = false;
+          clickfinger_behavior = true;
+        };
+      };
+
+      device = {
+        name = "apple-inc.-magic-trackpad";
+        sensitivity = -1.0;
+      };
+
+      gestures = {
+        workspace_swipe = true;
+        workspace_swipe_min_fingers = true;
+        workspace_swipe_distance = 200;
+        workspace_swipe_min_speed_to_force = 20;
       };
 
       cursor = {
@@ -87,6 +105,19 @@
         preserve_split = "yes"; # you probably want this
       };
 
+      # define workspaces
+      workspace = [
+        "1, monitor:DP-3, default:true"
+        "2, monitor:DP-3"
+        "3, monitor:DP-3"
+        "4, monitor:DP-3"
+        "5, monitor:DP-3"
+        "6, monitor:DP-3"
+        "7, monitor:DP-2, default:true"
+        "8, monitor:DP-2"
+        "9, monitor:DP-2"
+      ];
+
       bind =
         [
           "$mod, T, exec, $terminal"
@@ -95,6 +126,7 @@
           "$mod, SPACE, exec, $menu -show drun"
           "$mod, Q, killactive"
           "$mod CTRL, Q, exec, uwsm app -- hyprlock"
+          "$mod CTRL, F, fullscreen,"
           "$mod SHIFT, F, togglefloating,"
           "$mod, P, pseudo," # dwindle
           "$mod, J, togglesplit," # dwindle

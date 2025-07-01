@@ -9,6 +9,7 @@ let
     "com.spotify.Client"
     "org.videolan.VLC"
     "org.kde.okular" # PDF viewer
+    "org.signal.Signal"
   ];
 in
 {

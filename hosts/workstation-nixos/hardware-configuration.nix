@@ -30,10 +30,13 @@
       kernelModules = [ ];
     };
 
-    kernelModules = [ "kvm-amd" ];
+    kernelModules = [
+      "kvm-amd"
+    ];
     blacklistedKernelModules = [ ];
 
     kernelParams = [
+      "acpi_enforce_resources=lax"
       "pcie_aspm=force"
       "amd_pstate=guided"
       "nvidia_drm.modeset=1"

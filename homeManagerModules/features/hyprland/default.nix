@@ -1,5 +1,5 @@
-{ ... }: {
-
+{ ... }:
+{
   imports = [
     ./cliphist.nix
     ./dunst.nix
@@ -7,6 +7,7 @@
     ./hyprland.nix
     ./hyprlock.nix
     ./hyprpaper.nix
+    ./hyprpolkitagent.nix
     ./rofi.nix
     ./waybar.nix
   ];

@@ -10,6 +10,8 @@
     ./cliPrograms/git.nix
     ./cliPrograms/gpg.nix
     ./cliPrograms/ssh.nix
+    ./cliPrograms/starship.nix
+    ./cliPrograms/tmux.nix
     ./cliPrograms/zsh.nix
 
     ./files/uwsm-env.nix

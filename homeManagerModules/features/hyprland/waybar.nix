@@ -198,8 +198,7 @@ in
     enable = true;
     systemd = {
       enable = true;
-      target = "hyprland-session.target";
-      # systemd.target = "wayland-session@hyprland-uwsm.desktop.target";
+      target = "graphical-session.target";
     };
     style = css;
     settings = {
@@ -208,9 +207,3 @@ in
     };
   };
 }
-
-
-
-
-
-
