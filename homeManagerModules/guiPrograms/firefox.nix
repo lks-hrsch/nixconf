@@ -1,4 +1,5 @@
-{ pkgs, firefox-addons-allow-unfree, ... }: {
+{ pkgs, firefox-addons-allow-unfree, ... }:
+{
   programs.firefox = {
     enable = true;
 
@@ -86,11 +87,13 @@
         "privacy.trackingprotection.enabled" = true;
         "dom.security.https_only_mode" = true;
       };
-      extensions = with firefox-addons-allow-unfree; [
-        ublock-origin
-        youtube-shorts-block
-        onepassword-password-manager
-      ];
+      extensions = {
+        packages = with firefox-addons-allow-unfree; [
+          ublock-origin
+          youtube-shorts-block
+          onepassword-password-manager
+        ];
+      };
     };
   };
 }

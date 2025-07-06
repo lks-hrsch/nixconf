@@ -65,7 +65,7 @@ in
 
     fonts = {
       monospace = {
-        package = pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; };
+        package = pkgs.nerd-fonts.jetbrains-mono;
         name = "JetBrainsMono Nerd Font Mono";
       };
       sansSerif = {
@@ -86,6 +86,9 @@ in
     cursor.package = pkgs.bibata-cursors;
 
     targets = {
+      mako = {
+        enable = false; # lkshrsch profile: The option definition `services.mako.extraConfig' in `/nix/store/hfig46d452pr4i0g5ks17571z38cs1il-source/modules/mako/hm.nix' no longer has any effect; please remove it. Use services.mako.settings instead.
+      };
       waybar = {
         addCss = false;
       };

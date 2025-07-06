@@ -1,4 +1,7 @@
-{ ... }: {
+{ ... }:
+{
+  accounts = import ../../secrets/accounts.nix;
+
   programs.thunderbird = {
     enable = true;
     profiles.lkshrsch = {
@@ -7,6 +10,7 @@
     };
     settings = {
       "privacy.donottrackheader.enabled" = true;
+      "mailnews.start_page.enabled" = false;
     };
   };
 }
