@@ -31,7 +31,7 @@ let
   };
 
   custom_nixos_menu = {
-    format = "<span font='18'></span>";
+    format = "";
     on-click = "rofi -show drun";
     on-click-right = "~/.config/rofi/power-menu/power-menu.sh";
   };
@@ -43,9 +43,7 @@ let
   mainWaybarConfig = {
     layer = "top"; # Waybar at top layer
     position = "top"; # Waybar position (top|bottom|left|right)
-    margin = "6";
-    height = 34; # Waybar height (to be removed for auto height)
-    spacing = "6"; # Gaps between modules
+    margin = "4";
     # Choose the order of the modules
     output = "DP-3";
     reload_style_on_change = true;
@@ -131,9 +129,7 @@ let
   auxilliaryWaybarConfig = {
     layer = "top"; # Waybar at top layer
     position = "top"; # Waybar position (top|bottom|left|right)
-    margin = "6";
-    height = 34; # Waybar height (to be removed for auto height)
-    spacing = "6"; # Gaps between modules
+    margin = "4";
     # Choose the order of the modules
     output = "!DP-3";
     reload_style_on_change = true;
@@ -155,17 +151,24 @@ let
   css = ''
     * {
         background-color: transparent;
-        color: black;
+        color: rgba(205, 214, 244, 1);
+        border-radius: 10px;
     }
 
     tooltip,
     menu {
-        background-color: rgba(255, 255, 255, 0.7);
-        padding: 14px;
-        border-radius: 34px;
+        background-color: rgba(24, 24, 37, 1);
     }
 
-    #custom-nixos-menu,
+    #custom-nixos-menu {
+        font-size: 18px;
+        background-color: rgba(24, 24, 37, 1);
+        padding-left: 10px;
+        padding-right: 17px;
+        margin-left: 1px;
+        margin-right: 1px;
+    }
+
     #workspaces,
     #taskbar,
     #window,
@@ -180,15 +183,15 @@ let
     #memory,
     #language,
     #clock {
-        background-color: rgba(255, 255, 255, 0.8);
-        padding-left: 14px;
-        padding-right: 14px;
-        border-radius: 34px;
+        background-color: rgba(24, 24, 37, 1);
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-left: 1px;
+        margin-right: 1px;
     }
 
     #workspaces button.active {
-        background-color: rgba(200, 200, 200, 0.8);
-        border-radius: 34px;
+        background-color: rgba(49, 50, 68, 1);
         font-weight: bolder;
     }
   '';

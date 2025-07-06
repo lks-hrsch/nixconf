@@ -43,6 +43,7 @@
 
       windowrule = [
         "pseudo, class:fcitx, title:fcitx"
+        "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0" # Prevents focus on empty XWayland windows
         "suppressevent maximize, class:.*" # You'll probably like this.
       ];
 
@@ -50,12 +51,11 @@
         kb_layout = "gb";
         kb_options = "grp:alt_shift_toggle";
 
-        follow_mouse = 1;
-        force_no_accel = 1;
+        accel_profile = "flat";
 
         touchpad = {
           natural_scroll = true;
-          scroll_factor = 0.5;
+          scroll_factor = 0.8;
           tap-to-click = false;
           clickfinger_behavior = true;
         };
@@ -63,14 +63,11 @@
 
       device = {
         name = "apple-inc.-magic-trackpad";
-        sensitivity = -1.0;
       };
 
       gestures = {
         workspace_swipe = true;
         workspace_swipe_min_fingers = true;
-        workspace_swipe_distance = 200;
-        workspace_swipe_min_speed_to_force = 20;
       };
 
       cursor = {
@@ -78,24 +75,14 @@
       };
 
       general = {
-        gaps_in = 5;
-        gaps_out = 5;
-        border_size = 2;
-        # col.active_border = "rgba(ffffffcc)";  # White color for active border
-        # col.inactive_border = "rgba(000000cc)";  # Black color for inactive border
-
-        layout = "dwindle";
+        gaps_in = 2;
+        gaps_out = "2, 4, 4, 4";
       };
 
       decoration = {
         rounding = 10;
 
         blur = {
-          enabled = true;
-          size = 3;
-        };
-
-        shadow = {
           enabled = true;
         };
       };
