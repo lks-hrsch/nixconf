@@ -31,6 +31,10 @@
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -40,6 +44,7 @@
       home-manager,
       stylix,
       firefox-addons,
+      sops-nix,
       ...
     }@inputs:
     {
@@ -68,12 +73,16 @@
           specialArgs = { inherit inputs; };
           modules = [
             ./hosts/workstation-nixos/configuration.nix
+            sops-nix.nixosModules.sops
 
             # make home-manager as a module of nixos
             # so that home-manager configuration will be deployed automatically when executing `nixos-rebuild switch`
             home-manager.nixosModules.home-manager
             {
               home-manager = {
+                sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                ];
                 extraSpecialArgs = {
                   inherit inputs nixPkgs;
                   firefox-addons-allow-unfree = nixPkgs.callPackage firefox-addons { };

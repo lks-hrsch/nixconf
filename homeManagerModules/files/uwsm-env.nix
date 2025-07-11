@@ -5,7 +5,6 @@
     target = ".config/uwsm/env";
     text = ''
       ##### General UI / toolkit ###############################################
-      export EDITOR="alacritty"
       # export NIXOS_OZONE_WL="1"
       # export AQ_DRM_DEVICES="/dev/dri/card0:/dev/dri/card1"
       export GRIMBLAST_HIDE_CURSOR=0

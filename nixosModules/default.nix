@@ -4,6 +4,7 @@
   imports = [
     ./features/hyprland.nix
     ./features/internationalisation.nix
+    ./features/sops.nix
 
     ./programs/1password.nix
     ./programs/dconf.nix

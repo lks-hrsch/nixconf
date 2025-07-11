@@ -1,7 +1,18 @@
-{ lib, pkgs, ... }: {
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
+{
   programs.git = {
     enable = true;
     lfs.enable = true;
+    includes = [
+      {
+        path = "${config.sops.secrets."git/user-lks-hrsch".path}";
+      }
+    ];
     extraConfig = {
       gpg = {
         format = "ssh";
@@ -12,8 +23,6 @@
       commit = {
         gpgsign = true;
       };
-
-      user = import ../../secrets/git-user.nix;
     };
   };
 }

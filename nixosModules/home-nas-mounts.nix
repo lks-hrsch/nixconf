@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   ip = "192.168.1.11";
   automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s,x-systemd.requires=network-online.target,x-systemd.after=network-online.target";
@@ -15,7 +15,7 @@ in
     device = "//${ip}/backup";
     fsType = "cifs";
     options = [
-      "${automount_opts},credentials=/etc/nixos/secrets/smb-credentials-mars,uid=1000,gid=100"
+      "${automount_opts},credentials=${config.sops.secrets."smb-credentials-mars".path},uid=1000,gid=100"
     ];
   };
 
@@ -23,7 +23,7 @@ in
     device = "//${ip}/benchmark";
     fsType = "cifs";
     options = [
-      "${automount_opts},credentials=/etc/nixos/secrets/smb-credentials-mars,uid=1000,gid=100"
+      "${automount_opts},credentials=${config.sops.secrets."smb-credentials-mars".path},uid=1000,gid=100"
     ];
   };
 
@@ -31,7 +31,7 @@ in
     device = "//${ip}/lkshrsch";
     fsType = "cifs";
     options = [
-      "${automount_opts},credentials=/etc/nixos/secrets/smb-credentials-mars,uid=1000,gid=100"
+      "${automount_opts},credentials=${config.sops.secrets."smb-credentials-mars".path},uid=1000,gid=100"
     ];
   };
 
@@ -39,7 +39,7 @@ in
     device = "//${ip}/media";
     fsType = "cifs";
     options = [
-      "${automount_opts},credentials=/etc/nixos/secrets/smb-credentials-mars,uid=1000,gid=100"
+      "${automount_opts},credentials=${config.sops.secrets."smb-credentials-mars".path},uid=1000,gid=100"
     ];
   };
 
@@ -47,7 +47,7 @@ in
     device = "//${ip}/photos";
     fsType = "cifs";
     options = [
-      "${automount_opts},credentials=/etc/nixos/secrets/smb-credentials-mars,uid=1000,gid=100"
+      "${automount_opts},credentials=${config.sops.secrets."smb-credentials-mars".path},uid=1000,gid=100"
     ];
   };
 
@@ -55,7 +55,7 @@ in
     device = "//${ip}/university";
     fsType = "cifs";
     options = [
-      "${automount_opts},credentials=/etc/nixos/secrets/smb-credentials-mars,uid=1000,gid=100"
+      "${automount_opts},credentials=${config.sops.secrets."smb-credentials-mars".path},uid=1000,gid=100"
     ];
   };
 }

@@ -1,7 +1,9 @@
-{ ... }:
+{ config, ... }:
 {
   programs.ssh = {
     enable = true;
-    extraConfig = builtins.readFile ../../secrets/ssh-extraConfig;
+    includes = [
+      "${config.sops.secrets."ssh-extra-config".path}"
+    ];
   };
 }

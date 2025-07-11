@@ -3,6 +3,7 @@
 
   imports = [
     ./features/hyprland
+    ./features/sops.nix
     ./features/stylix.nix
     ./features/xdg.nix
 
@@ -12,6 +13,7 @@
     ./cliPrograms/ssh.nix
     ./cliPrograms/starship.nix
     ./cliPrograms/tmux.nix
+    ./cliPrograms/vim.nix
     ./cliPrograms/zsh.nix
 
     ./files/uwsm-env.nix

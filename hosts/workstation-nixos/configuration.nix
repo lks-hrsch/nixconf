@@ -73,19 +73,19 @@
         };
 
         wireguardConfig = {
-          PrivateKeyFile = "/etc/nixos/secrets/wg0-private.key";
+          PrivateKeyFile = config.sops.secrets."wg0/private-key".path;
         };
 
         wireguardPeers = [
           {
             PublicKey = "eTYFEILoUH8pbFVU9WJpzdNGTPm4eLiDAQXmyO1M7wE=";
-            PresharedKeyFile = "/etc/nixos/secrets/wg0-preshared.key";
+            PresharedKeyFile = config.sops.secrets."wg0/preshared-key".path;
             AllowedIPs = [ "10.10.1.1/32" ];
             Endpoint = "mercury.lukashirsch.de:51821";
           }
           {
             PublicKey = "65mINKiTOCgTIiGCSk5YpbSFdryFEnTrr9vGcHEL5yI=";
-            PresharedKeyFile = "/etc/nixos/secrets/wg0-preshared.key";
+            PresharedKeyFile = config.sops.secrets."wg0/preshared-key".path;
             AllowedIPs = [ "10.10.1.3/32" ];
             Endpoint = "earth.staudenstuebler.de:51821";
           }
@@ -245,6 +245,10 @@
     ffmpeg_6-full
     gnugrep
     dig
+
+    # for decryption and encryption of secrets
+    sops
+    age
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
