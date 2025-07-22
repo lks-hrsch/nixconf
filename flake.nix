@@ -48,59 +48,157 @@
       ...
     }@inputs:
     {
-      nixosConfigurations."workstation-nixos" =
-        let
-          system = "x86_64-linux";
-          nixPkgs = import nixpkgs {
-            inherit system;
-            config = {
-              allowUnfree = true;
-              cudaSupport = true;
-              rocmSupport = true;
+      nixosConfigurations = {
+        "workstation-nixos" =
+          let
+            system = "x86_64-linux";
+            nixPkgs = import nixpkgs {
+              inherit system;
+              config = {
+                allowUnfree = true;
+                cudaSupport = true;
+                rocmSupport = true;
+              };
+              overlays = [
+                (final: prev: {
+                  unstable = import nixpkgs-unstable {
+                    system = prev.system;
+                    config = prev.config;
+                  };
+                })
+              ];
             };
-            overlays = [
-              (final: prev: {
-                unstable = import nixpkgs-unstable {
-                  system = prev.system;
-                  config = prev.config;
+          in
+          nixpkgs.lib.nixosSystem {
+            pkgs = nixPkgs;
+            specialArgs = { inherit inputs; };
+            modules = [
+              ./hosts/workstation-nixos/configuration.nix
+              sops-nix.nixosModules.sops
+
+              # make home-manager as a module of nixos
+              # so that home-manager configuration will be deployed automatically when executing `nixos-rebuild switch`
+              home-manager.nixosModules.home-manager
+              {
+                home-manager = {
+                  sharedModules = [
+                    sops-nix.homeManagerModules.sops
+                  ];
+                  extraSpecialArgs = {
+                    inherit inputs nixPkgs;
+                    firefox-addons-allow-unfree = nixPkgs.callPackage firefox-addons { };
+                  };
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  backupFileExtension = ".backup";
+                  users.lkshrsch = {
+                    imports = [
+                      stylix.homeManagerModules.stylix
+                      ./hosts/workstation-nixos/home.nix
+
+                    ];
+                  };
                 };
-              })
+              }
             ];
           };
-        in
-        nixpkgs.lib.nixosSystem {
-          pkgs = nixPkgs;
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./hosts/workstation-nixos/configuration.nix
-            sops-nix.nixosModules.sops
 
-            # make home-manager as a module of nixos
-            # so that home-manager configuration will be deployed automatically when executing `nixos-rebuild switch`
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                sharedModules = [
-                  sops-nix.homeManagerModules.sops
-                ];
-                extraSpecialArgs = {
-                  inherit inputs nixPkgs;
-                  firefox-addons-allow-unfree = nixPkgs.callPackage firefox-addons { };
-                };
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                backupFileExtension = ".backup";
-                users.lkshrsch = {
-                  imports = [
-                    stylix.homeManagerModules.stylix
-                    ./hosts/workstation-nixos/home.nix
+        "phobos" =
+          let
+            system = "x86_64-linux";
+            nixPkgs = import nixpkgs {
+              inherit system;
+              overlays = [
+                (final: prev: {
+                  unstable = import nixpkgs-unstable {
+                    system = prev.system;
+                    config = prev.config;
+                  };
+                })
+              ];
+            };
+          in
+          nixpkgs.lib.nixosSystem {
+            pkgs = nixPkgs;
+            specialArgs = { inherit inputs; };
+            modules = [
+              ./hosts/mars/phobos/configuration.nix
+              sops-nix.nixosModules.sops
+            ];
+          };
 
-                  ];
-                };
-              };
-            }
-          ];
-        };
+        "deimos" =
+          let
+            system = "x86_64-linux";
+            nixPkgs = import nixpkgs {
+              inherit system;
+              overlays = [
+                (final: prev: {
+                  unstable = import nixpkgs-unstable {
+                    system = prev.system;
+                    config = prev.config;
+                  };
+                })
+              ];
+            };
+          in
+          nixpkgs.lib.nixosSystem {
+            pkgs = nixPkgs;
+            specialArgs = { inherit inputs; };
+            modules = [
+              ./hosts/mars/deimos/configuration.nix
+              sops-nix.nixosModules.sops
+            ];
+          };
+
+        "curiosity" =
+          let
+            system = "x86_64-linux";
+            nixPkgs = import nixpkgs {
+              inherit system;
+              overlays = [
+                (final: prev: {
+                  unstable = import nixpkgs-unstable {
+                    system = prev.system;
+                    config = prev.config;
+                  };
+                })
+              ];
+            };
+          in
+          nixpkgs.lib.nixosSystem {
+            pkgs = nixPkgs;
+            specialArgs = { inherit inputs; };
+            modules = [
+              ./hosts/mars/curiosity/configuration.nix
+              sops-nix.nixosModules.sops
+            ];
+          };
+
+        "opportunity" =
+          let
+            system = "x86_64-linux";
+            nixPkgs = import nixpkgs {
+              inherit system;
+              overlays = [
+                (final: prev: {
+                  unstable = import nixpkgs-unstable {
+                    system = prev.system;
+                    config = prev.config;
+                  };
+                })
+              ];
+            };
+          in
+          nixpkgs.lib.nixosSystem {
+            pkgs = nixPkgs;
+            specialArgs = { inherit inputs; };
+            modules = [
+              ./hosts/mars/opportunity/configuration.nix
+              sops-nix.nixosModules.sops
+            ];
+          };
+      };
 
       nixosModules.default = ./nixosModules;
       homeManagerModules.default = ./homeManagerModules;
