@@ -1,3 +1,10 @@
-{ ... }: {
-  programs.xwayland.enable = true;
+{
+  lib,
+  config,
+  ...
+}:
+{
+  config = lib.mkIf config.features.desktop.enable {
+    programs.xwayland.enable = true;
+  };
 }

@@ -1,27 +1,20 @@
-{ ... }:
+{ lib, ... }:
 {
+  options.features = {
+    desktop.enable = lib.mkEnableOption "desktop environment";
+    gaming.enable = lib.mkEnableOption "gaming features";
+
+    zfs.enable = lib.mkEnableOption "ZFS support";
+    nas.enable = lib.mkEnableOption "Network Attached Storage (NAS) support";
+  };
 
   imports = [
-    ./features/hyprland.nix
-    ./features/internationalisation.nix
-    ./features/sops.nix
-
-    ./programs/1password.nix
-    ./programs/dconf.nix
-    ./programs/steam.nix
-    ./programs/tmux.nix
-    ./programs/xwayland.nix
-    ./programs/zsh.nix
-
-    ./services/avahi.nix
-    ./services/flatpak.nix
-    ./services/openssh.nix
-    ./services/pipewire.nix
-    ./services/zfs.nix
-    ./services/syncthing.nix
-    ./services/xserver.nix
+    ./features
+    ./programs
+    ./services
 
     ./home-nas-mounts.nix
+    ./users.nix
   ];
 
 }

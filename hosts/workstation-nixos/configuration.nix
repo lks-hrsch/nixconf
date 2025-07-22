@@ -10,35 +10,6 @@
 }:
 
 {
-  # Nix settings
-  nix = {
-    extraOptions = "experimental-features = nix-command flakes";
-    gc = {
-      automatic = true; # Automatically run garbage collection
-      dates = "weekly"; # Run garbage collection weekly
-      options = "--delete-older-than 21d";
-    };
-    optimise = {
-      automatic = true;
-    };
-    settings = {
-      trusted-users = [
-        "root"
-        "lkshrsch"
-      ];
-      substituters = [
-        "https://cache.nixos.org/"
-        "https://nix-community.cachix.org"
-        "https://hyprland.cachix.org"
-      ];
-      trusted-public-keys = [
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-      ];
-    };
-  };
-
   imports = [
     inputs.self.outputs.nixosModules.default
 
@@ -46,9 +17,18 @@
     ./hardware-configuration.nix
   ];
 
+  features = {
+    desktop.enable = true; # Enable desktop features.
+    gaming.enable = true; # Enable gaming features.
+    zfs.enable = true; # Enable ZFS support.
+    nas.enable = true; # Enable NAS features.
+  };
+
   # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader = {
+    systemd-boot.enable = true;
+    efi.canTouchEfiVariables = true;
+  };
 
   networking = {
     hostName = "workstation-nixos"; # Define your hostname.
@@ -121,9 +101,6 @@
 
     };
   };
-
-  # Set your time zone.
-  time.timeZone = "Europe/Berlin";
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -204,21 +181,6 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.groups.games = { }; # Declare the "games" group.
-
-  users.users.lkshrsch = {
-    isNormalUser = true;
-    home = "/home/lkshrsch";
-    shell = pkgs.zsh;
-    extraGroups = [
-      "wheel"
-      "docker"
-      "video"
-      "games"
-    ];
-  };
-
   # https://discourse.nixos.org/t/how-to-automatically-mount-external-hard-drive/15563
   # https://www.reddit.com/r/NixOS/comments/185f0x4/how_to_mount_a_usb_drive/
   services.devmon.enable = true;
@@ -245,10 +207,6 @@
     ffmpeg_6-full
     gnugrep
     dig
-
-    # for decryption and encryption of secrets
-    sops
-    age
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
