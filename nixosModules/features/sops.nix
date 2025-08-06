@@ -12,7 +12,7 @@
   ];
 
   sops = {
-    age.keyFile = "/home/lkshrsch/.config/sops/age/keys.txt";
+    age.keyFile = "/etc/sops/age/keys.txt";
     defaultSopsFile = ../../secrets/secrets.yaml;
     defaultSopsFormat = "yaml";
 

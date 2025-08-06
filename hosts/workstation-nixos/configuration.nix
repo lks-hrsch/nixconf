@@ -18,10 +18,11 @@
   ];
 
   features = {
-    desktop.enable = true; # Enable desktop features.
-    gaming.enable = true; # Enable gaming features.
-    zfs.enable = true; # Enable ZFS support.
-    nas.enable = true; # Enable NAS features.
+    desktop.enable = true;
+    gaming.enable = true;
+    virtualisation.podman.enable = true;
+    zfs.enable = true;
+    nas.enable = true;
   };
 
   # Use the systemd-boot EFI boot loader.
@@ -122,15 +123,6 @@
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
-  # docker
-  # https://nixos.wiki/wiki/Docker#GPU_Pass-through_.28Nvidia.29
-  virtualisation = {
-    docker = {
-      enable = true;
-      storageDriver = "zfs";
-      daemon.settings.data-root = "/shared/docker";
-    };
-  };
   hardware.nvidia-container-toolkit.enable = true;
 
   # Enable OpenGL

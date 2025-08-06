@@ -35,6 +35,10 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    quadlet-nix = {
+      url = "github:SEIAROTg/quadlet-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -45,6 +49,7 @@
       stylix,
       firefox-addons,
       sops-nix,
+      quadlet-nix,
       ...
     }@inputs:
     {
@@ -148,6 +153,7 @@
             modules = [
               ./hosts/mars/deimos/configuration.nix
               sops-nix.nixosModules.sops
+              quadlet-nix.nixosModules.quadlet
             ];
           };
 

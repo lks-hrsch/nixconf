@@ -39,12 +39,7 @@
       ninja
       clang
       clang-tools
-      gdb
-      (opencv.override {
-        enableGtk3 = true;
-        enableFfmpeg = true;
-        enableGStreamer = true;
-      })
+
       # cudatoolkit
       linuxPackages.nvidia_x11
 

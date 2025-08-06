@@ -71,11 +71,6 @@
     fsType = "zfs";
   };
 
-  fileSystems."/shared/docker" = {
-    device = "zroot/shared/docker";
-    fsType = "zfs";
-  };
-
   fileSystems."/nix" = {
     device = "zroot/local/nix";
     fsType = "zfs";
