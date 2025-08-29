@@ -17,11 +17,22 @@
     "${modulesPath}/virtualisation/lxc-container.nix"
   ];
 
+  # Install LDAP and Kerberos management tools
+  environment.systemPackages = with pkgs; [
+    openldap # LDAP client tools (ldapsearch, ldapadd, etc.)
+    krb5 # Kerberos client tools
+    ldapvi # LDAP editor
+  ];
+
+
   networking = {
     hostName = "phobos";
     dhcpcd.enable = false;
     useDHCP = false;
     useHostResolvConf = false;
+    firewall = {
+      enable = true;
+    };
   };
 
   systemd.network = {

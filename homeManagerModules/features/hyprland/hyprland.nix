@@ -16,10 +16,6 @@
     # set the flake package
     package = null; # use the NixOS package
     portalPackage = null; # use the NixOS package
-    plugins = with inputs.hyprland-plugins.packages.${pkgs.system}; [
-      hyprexpo
-    ];
-
     settings = {
       "$terminal" = "uwsm app -- alacritty";
       "$fileManager" = "uwsm app -- nautilus";
@@ -37,8 +33,8 @@
       ];
 
       monitor = [
-        "DP-3,highrr,auto,1,vrr,1"
-        "DP-2,highrr,auto-left,1,transform,1,vrr,1"
+        "DP-3,highrr,auto,1,cm,hdr,sdrbrightness,1.4,sdrsaturation,1,vrr,2"
+        "DP-2,highres,auto-left,1,transform,1,cm,hdr,sdrbrightness,1.2,sdrsaturation,1,vrr,2"
       ];
 
       windowrule = [
@@ -65,10 +61,11 @@
         name = "apple-inc.-magic-trackpad";
       };
 
-      gestures = {
-        workspace_swipe = true;
-        workspace_swipe_min_fingers = true;
-      };
+      gesture = [
+        "3, horizontal, workspace"
+        "4, horizontal, workspace"
+        "5, horizontal, workspace"
+      ];
 
       cursor = {
         no_hardware_cursors = true;
@@ -105,65 +102,51 @@
         "9, monitor:DP-2"
       ];
 
-      bind =
-        [
-          "$mod, T, exec, $terminal"
-          "$mod, E, exec, $fileManager"
-          "$mod, F, exec, uwsm app -- firefox"
-          "$mod, SPACE, exec, $menu -show drun"
-          "$mod, Q, killactive"
-          "$mod CTRL, Q, exec, uwsm app -- hyprlock"
-          "$mod CTRL, F, fullscreen,"
-          "$mod SHIFT, F, togglefloating,"
-          "$mod, P, pseudo," # dwindle
-          "$mod, J, togglesplit," # dwindle
+      bind = [
+        "$mod, T, exec, $terminal"
+        "$mod, E, exec, $fileManager"
+        "$mod, F, exec, uwsm app -- firefox"
+        "$mod, SPACE, exec, $menu -show drun"
+        "$mod, Q, killactive"
+        "$mod CTRL, Q, exec, uwsm app -- hyprlock"
+        "$mod CTRL, F, fullscreen,"
+        "$mod SHIFT, F, togglefloating,"
+        "$mod, P, pseudo," # dwindle
+        "$mod, J, togglesplit," # dwindle
 
-          # cliphist
-          "$mod ALT, C, exec, cliphist list | $menu -dmenu | cliphist decode | wl-copy"
+        # cliphist
+        "$mod ALT, C, exec, cliphist list | $menu -dmenu | cliphist decode | wl-copy"
 
-          # hyprexpo
-          # "$mod, grave, hyprexpo:expo, toggle"
-          ", F3, hyprexpo:expo, toggle"
-          "CTRL, up, hyprexpo:expo, toggle"
+        # grimblast
+        "$mod SHIFT, 3, exec, grimblast --notify copysave active"
+        "$mod SHIFT, 4, exec, grimblast --notify copysave area"
+        "$mod SHIFT, 5, exec, grimblast --notify copysave output"
 
-          # grimblast
-          "$mod SHIFT, 3, exec, grimblast --notify copysave active"
-          "$mod SHIFT, 4, exec, grimblast --notify copysave area"
-          "$mod SHIFT, 5, exec, grimblast --notify copysave output"
-
-          # workspaces
-          "CTRL, left, workspace, m-1"
-          "CTRL, right, workspace, m+1"
-        ]
-        ++ (
-          # workspaces
-          # binds $mod + [shift +] {1..9} to [move to] workspace {1..9}
-          builtins.concatLists (
-            builtins.genList (
-              i:
-              let
-                ws = i + 1;
-              in
-              [
-                "CTRL, code:1${toString i}, workspace, ${toString ws}"
-                "CTRL SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
-              ]
-            ) 9
-          )
-        );
+        # workspaces
+        "CTRL, left, workspace, m-1"
+        "CTRL, right, workspace, m+1"
+      ]
+      ++ (
+        # workspaces
+        # binds $mod + [shift +] {1..9} to [move to] workspace {1..9}
+        builtins.concatLists (
+          builtins.genList (
+            i:
+            let
+              ws = i + 1;
+            in
+            [
+              "CTRL, code:1${toString i}, workspace, ${toString ws}"
+              "CTRL SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
+            ]
+          ) 9
+        )
+      );
 
       bindm = [
         "$mod, mouse:272, movewindow"
         "$mod, mouse:273, resizewindow"
       ];
-
-      plugin = {
-        hyprexpo = {
-          columns = 3;
-          gap_size = 5;
-          workspace_method = "center current";
-        };
-      };
     };
   };
 }

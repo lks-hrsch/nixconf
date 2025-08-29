@@ -3,13 +3,12 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
     groups = {
+      video = { };
+      render = { };
       apps = {
-        # Declare the "apps" group.
         gid = 568;
       };
-      games = {
-        # Declare the "games" group.
-      };
+      games = { };
     };
 
     users = {

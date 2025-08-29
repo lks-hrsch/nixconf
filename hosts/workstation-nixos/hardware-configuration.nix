@@ -37,11 +37,9 @@
 
     kernelParams = [
       "acpi_enforce_resources=lax"
-      "pcie_aspm=force"
       "amd_pstate=guided"
       "nvidia_drm.modeset=1"
       "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-      "nvidia.NVreg_DynamicPowerManagement=0x02"
       "zfs.zfs_arc_max=4294967296" # 4 GiB https://nixos.wiki/wiki/ZFS
       "zfs.zfs_prefetch_disable=1"
     ];
