@@ -23,6 +23,31 @@
     virtualisation.podman.enable = true;
     zfs.enable = true;
     nas.enable = true;
+    wireguard = {
+      enable = true;
+      address = "10.10.1.65/24";
+      dns = [
+        "10.10.1.1"
+        "10.10.1.3"
+      ];
+      peers = [
+        {
+          publicKey = "eTYFEILoUH8pbFVU9WJpzdNGTPm4eLiDAQXmyO1M7wE=";
+          allowedIPs = [
+            "10.10.1.1/32"
+            "10.10.1.4/32"
+            "10.10.1.17/32"
+            "10.10.1.18/32"
+          ];
+          endpoint = "mercury.lukashirsch.de:51821";
+        }
+        {
+          publicKey = "65mINKiTOCgTIiGCSk5YpbSFdryFEnTrr9vGcHEL5yI=";
+          allowedIPs = [ "10.10.1.3/32" ];
+          endpoint = "earth.staudenstuebler.de:51821";
+        }
+      ];
+    };
   };
 
   # Use the systemd-boot EFI boot loader.
@@ -45,34 +70,6 @@
 
   systemd.network = {
     enable = true;
-    netdevs = {
-      "30-wg0" = {
-        netdevConfig = {
-          Kind = "wireguard";
-          Name = "wg0";
-          MTUBytes = "1420";
-        };
-
-        wireguardConfig = {
-          PrivateKeyFile = config.sops.secrets."wg0/private-key".path;
-        };
-
-        wireguardPeers = [
-          {
-            PublicKey = "eTYFEILoUH8pbFVU9WJpzdNGTPm4eLiDAQXmyO1M7wE=";
-            PresharedKeyFile = config.sops.secrets."wg0/preshared-key".path;
-            AllowedIPs = [ "10.10.1.1/32" ];
-            Endpoint = "mercury.lukashirsch.de:51821";
-          }
-          {
-            PublicKey = "65mINKiTOCgTIiGCSk5YpbSFdryFEnTrr9vGcHEL5yI=";
-            PresharedKeyFile = config.sops.secrets."wg0/preshared-key".path;
-            AllowedIPs = [ "10.10.1.3/32" ];
-            Endpoint = "earth.staudenstuebler.de:51821";
-          }
-        ];
-      };
-    };
     networks = {
       "10-lan" = {
         matchConfig.Name = "enp10s0";
@@ -87,19 +84,6 @@
       #   };
       #   linkConfig.RequiredForOnline = "no";
       # };
-      "30-wg0" = {
-        matchConfig.Name = "wg0";
-        address = [
-          "10.10.1.65/24"
-        ];
-        DHCP = "no";
-        dns = [
-          "10.10.1.1"
-          "10.10.1.3"
-        ];
-        linkConfig.RequiredForOnline = "no";
-      };
-
     };
   };
 

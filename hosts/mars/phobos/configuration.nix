@@ -17,6 +17,32 @@
     "${modulesPath}/virtualisation/lxc-container.nix"
   ];
 
+  features.wireguard = {
+    enable = true;
+    address = "10.10.1.17/24";
+    dns = [
+      "10.10.1.1"
+      "10.10.1.3"
+    ];
+    peers = [
+      {
+        publicKey = "eTYFEILoUH8pbFVU9WJpzdNGTPm4eLiDAQXmyO1M7wE=";
+        allowedIPs = [
+          "10.10.1.1/32"
+          "10.10.1.64/30"
+        ];
+        endpoint = "mercury.lukashirsch.de:51821";
+        persistentKeepalive = 25;
+      }
+      {
+        publicKey = "65mINKiTOCgTIiGCSk5YpbSFdryFEnTrr9vGcHEL5yI=";
+        allowedIPs = [ "10.10.1.3/32" ];
+        endpoint = "earth.staudenstuebler.de:51821";
+        persistentKeepalive = 25;
+      }
+    ];
+  };
+
   # Install LDAP and Kerberos management tools
   environment.systemPackages = with pkgs; [
     openldap # LDAP client tools (ldapsearch, ldapadd, etc.)
@@ -24,6 +50,64 @@
     ldapvi # LDAP editor
   ];
 
+  # LDAP Server (OpenLDAP)
+  services.openldap = {
+    enable = true;
+    urlList = [ "ldap:///" ];
+
+    settings = {
+      attrs = {
+        olcLogLevel = "conns config";
+        olcPidFile = "/run/openldap/slapd.pid";
+      };
+      children = {
+        "cn=schema" = {
+          includes = [
+            "${pkgs.openldap}/etc/schema/core.ldif"
+            "${pkgs.openldap}/etc/schema/cosine.ldif"
+            "${pkgs.openldap}/etc/schema/inetorgperson.ldif"
+            "${pkgs.openldap}/etc/schema/nis.ldif"
+          ];
+        };
+        "olcDatabase={1}mdb" = {
+          attrs = {
+            objectClass = [
+              "olcDatabaseConfig"
+              "olcMdbConfig"
+            ];
+            olcDatabase = "{1}mdb";
+            olcDbDirectory = "/var/lib/openldap/db";
+            olcSuffix = "dc=phobos,dc=mars,dc=lukashirsch,dc=de";
+            olcRootDN = "cn=admin,dc=phobos,dc=mars,dc=lukashirsch,dc=de";
+            olcRootPW = "{SSHA}ZUrYQuUfi5WcBWoX26vZyM+EVHLBY/oP";
+            olcDbIndex = [
+              "objectClass eq"
+              "cn,uid eq"
+              "uidNumber,gidNumber eq"
+              "member,memberUid eq"
+            ];
+          };
+        };
+      };
+    };
+  };
+
+  # Kerberos Server (MIT Kerberos)
+  services.kerberos_server = {
+    enable = true;
+    settings = {
+      realms = {
+        "MARS.LUKASHIRSCH.DE" = {
+          admin_server = "phobos.mars.lukashirsch.de";
+          kdc = "phobos.mars.lukashirsch.de";
+          kpasswd_server = "phobos.mars.lukashirsch.de";
+        };
+      };
+      libdefaults = {
+        default_realm = "MARS.LUKASHIRSCH.DE";
+      };
+    };
+  };
 
   networking = {
     hostName = "phobos";
@@ -32,6 +116,17 @@
     useHostResolvConf = false;
     firewall = {
       enable = true;
+      allowedTCPPorts = [
+        389 # LDAP
+        636 # LDAPS
+        88 # Kerberos
+        464 # Kerberos admin
+        749 # Kerberos admin
+      ];
+      allowedUDPPorts = [
+        88 # Kerberos
+        464 # Kerberos admin
+      ];
     };
   };
 

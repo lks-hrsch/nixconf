@@ -21,6 +21,31 @@
 
   features = {
     virtualisation.podman.enable = true;
+    wireguard = {
+      enable = true;
+      address = "10.10.1.18/24";
+      dns = [
+        "10.10.1.1"
+        "10.10.1.3"
+      ];
+      peers = [
+        {
+          publicKey = "eTYFEILoUH8pbFVU9WJpzdNGTPm4eLiDAQXmyO1M7wE=";
+          allowedIPs = [
+            "10.10.1.1/32"
+            "10.10.1.64/30"
+          ];
+          endpoint = "mercury.lukashirsch.de:51821";
+          persistentKeepalive = 25;
+        }
+        {
+          publicKey = "65mINKiTOCgTIiGCSk5YpbSFdryFEnTrr9vGcHEL5yI=";
+          allowedIPs = [ "10.10.1.3/32" ];
+          endpoint = "earth.staudenstuebler.de:51821";
+          persistentKeepalive = 25;
+        }
+      ];
+    };
   };
 
   networking = {

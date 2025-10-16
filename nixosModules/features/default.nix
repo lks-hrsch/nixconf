@@ -6,5 +6,6 @@
     ./nix.nix
     ./sops.nix
     ./time.nix
+    ./wireguard.nix
   ];
 }
