@@ -25,6 +25,10 @@ in
       };
       podman = {
         enable = true;
+        autoPrune.enable = true;
+        defaultNetwork.settings = {
+          dns_enabled = true;
+        };
         dockerCompat = true; # Enable Docker compatibility mode
         dockerSocket.enable = true; # Enable Docker socket for compatibility
       };
