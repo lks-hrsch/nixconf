@@ -32,6 +32,10 @@ in
         dockerCompat = true; # Enable Docker compatibility mode
         dockerSocket.enable = true; # Enable Docker socket for compatibility
       };
+      quadlet = {
+        enable = true;
+        autoUpdate.enable = true;
+      };
     };
   };
 

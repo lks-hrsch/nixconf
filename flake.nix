@@ -80,6 +80,7 @@
             modules = [
               ./hosts/workstation-nixos/configuration.nix
               sops-nix.nixosModules.sops
+              quadlet-nix.nixosModules.quadlet
 
               # make home-manager as a module of nixos
               # so that home-manager configuration will be deployed automatically when executing `nixos-rebuild switch`

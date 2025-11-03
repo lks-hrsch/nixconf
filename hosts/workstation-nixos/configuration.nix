@@ -53,6 +53,7 @@
   # Use the systemd-boot EFI boot loader.
   boot.loader = {
     systemd-boot.enable = true;
+systemd-boot.configurationLimit = 5; # keep only a few generations on the ESP to avoid filling /boot
     efi.canTouchEfiVariables = true;
   };
 
@@ -74,16 +75,24 @@
       "10-lan" = {
         matchConfig.Name = "enp10s0";
         networkConfig = {
-          DHCP = "yes";
+          DHCP = "no";
+          Address = "192.168.1.40/24";
+          Gateway = "192.168.1.1";
+          DNS = [ "192.168.1.1" ];
+          IPv6AcceptRA = true;
         };
       };
-      # "20-wlan" = {
-      #   matchConfig.Name = "wlan0";
-      #   networkConfig = {
-      #     DHCP = "yes";
-      #   };
-      #   linkConfig.RequiredForOnline = "no";
-      # };
+      "20-wlan" = {
+      matchConfig.Name = "wlan0";
+      networkConfig = {
+          DHCP = "no";
+          Address = "192.168.1.41/24";
+          Gateway = "192.168.1.1";
+          DNS = [ "192.168.1.1" ];
+          IPv6AcceptRA = true;
+        };
+linkConfig.RequiredForOnline = "no";
+      };
     };
   };
 

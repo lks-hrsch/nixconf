@@ -26,8 +26,26 @@
         "nvidia_modeset"
         "nvidia_uvm"
         "nvidia_drm"
+        "igc" # lspci -v | grep -iA8 'network\|ethernet'
       ];
       kernelModules = [ ];
+
+      # Remote unlock for encrypted ZFS: enable networking and SSH in initrd
+      network = {
+        enable = true;
+        ssh = {
+          enable = true;
+          port = 2222; # connect with: ssh -p 2222 root@<initrd-ip>
+          hostKeys = [ "/etc/ssh/ssh_host_ed25519_key" ];
+          authorizedKeys = [ (builtins.readFile ../../secrets/private_ed25519.pub) ];
+          # shell = "/bin/cryptsetup-askpass";
+        };
+        udhcpc.enable = false;
+      };
+      # Copy the host private key into the initrd image
+      secrets = {
+        "/etc/ssh/ssh_host_ed25519_key" = "/etc/ssh/ssh_host_ed25519_key";
+      };
     };
 
     kernelModules = [
@@ -42,10 +60,11 @@
       "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
       "zfs.zfs_arc_max=4294967296" # 4 GiB https://nixos.wiki/wiki/ZFS
       "zfs.zfs_prefetch_disable=1"
+      "ip=192.168.1.40::192.168.1.1:255.255.255.0:workstation-nixos::none"
     ];
     extraModulePackages = [ ];
 
-    # ZFS support
+    # ZFS support (ensures ZFS is included in initrd too)
     supportedFilesystems = [ "zfs" ];
   };
 

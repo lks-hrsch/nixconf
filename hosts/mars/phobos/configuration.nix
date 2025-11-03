@@ -29,7 +29,7 @@
         publicKey = "eTYFEILoUH8pbFVU9WJpzdNGTPm4eLiDAQXmyO1M7wE=";
         allowedIPs = [
           "10.10.1.1/32"
-          "10.10.1.64/30"
+          "10.10.1.64/28"
         ];
         endpoint = "mercury.lukashirsch.de:51821";
         persistentKeepalive = 25;
