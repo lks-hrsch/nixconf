@@ -83,15 +83,15 @@ systemd-boot.configurationLimit = 5; # keep only a few generations on the ESP to
         };
       };
       "20-wlan" = {
-      matchConfig.Name = "wlan0";
-      networkConfig = {
+        matchConfig.Name = "wlan0";
+        networkConfig = {
           DHCP = "no";
           Address = "192.168.1.41/24";
           Gateway = "192.168.1.1";
           DNS = [ "192.168.1.1" ];
           IPv6AcceptRA = true;
         };
-linkConfig.RequiredForOnline = "no";
+        linkConfig.RequiredForOnline = "no";
       };
     };
   };

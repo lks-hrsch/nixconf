@@ -1,6 +1,11 @@
-{ pkgs, ... }:
 {
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  pkgs,
+  config,
+  constants,
+  ...
+}:
+{
+  # Define a user account. Don't forget to set a password with 'passwd'.
   users = {
     groups = {
       video = { };
@@ -28,6 +33,7 @@
           "video"
           "games"
         ];
+        openssh.authorizedKeys.keys = [ constants.sshPublicKey ];
       };
     };
   };

@@ -57,6 +57,7 @@
         "workstation-nixos" =
           let
             system = "x86_64-linux";
+            constants = import ./lib/constants.nix;
             nixPkgs = import nixpkgs {
               inherit system;
               config = {
@@ -76,7 +77,7 @@
           in
           nixpkgs.lib.nixosSystem {
             pkgs = nixPkgs;
-            specialArgs = { inherit inputs; };
+            specialArgs = { inherit inputs constants; };
             modules = [
               ./hosts/workstation-nixos/configuration.nix
               sops-nix.nixosModules.sops
@@ -112,6 +113,7 @@
         "phobos" =
           let
             system = "x86_64-linux";
+            constants = import ./lib/constants.nix;
             nixPkgs = import nixpkgs {
               inherit system;
               overlays = [
@@ -126,7 +128,7 @@
           in
           nixpkgs.lib.nixosSystem {
             pkgs = nixPkgs;
-            specialArgs = { inherit inputs; };
+            specialArgs = { inherit inputs constants; };
             modules = [
               ./hosts/mars/phobos/configuration.nix
               sops-nix.nixosModules.sops
@@ -136,6 +138,7 @@
         "deimos" =
           let
             system = "x86_64-linux";
+            constants = import ./lib/constants.nix;
             nixPkgs = import nixpkgs {
               inherit system;
               overlays = [
@@ -150,7 +153,7 @@
           in
           nixpkgs.lib.nixosSystem {
             pkgs = nixPkgs;
-            specialArgs = { inherit inputs; };
+            specialArgs = { inherit inputs constants; };
             modules = [
               ./hosts/mars/deimos/configuration.nix
               sops-nix.nixosModules.sops
@@ -161,6 +164,7 @@
         "curiosity" =
           let
             system = "x86_64-linux";
+            constants = import ./lib/constants.nix;
             nixPkgs = import nixpkgs {
               inherit system;
               overlays = [
@@ -175,7 +179,7 @@
           in
           nixpkgs.lib.nixosSystem {
             pkgs = nixPkgs;
-            specialArgs = { inherit inputs; };
+            specialArgs = { inherit inputs constants; };
             modules = [
               ./hosts/mars/curiosity/configuration.nix
               sops-nix.nixosModules.sops
@@ -185,6 +189,7 @@
         "opportunity" =
           let
             system = "x86_64-linux";
+            constants = import ./lib/constants.nix;
             nixPkgs = import nixpkgs {
               inherit system;
               overlays = [
@@ -199,7 +204,7 @@
           in
           nixpkgs.lib.nixosSystem {
             pkgs = nixPkgs;
-            specialArgs = { inherit inputs; };
+            specialArgs = { inherit inputs constants; };
             modules = [
               ./hosts/mars/opportunity/configuration.nix
               sops-nix.nixosModules.sops
