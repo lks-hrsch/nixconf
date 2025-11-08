@@ -22,9 +22,7 @@
       jq
       fio
       fastfetch
-      nixpkgs-fmt
       pkg-config
-      nil
       rustdesk
       osu-lazer
       gimp3

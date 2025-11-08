@@ -6,14 +6,7 @@
     ./features/stylix.nix
 
     # CLI programs (cross-platform)
-    ./cliPrograms/btop.nix
-    ./cliPrograms/git.nix
-    ./cliPrograms/gpg.nix
-    ./cliPrograms/ssh.nix
-    ./cliPrograms/starship.nix
-    ./cliPrograms/tmux.nix
-    ./cliPrograms/vim.nix
-    ./cliPrograms/zsh.nix
+    ./cliPrograms
 
     # GUI programs (cross-platform)
     ./guiPrograms/alacritty.nix

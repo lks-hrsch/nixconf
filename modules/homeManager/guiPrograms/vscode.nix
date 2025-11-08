@@ -3,6 +3,7 @@
   home.packages = with pkgs; [
     nil
     nixfmt-rfc-style
+    nixpkgs-fmt
     code-cursor
   ];
 
