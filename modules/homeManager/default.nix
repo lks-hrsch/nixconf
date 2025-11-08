@@ -1,12 +1,11 @@
-{ ... }:
+{ lib, ... }:
 {
-
   imports = [
-    ./features/hyprland
+    # Cross-platform features
     ./features/sops.nix
     ./features/stylix.nix
-    ./features/xdg.nix
 
+    # CLI programs (cross-platform)
     ./cliPrograms/btop.nix
     ./cliPrograms/git.nix
     ./cliPrograms/gpg.nix
@@ -16,14 +15,13 @@
     ./cliPrograms/vim.nix
     ./cliPrograms/zsh.nix
 
-    ./files/uwsm-env.nix
-
+    # GUI programs (cross-platform)
     ./guiPrograms/alacritty.nix
     ./guiPrograms/firefox.nix
     ./guiPrograms/obsidian.nix
-    ./guiPrograms/obsstudio.nix
-    ./guiPrograms/thunderbird.nix
     ./guiPrograms/vscode.nix
   ];
 
+  # Note: Linux-specific modules in ./linux should be imported
+  # separately by NixOS configurations, not by Darwin configurations
 }

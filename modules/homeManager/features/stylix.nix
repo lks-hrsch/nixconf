@@ -92,6 +92,7 @@ in
       waybar = {
         addCss = false;
       };
+      gnome.enable = pkgs.stdenv.isLinux; # Only enable GNOME theming on Linux
     };
   };
 }

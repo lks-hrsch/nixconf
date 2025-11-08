@@ -22,6 +22,7 @@
     };
     hyprland = {
       url = "github:hyprwm/Hyprland";
+inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprland-contrib = {
       url = "github:hyprwm/contrib";
@@ -43,6 +44,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       nixpkgs-unstable,
       home-manager,
@@ -57,7 +59,7 @@
         "workstation-nixos" =
           let
             system = "x86_64-linux";
-            constants = import ./lib/constants.nix;
+            constants = import ./secrets/constants.nix;
             nixPkgs = import nixpkgs {
               inherit system;
               config = {
@@ -214,5 +216,9 @@
 
       nixosModules.default = ./nixosModules;
       homeManagerModules.default = ./homeManagerModules;
+      homeManagerModules = {
+        default = ./modules/homeManager;
+        linux = ./modules/homeManager/linux;
+      };
     };
 }

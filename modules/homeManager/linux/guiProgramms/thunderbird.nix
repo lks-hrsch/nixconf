@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  accounts = import ../../secrets/accounts.nix { };
+  accounts = import ../../../../secrets/accounts.nix { };
 
   programs.thunderbird = {
     enable = true;

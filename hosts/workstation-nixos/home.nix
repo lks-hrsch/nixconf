@@ -8,6 +8,7 @@
 
   imports = [
     inputs.self.outputs.homeManagerModules.default
+    inputs.self.outputs.homeManagerModules.linux # Linux-specific modules
   ];
 
   home = {
