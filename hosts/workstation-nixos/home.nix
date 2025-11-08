@@ -19,9 +19,6 @@
     packages = with pkgs; [
       nautilus
       pavucontrol
-      jq
-      fio
-      fastfetch
       pkg-config
       rustdesk
       osu-lazer
@@ -41,21 +38,6 @@
 
       # cudatoolkit
       linuxPackages.nvidia_x11
-
-      # latex
-      (texliveSmall.withPackages (
-        ps: with ps; [
-          tudscr
-          luainputenc
-          fontaxes
-          lualatex-math
-          latexmk
-          datetime2
-          biblatex
-        ]
-      ))
-      ghostscript
-      biber
 
       # dev virtualization
       grub2

@@ -8,15 +8,20 @@
     onActivation = {
       autoUpdate = true;
       upgrade = true;
+      cleanup = "zap";
     };
 
     # CLI tools (formulae)
     brews = [
+      "appium"
       "docker-compose"
+      "git-svn"
       "helm"
       "ios-deploy"
       "podman"
       "podman-compose"
+      "rbenv"
+      "subversion"
     ];
 
     # GUI applications (casks)
