@@ -13,6 +13,9 @@
   imports = [
     inputs.self.outputs.nixosModules.default
 
+    # openvpn
+    ./openvpn.nix
+
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
@@ -53,7 +56,7 @@
   # Use the systemd-boot EFI boot loader.
   boot.loader = {
     systemd-boot.enable = true;
-systemd-boot.configurationLimit = 5; # keep only a few generations on the ESP to avoid filling /boot
+    systemd-boot.configurationLimit = 5; # keep only a few generations on the ESP to avoid filling /boot
     efi.canTouchEfiVariables = true;
   };
 
