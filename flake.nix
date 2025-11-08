@@ -8,6 +8,10 @@
     nixpkgs-unstable = {
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -22,7 +26,7 @@
     };
     hyprland = {
       url = "github:hyprwm/Hyprland";
-inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprland-contrib = {
       url = "github:hyprwm/contrib";
@@ -47,6 +51,7 @@ inputs.nixpkgs.follows = "nixpkgs";
       self,
       nixpkgs,
       nixpkgs-unstable,
+      nix-darwin,
       home-manager,
       stylix,
       firefox-addons,
@@ -55,6 +60,58 @@ inputs.nixpkgs.follows = "nixpkgs";
       ...
     }@inputs:
     {
+      darwinConfigurations = {
+        "lkshrsch-mbp-m3" =
+          let
+            system = "aarch64-darwin";
+            constants = import ./secrets/constants.nix;
+            nixPkgs = import nixpkgs {
+              inherit system;
+              config = {
+                allowUnfree = true;
+              };
+              overlays = [
+                (final: prev: {
+                  unstable = import nixpkgs-unstable {
+                    system = prev.system;
+                    config = prev.config;
+                  };
+                })
+              ];
+            };
+          in
+          nix-darwin.lib.darwinSystem {
+            pkgs = nixPkgs;
+            specialArgs = { inherit self inputs constants; };
+            modules = [
+              ./hosts/lkshrsch-mbp-m3/configuration.nix
+              sops-nix.darwinModules.sops
+
+              home-manager.darwinModules.home-manager
+              {
+                home-manager = {
+                  sharedModules = [
+                    sops-nix.homeManagerModules.sops
+                  ];
+                  extraSpecialArgs = {
+                    inherit inputs nixPkgs;
+                    firefox-addons-allow-unfree = nixPkgs.callPackage firefox-addons { };
+                  };
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  backupFileExtension = ".backup";
+                  users.lkshrsch = {
+                    imports = [
+                      stylix.homeManagerModules.stylix
+                      ./hosts/lkshrsch-mbp-m3/home.nix
+                    ];
+                  };
+                };
+              }
+            ];
+          };
+      };
+
       nixosConfigurations = {
         "workstation-nixos" =
           let
@@ -215,7 +272,7 @@ inputs.nixpkgs.follows = "nixpkgs";
       };
 
       nixosModules.default = ./nixosModules;
-      homeManagerModules.default = ./homeManagerModules;
+      darwinModules.default = ./modules/darwin;
       homeManagerModules = {
         default = ./modules/homeManager;
         linux = ./modules/homeManager/linux;
