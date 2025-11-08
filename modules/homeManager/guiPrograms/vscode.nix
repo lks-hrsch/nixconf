@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
+    nil
     nixfmt-rfc-style
     code-cursor
   ];
@@ -47,6 +48,8 @@
 
       userSettings = {
         "editor.formatOnSave" = true;
+
+        "git.autofetch" = "all";
 
         "nix.formatterPath" = "nixpkgs-fmt";
         "nix.enableLanguageServer" = true;

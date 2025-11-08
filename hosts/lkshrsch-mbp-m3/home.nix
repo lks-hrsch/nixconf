@@ -1,5 +1,4 @@
 {
-  pkgs,
   lib,
   inputs,
   ...
@@ -15,8 +14,5 @@
     stateVersion = "25.05";
     homeDirectory = lib.mkForce "/Users/lkshrsch";
     username = "lkshrsch";
-
-    packages = with pkgs; [
-    ];
   };
 }

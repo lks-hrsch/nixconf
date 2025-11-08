@@ -1,7 +1,11 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  ...
+}:
 let
   # Platform-specific 1Password agent socket path
-  onePasswordAgent = 
+  onePasswordAgent =
     if pkgs.stdenv.isLinux then
       "~/.1password/agent.sock"
     else
@@ -14,7 +18,7 @@ in
     includes = [
       "${config.sops.secrets."ssh-extra-config".path}"
     ];
-    
+
     matchBlocks = {
       "*" = {
         identityAgent = onePasswordAgent;
