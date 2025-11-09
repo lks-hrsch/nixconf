@@ -2,6 +2,7 @@
 {
   imports = [
     ./btop.nix
+    ./direnv.nix
     ./fastfetch.nix
     ./git.nix
     ./gpg.nix

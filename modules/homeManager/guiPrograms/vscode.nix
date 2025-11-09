@@ -9,8 +9,9 @@
 
   programs.vscode = {
     enable = true;
-    profiles.default = {
+    mutableExtensionsDir = true;
 
+    profiles.default = {
       extensions = with pkgs.vscode-extensions; [
         pkief.material-icon-theme
         visualstudioexptteam.vscodeintellicode
@@ -20,6 +21,8 @@
 
         # some useful tools
         tomoki1207.pdf # PDF viewer
+        davidanson.vscode-markdownlint
+        tamasfe.even-better-toml
 
         # git
         mhutchie.git-graph
@@ -27,24 +30,28 @@
 
         # github
         github.copilot
-        github.copilot-chat
+        # github.copilot-chat
         github.vscode-pull-request-github
         github.vscode-github-actions
-
-        # docker
-        # ms-azuretools.vscode-docker
-        # ms-azuretools.vscode-containers
-        # docker.docker
 
         # nix extensions
         jnoortheen.nix-ide
 
         # C/C++ extensions
         llvm-vs-code-extensions.vscode-clangd
+        vadimcn.vscode-lldb
+
+        # Rust extensions
+        rust-lang.rust-analyzer
+        tauri-apps.tauri-vscode
 
         # python extensions
         ms-python.python
         charliermarsh.ruff
+
+        # web development
+        bradlc.vscode-tailwindcss
+        biomejs.biome
       ];
 
       userSettings = {
