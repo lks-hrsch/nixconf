@@ -24,6 +24,10 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-vscode-extensions = {
+      url = "github:nix-community/nix-vscode-extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     hyprland = {
       url = "github:hyprwm/Hyprland";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -43,6 +47,10 @@
     quadlet-nix = {
       url = "github:SEIAROTg/quadlet-nix";
     };
+    mac-app-util = {
+      url = "github:hraban/mac-app-util";
+      inputs.cl-nix-lite.url = "github:r4v3n6101/cl-nix-lite/url-fix"; # https://github.com/hraban/mac-app-util/issues/39#issuecomment-3503946041
+    };
   };
 
   outputs =
@@ -54,8 +62,10 @@
       home-manager,
       stylix,
       firefox-addons,
+      nix-vscode-extensions,
       sops-nix,
       quadlet-nix,
+      mac-app-util,
       ...
     }@inputs:
     {
@@ -70,6 +80,7 @@
                 allowUnfree = true;
               };
               overlays = [
+                nix-vscode-extensions.overlays.default
                 (final: prev: {
                   unstable = import nixpkgs-unstable {
                     system = prev.system;
@@ -85,12 +96,15 @@
             modules = [
               ./hosts/lkshrsch-mbp-m3/configuration.nix
               sops-nix.darwinModules.sops
+              mac-app-util.darwinModules.default
 
               home-manager.darwinModules.home-manager
               {
                 home-manager = {
                   sharedModules = [
                     sops-nix.homeManagerModules.sops
+                    mac-app-util.homeManagerModules.default
+                    stylix.homeManagerModules.stylix
                   ];
                   extraSpecialArgs = {
                     inherit inputs nixPkgs;
@@ -101,7 +115,6 @@
                   backupFileExtension = ".backup";
                   users.lkshrsch = {
                     imports = [
-                      stylix.homeManagerModules.stylix
                       ./hosts/lkshrsch-mbp-m3/home.nix
                     ];
                   };
@@ -124,6 +137,7 @@
                 rocmSupport = true;
               };
               overlays = [
+                nix-vscode-extensions.overlays.default
                 (final: prev: {
                   unstable = import nixpkgs-unstable {
                     system = prev.system;
@@ -148,6 +162,7 @@
                 home-manager = {
                   sharedModules = [
                     sops-nix.homeManagerModules.sops
+                    stylix.homeManagerModules.stylix
                   ];
                   extraSpecialArgs = {
                     inherit inputs nixPkgs;
@@ -158,7 +173,6 @@
                   backupFileExtension = ".backup";
                   users.lkshrsch = {
                     imports = [
-                      stylix.homeManagerModules.stylix
                       ./hosts/workstation-nixos/home.nix
 
                     ];

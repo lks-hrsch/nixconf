@@ -9,20 +9,21 @@
 
   programs.vscode = {
     enable = true;
-    mutableExtensionsDir = true;
 
     profiles.default = {
-      extensions = with pkgs.vscode-extensions; [
+      extensions = with pkgs.vscode-marketplace-release; [
         pkief.material-icon-theme
         visualstudioexptteam.vscodeintellicode
         christian-kohler.path-intellisense
         ms-vscode-remote.remote-containers
         ms-vscode-remote.remote-ssh
+        ms-vscode-remote.remote-ssh-edit
 
         # some useful tools
         tomoki1207.pdf # PDF viewer
         davidanson.vscode-markdownlint
         tamasfe.even-better-toml
+        ms-azuretools.vscode-containers
 
         # git
         mhutchie.git-graph
@@ -30,7 +31,7 @@
 
         # github
         github.copilot
-        # github.copilot-chat
+        github.copilot-chat
         github.vscode-pull-request-github
         github.vscode-github-actions
 
@@ -47,15 +48,26 @@
 
         # python extensions
         ms-python.python
+        ms-python.vscode-pylance
         charliermarsh.ruff
+        ms-toolsai.jupyter-keymap
+        ms-toolsai.jupyter-renderers
+        ms-toolsai.vscode-jupyter-cell-tags
+        ms-toolsai.vscode-jupyter-powertoys
 
         # web development
+        ms-vscode.vscode-typescript-next
         bradlc.vscode-tailwindcss
         biomejs.biome
       ];
 
       userSettings = {
+        "telemetry.editStats.enabled" = false;
+        "telemetry.feedback.enabled" = false;
+        "telemetry.telemetryLevel" = "off";
+
         "editor.formatOnSave" = true;
+        "editor.formatOnPaste" = true;
 
         "git.autofetch" = "all";
 
@@ -75,7 +87,11 @@
         };
         "github.copilot.nextEditSuggestions.enabled" = true;
         "github.copilot.nextEditSuggestions.fixes" = true;
+        "github.copilot.chat.agent.thinkingTool" = false;
+        "github.copilot.chat.edits.temporalContext.enabled" = false;
         "github.copilot.chat.codesearch.enabled" = true;
+        "github.copilot.chat.languageContext.fix.typescript.enabled" = false;
+        "github.copilot.chat.useResponsesApi" = false;
       };
     };
   };
