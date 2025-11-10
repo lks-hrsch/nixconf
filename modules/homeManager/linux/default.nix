@@ -5,7 +5,7 @@
     ./features/hyprland
     ./features/xdg.nix
     ./files/uwsm-env.nix
-    ./guiPrograms/obsstudio.nix
-    ./guiPrograms/thunderbird.nix
+    ./guiProgramms/obsstudio.nix
+    ./guiProgramms/thunderbird.nix
   ];
 }

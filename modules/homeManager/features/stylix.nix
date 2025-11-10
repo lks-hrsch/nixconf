@@ -58,7 +58,8 @@ in
 {
   stylix = {
     enable = true;
-    image = ../../wallpaper/anime-girl-cherry-blossom-train-looking-away-4k-oc.png;
+    # Path is relative to modules/homeManager/features -> up to /etc/nixos, then into wallpaper/
+    image = ../../../wallpaper/anime-girl-cherry-blossom-train-looking-away-4k-oc.png;
     polarity = "dark";
 
     base16Scheme = base16;

@@ -40,7 +40,7 @@
 
         # C/C++ extensions
         llvm-vs-code-extensions.vscode-clangd
-        vadimcn.vscode-lldb
+        # vadimcn.vscode-lldb
 
         # Rust extensions
         rust-lang.rust-analyzer
