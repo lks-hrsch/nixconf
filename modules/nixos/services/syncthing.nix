@@ -16,7 +16,7 @@ in
       dataDir = homeDir;
       configDir = "${homeDir}/.config/syncthing";
 
-      settings = import ../../secrets/syncthing-settings.nix {
+      settings = import ../../../secrets/syncthing-settings.nix {
         inherit homeDir;
       };
     };

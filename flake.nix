@@ -284,7 +284,7 @@
           };
       };
 
-      nixosModules.default = ./nixosModules;
+      nixosModules.default = ./modules/nixos;
       darwinModules.default = ./modules/darwin;
       homeManagerModules = {
         default = ./modules/homeManager;

@@ -25,9 +25,11 @@
     programs.hyprland = {
       enable = true;
       withUWSM = true;
-      # set the flake package
-      package = inputs.hyprland.packages.${pkgs.system}.hyprland;
-      # make sure to also set the portal package, so that they are in sync
+      package = inputs.hyprland.packages.${pkgs.system}.hyprland.override {
+        wayland-protocols = pkgs.unstable.wayland-protocols; # >= 1.45
+        libinput = pkgs.unstable.libinput; # >= 1.28
+        libxkbcommon = pkgs.unstable.libxkbcommon; # for xkb_keymap_new_from_names2
+      };
       portalPackage = inputs.hyprland.packages.${pkgs.system}.xdg-desktop-portal-hyprland;
     };
   };
