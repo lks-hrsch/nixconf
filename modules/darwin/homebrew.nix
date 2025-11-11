@@ -1,5 +1,9 @@
-{ ... }:
+{ pkgs, ... }:
 {
+environment.systemPackages = with pkgs; [
+    mas # https://github.com/mas-cli/mas
+  ];
+
   # Homebrew configuration
   homebrew = {
     enable = true;
@@ -28,12 +32,10 @@
     casks = [
       "1password"
       "1password-cli"
-      "alacritty"
-      "aldente"
+            "aldente"
       "anki"
       "discord"
-      "firefox"
-      "fork"
+            "fork"
       "google-chrome"
       "jetbrains-toolbox"
       "keepassxc"
@@ -41,8 +43,7 @@
       "microsoft-edge"
       "mullvad-vpn"
       "notion"
-      "obsidian"
-      "ollama-app"
+            "ollama-app"
       "onyx"
       "openvpn-connect"
       "podman-desktop"
@@ -57,5 +58,10 @@
       "windows-app"
       "zoom"
     ];
+
+    # https://nix-darwin.github.io/nix-darwin/manual/index.html#opt-homebrew.masApps
+    masApps = {
+      "1Password for Safari" = 1569813296;
+    };
   };
 }
