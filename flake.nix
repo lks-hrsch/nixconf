@@ -284,11 +284,15 @@
           };
       };
 
-      nixosModules.default = ./modules/nixos;
-      darwinModules.default = ./modules/darwin;
-      homeManagerModules = {
-        default = ./modules/homeManager;
-        linux = ./modules/homeManager/linux;
+      # module decalrations
+      modules = {
+        nixos.default = ./modules/nixos;
+        darwin.default = ./modules/darwin;
+        shared.default = ./modules/shared;
+        homeManager = {
+          default = ./modules/homeManager;
+          linux = ./modules/homeManager/linux;
+        };
       };
     };
 }

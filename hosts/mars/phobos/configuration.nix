@@ -11,7 +11,8 @@
 
 {
   imports = [
-    inputs.self.outputs.nixosModules.default
+    inputs.self.outputs.modules.nixos.default
+    inputs.self.outputs.modules.shared.default
 
     # Include the default incus configuration.
     "${modulesPath}/virtualisation/lxc-container.nix"

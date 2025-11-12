@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, ... }:
 {
   options.features = {
     desktop.enable = lib.mkEnableOption "desktop environment";
@@ -17,16 +17,5 @@
     ./virtualisation
 
     ./home-nas-mounts.nix
-    ./users.nix
   ];
-
-  config = {
-    # global system packages
-    environment.systemPackages = with pkgs; [
-      btop
-      pciutils
-      usbutils
-    ];
-  };
-
 }

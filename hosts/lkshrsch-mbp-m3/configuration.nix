@@ -6,10 +6,18 @@
 }:
 {
   imports = [
-    inputs.self.outputs.darwinModules.default
+    inputs.self.outputs.modules.darwin.default
+    inputs.self.outputs.modules.shared.default
   ];
 
-  security.pam.services.sudo_local.touchIdAuth = true;
+  features = {
+    desktop.enable = true;
+  };
+
+  security.pam.services.sudo_local = {
+    touchIdAuth = true;
+    watchIdAuth = true;
+  };
 
   # this will allow you to use nix-darwin with Determinate.
   nix.enable = false;

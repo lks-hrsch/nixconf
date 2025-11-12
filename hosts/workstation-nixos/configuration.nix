@@ -11,7 +11,8 @@
 
 {
   imports = [
-    inputs.self.outputs.nixosModules.default
+    inputs.self.outputs.modules.nixos.default
+    inputs.self.outputs.modules.shared.default
 
     # openvpn
     ./openvpn.nix

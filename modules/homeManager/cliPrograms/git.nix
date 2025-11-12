@@ -23,7 +23,7 @@
         format = "ssh";
       };
       "gpg \"ssh\"" = {
-        program = "${lib.getExe' pkgs._1password-gui "op-ssh-sign"}";
+        program = "${lib.getExe' pkgs.unstable._1password-gui "op-ssh-sign"}";
       };
       commit = {
         gpgsign = true;

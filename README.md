@@ -1,7 +1,20 @@
 # nixconf
 
+- <https://mynixos.com>
+
 ``` bash
+sudo nix-store --gc
 sudo nix-store --optimise
+
+# list generations 
+sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
+nix-env --list-generations --profile ~/.local/state/nix/profiles/home-manager
+
+# delete generations older than 1d
+sudo nix-env --delete-generations 1d --profile /nix/var/nix/profiles/system
+
+# complet clean up which deletes all generations
+sudo nix-collect-garbage --delete-old
 ```
 
 on nixos:

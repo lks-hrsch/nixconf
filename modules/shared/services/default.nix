@@ -1,6 +1,6 @@
 { ... }:
 {
   imports = [
-    ./homebrew.nix
+    ./openssh.nix
   ];
 }

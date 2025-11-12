@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-environment.systemPackages = with pkgs; [
+  environment.systemPackages = with pkgs; [
     mas # https://github.com/mas-cli/mas
   ];
 
@@ -30,12 +30,10 @@ environment.systemPackages = with pkgs; [
 
     # GUI applications (casks)
     casks = [
-      "1password"
-      "1password-cli"
-            "aldente"
+      "aldente"
       "anki"
       "discord"
-            "fork"
+      "fork"
       "google-chrome"
       "jetbrains-toolbox"
       "keepassxc"
@@ -43,25 +41,45 @@ environment.systemPackages = with pkgs; [
       "microsoft-edge"
       "mullvad-vpn"
       "notion"
-            "ollama-app"
+      "ollama-app"
       "onyx"
       "openvpn-connect"
       "podman-desktop"
       "postman"
       "rustdesk"
-      "slack"
       "spotify"
       "syncthing-app"
-      "tailscale-app"
       "vlc"
       "winbox"
-      "windows-app"
       "zoom"
     ];
 
     # https://nix-darwin.github.io/nix-darwin/manual/index.html#opt-homebrew.masApps
     masApps = {
-      "1Password for Safari" = 1569813296;
+      "1Password for Safari" = 1569813296; # Safari extension
+      "LanguageTool" = 1534275760; # Safari extension
+      "WireGuard" = 1451685025;
+      "Tailscale" = 1475387142;
+
+      # University
+      "eduVPN" = 1317704208;
+      "Goodnotes" = 1444383602;
+
+      # Business and productivity
+      "Bitwarden" = 1352778147;
+      "Microsoft Excel" = 462058435;
+      "Microsoft Outlook" = 985367838;
+      "Microsoft PowerPoint" = 462062816;
+      "Microsoft Word" = 462054704;
+      "OneDrive" = 823766827;
+      "Windows App" = 1295203466;
+      "Xcode" = 497799835;
+      "Developer" = 640199958;
+
+      # Random useful apps
+      "AusweisApp" = 948660805;
+      "Blackmagic Disk Speed Test" = 425264550;
+      "Slack for Desktop" = 803453959;
     };
   };
 }

@@ -7,7 +7,7 @@
   # Import the default home-manager modules
   # Linux-specific modules will be automatically excluded on Darwin
   imports = [
-    inputs.self.outputs.homeManagerModules.default
+    inputs.self.outputs.modules.homeManager.default
   ];
 
   home = {
