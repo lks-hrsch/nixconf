@@ -2,39 +2,49 @@
 {
   programs.firefox = {
     enable = true;
-    package = pkgs.firefox-bin;
+    package = pkgs.unstable.firefox-beta-bin;
 
     profiles.lkshrsch = {
-      search.engines = {
-        "Nix Packages" = {
-          urls = [
-            {
-              template = "https://search.nixos.org/packages";
-              params = [
-                {
-                  name = "type";
-                  value = "packages";
-                }
-                {
-                  name = "channel";
-                  value = "unstable";
-                }
-                {
-                  name = "query";
-                  value = "{searchTerms}";
-                }
-              ];
-            }
-          ];
-          icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-          definedAliases = [ "@n" ];
+      search = {
+        force = true;
+        default = "ddg";
+        privateDefault = "ddg";
+        engines = {
+          "bing".metaData.hidden = true;
+          "ecosia".metaData.hidden = true;
+          "amazondotcom-us".metaData.hidden = true;
+          "wikipedia".metaData.hidden = true;
+
+          "Nix Packages" = {
+            urls = [
+              {
+                template = "https://search.nixos.org/packages";
+                params = [
+                  {
+                    name = "type";
+                    value = "packages";
+                  }
+                  {
+                    name = "channel";
+                    value = "unstable";
+                  }
+                  {
+                    name = "query";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
+            icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
+            definedAliases = [ "@n" ];
+          };
         };
       };
 
-      search.force = true;
-
       settings = {
         "browser.startup.homepage" = "https://start.duckduckgo.com";
+        "browser.aboutConfig.showWarning" = false; # No warning when going to config
+        "browser.warnOnQuitShortcut" = false;
 
         "browser.disableResetPrompt" = true;
         "browser.download.panel.shown" = true;
@@ -46,7 +56,10 @@
 
         "general.smoothScroll" = true;
         "media.hardware-video-decoding.force-enabled" = true;
+        "media.ffmpeg.vaapi.enabled" = true; # Enable hardware acceleration
         "widget.dmabuf.force-enabled" = true;
+        "layers.acceleration.force-enabled" = true;
+        "gfx.webrender.all" = true;
 
         # Disable Pocket
         "extensions.pocket.enabled" = false;

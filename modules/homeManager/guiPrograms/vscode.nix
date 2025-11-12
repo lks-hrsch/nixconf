@@ -59,6 +59,7 @@
         ms-vscode.vscode-typescript-next
         bradlc.vscode-tailwindcss
         biomejs.biome
+        ms-playwright.playwright
       ];
 
       userSettings = {
@@ -92,6 +93,9 @@
         "github.copilot.chat.codesearch.enabled" = true;
         "github.copilot.chat.languageContext.fix.typescript.enabled" = false;
         "github.copilot.chat.useResponsesApi" = false;
+
+        "playwright.pickLocatorCopyToClipboard" = true;
+        "playwright.reuseBrowser" = true;
       };
     };
   };
