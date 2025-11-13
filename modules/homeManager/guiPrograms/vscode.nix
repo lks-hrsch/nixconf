@@ -94,6 +94,13 @@
         "github.copilot.chat.languageContext.fix.typescript.enabled" = false;
         "github.copilot.chat.useResponsesApi" = false;
 
+        "chat.mcp.gallery.enabled" = true;
+        "chat.mcp.discovery.enabled" = {
+          "claude-desktop" = true;
+          "cursor-global" = true;
+          "cursor-workspace" = true;
+        };
+
         "playwright.pickLocatorCopyToClipboard" = true;
         "playwright.reuseBrowser" = true;
       };

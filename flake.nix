@@ -1,5 +1,5 @@
 {
-  description = "lkshrsch's NixOL configuration";
+  description = "lkshrsch's configurations for nix-darwin and nixos";
 
   inputs = {
     nixpkgs = {
