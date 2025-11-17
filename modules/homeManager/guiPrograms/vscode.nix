@@ -10,10 +10,9 @@
   programs.vscode = {
     enable = true;
 
-    profiles.default = {
+    profiles."lkshrsch" = {
       extensions = with pkgs.vscode-marketplace-release; [
         pkief.material-icon-theme
-        visualstudioexptteam.vscodeintellicode
         christian-kohler.path-intellisense
         ms-vscode-remote.remote-containers
         ms-vscode-remote.remote-ssh
@@ -50,8 +49,10 @@
         ms-python.python
         ms-python.vscode-pylance
         charliermarsh.ruff
+        ms-toolsai.jupyter
         ms-toolsai.jupyter-keymap
         ms-toolsai.jupyter-renderers
+        ms-toolsai.vscode-jupyter-slideshow
         ms-toolsai.vscode-jupyter-cell-tags
         ms-toolsai.vscode-jupyter-powertoys
 
@@ -69,6 +70,7 @@
 
         "editor.formatOnSave" = true;
         "editor.formatOnPaste" = true;
+        "workbench.editorLargeFileConfirmation" = 100; # 100 MB
 
         "git.autofetch" = "all";
 

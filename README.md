@@ -45,7 +45,16 @@ sudo darwin-rebuild switch --flake ".#lkshrsch-mbp-m3"
 ## working with git-crypt
 
 ``` bash
+
+
+
 # add a new gpg user
+gpg --armor --export <KEYID> > new-public-key.asc
+gpg --import new-public-key.asc
+gpg --edit-key <KEYID>
+# Type: trust
+# Select trust level (usually 5 for ultimate if you verified it)
+# Type: quit
 git-crypt add-gpg-user <KEYID>
 
 # unlock the repository

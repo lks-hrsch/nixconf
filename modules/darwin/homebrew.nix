@@ -1,8 +1,10 @@
-{ pkgs, ... }:
+{ ... }:
 {
-  environment.systemPackages = with pkgs; [
-    mas # https://github.com/mas-cli/mas
-  ];
+  # issues in newer macOS versions with mas package use brew version
+  # https://github.com/mas-cli/mas/issues/1029
+  # environment.systemPackages = with pkgs; [
+  #   mas # https://github.com/mas-cli/mas
+  # ];
 
   # Homebrew configuration
   homebrew = {
@@ -22,6 +24,7 @@
       "git-svn"
       "helm"
       "ios-deploy"
+      "mas" # https://github.com/mas-cli/mas
       "podman"
       "podman-compose"
       "rbenv"

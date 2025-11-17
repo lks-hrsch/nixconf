@@ -2,7 +2,7 @@
 {
   programs.firefox = {
     enable = true;
-    package = pkgs.unstable.firefox-beta-bin;
+    package = pkgs.unstable.firefox-beta;
 
     profiles.lkshrsch = {
       search = {
