@@ -2,7 +2,7 @@
 {
   programs.firefox = {
     enable = true;
-    package = pkgs.unstable.firefox-beta;
+    package = pkgs.unstable.firefox-bin;  # use firefox-bin because of build error
 
     profiles.lkshrsch = {
       search = {

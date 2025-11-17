@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   ###############################################################
   # Catppuccin Mocha Palette (Full) with Base16 Mapping Override
@@ -56,27 +56,42 @@ let
   };
 in
 {
+  home.packages = with pkgs; [
+    # It is sometimes useful to fine-tune packages, for example, by applying
+    # overrides. You can do that directly here, just don't forget the
+    # parentheses. Maybe you want to install Nerd Fonts with a limited number of
+    # fonts?
+    font-awesome
+    nerd-fonts.jetbrains-mono
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+    noto-fonts-color-emoji
+
+    # Icon packages
+    adwaita-icon-theme
+  ];
+
   stylix = {
     enable = true;
+    autoEnable = true;
     # Path is relative to modules/homeManager/features -> up to /etc/nixos, then into wallpaper/
     image = ../../../wallpaper/anime-girl-cherry-blossom-train-looking-away-4k-oc.png;
     polarity = "dark";
 
     base16Scheme = base16;
 
+    # https://fonts.google.com/?query=Notos
     fonts = {
       monospace = {
         package = pkgs.nerd-fonts.jetbrains-mono;
         name = "JetBrainsMono Nerd Font Mono";
       };
       sansSerif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Sans";
+        package = pkgs.noto-fonts;
+        name = "Noto Sans";
       };
-      serif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Serif";
-      };
+      serif = config.stylix.fonts.sansSerif; # Use same as sansSerif
       emoji = {
         package = pkgs.noto-fonts-emoji;
         name = "Noto Color Emoji";
@@ -86,7 +101,7 @@ in
     cursor = {
       name = "Bibata-Modern-Classic";
       package = pkgs.bibata-cursors;
-      size = 24;
+      size = 22;
     };
 
     targets = {

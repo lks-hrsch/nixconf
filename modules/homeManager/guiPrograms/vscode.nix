@@ -9,6 +9,7 @@
 
   programs.vscode = {
     enable = true;
+    package = pkgs.unstable.vscode;
 
     profiles."lkshrsch" = {
       extensions = with pkgs.vscode-marketplace-release; [
