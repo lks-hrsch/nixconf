@@ -17,7 +17,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix = {
-      url = "github:danth/stylix/release-24.11";
+      url = "github:danth/stylix/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     firefox-addons = {
@@ -35,10 +35,6 @@
     hyprland-contrib = {
       url = "github:hyprwm/contrib";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.hyprland.follows = "hyprland";
     };
     sops-nix = {
       url = "github:Mic92/sops-nix";
@@ -104,7 +100,7 @@
                   sharedModules = [
                     sops-nix.homeManagerModules.sops
                     mac-app-util.homeManagerModules.default
-                    stylix.homeManagerModules.stylix
+                    stylix.homeModules.stylix
                   ];
                   extraSpecialArgs = {
                     inherit inputs nixPkgs;
@@ -162,7 +158,7 @@
                 home-manager = {
                   sharedModules = [
                     sops-nix.homeManagerModules.sops
-                    stylix.homeManagerModules.stylix
+                    stylix.homeModules.stylix
                   ];
                   extraSpecialArgs = {
                     inherit inputs nixPkgs;

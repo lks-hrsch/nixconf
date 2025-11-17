@@ -83,12 +83,24 @@ in
       };
     };
 
-    cursor.name = "Bibata-Modern-Classic";
-    cursor.package = pkgs.bibata-cursors;
+    cursor = {
+      name = "Bibata-Modern-Classic";
+      package = pkgs.bibata-cursors;
+      size = 24;
+    };
 
     targets = {
       mako = {
         enable = false; # lkshrsch profile: The option definition `services.mako.extraConfig' in `/nix/store/hfig46d452pr4i0g5ks17571z38cs1il-source/modules/mako/hm.nix' no longer has any effect; please remove it. Use services.mako.settings instead.
+      };
+      firefox = {
+        profileNames = [ "lkshrsch" ];
+      };
+      vscode = {
+        profileNames = [
+          "default"
+          "lkshrsch"
+        ];
       };
       waybar = {
         addCss = false;
