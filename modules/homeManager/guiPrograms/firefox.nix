@@ -1,8 +1,19 @@
-{ pkgs, firefox-addons-allow-unfree, ... }:
 {
+  pkgs,
+  firefox-addons-allow-unfree,
+  ...
+}:
+let
+  firefox-bin = pkgs.unstable.firefox;
+in
+{
+  # On macOS, programs.firefox.package doesn't automatically create app symlinks
+  # so we need to add it to home.packages as well
+  home.packages = [ firefox-bin ];
+
   programs.firefox = {
     enable = true;
-    package = pkgs.unstable.firefox-bin;  # use firefox-bin because of build error
+    package = firefox-bin; # use firefox-bin because of build error
 
     profiles.lkshrsch = {
       search = {

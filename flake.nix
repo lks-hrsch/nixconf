@@ -64,12 +64,24 @@
       mac-app-util,
       ...
     }@inputs:
+    let
+      custom-overlays = import ./overlays { inherit nixpkgs-unstable; };
+      constants = import ./secrets/constants.nix;
+      lib = import ./lib {
+        inherit
+          nixpkgs
+          custom-overlays
+          sops-nix
+          inputs
+          constants
+          ;
+      };
+    in
     {
       darwinConfigurations = {
         "lkshrsch-mbp-m3" =
           let
             system = "aarch64-darwin";
-            constants = import ./secrets/constants.nix;
             nixPkgs = import nixpkgs {
               inherit system;
               config = {
@@ -77,12 +89,7 @@
               };
               overlays = [
                 nix-vscode-extensions.overlays.default
-                (final: prev: {
-                  unstable = import nixpkgs-unstable {
-                    system = prev.system;
-                    config = prev.config;
-                  };
-                })
+                custom-overlays.unstable
               ];
             };
           in
@@ -124,7 +131,6 @@
         "workstation-nixos" =
           let
             system = "x86_64-linux";
-            constants = import ./secrets/constants.nix;
             nixPkgs = import nixpkgs {
               inherit system;
               config = {
@@ -134,12 +140,7 @@
               };
               overlays = [
                 nix-vscode-extensions.overlays.default
-                (final: prev: {
-                  unstable = import nixpkgs-unstable {
-                    system = prev.system;
-                    config = prev.config;
-                  };
-                })
+                custom-overlays.unstable
               ];
             };
           in
@@ -178,106 +179,24 @@
             ];
           };
 
-        "phobos" =
-          let
-            system = "x86_64-linux";
-            constants = import ./lib/constants.nix;
-            nixPkgs = import nixpkgs {
-              inherit system;
-              overlays = [
-                (final: prev: {
-                  unstable = import nixpkgs-unstable {
-                    system = prev.system;
-                    config = prev.config;
-                  };
-                })
-              ];
-            };
-          in
-          nixpkgs.lib.nixosSystem {
-            pkgs = nixPkgs;
-            specialArgs = { inherit inputs constants; };
-            modules = [
-              ./hosts/mars/phobos/configuration.nix
-              sops-nix.nixosModules.sops
-            ];
-          };
+        "phobos" = lib.mkNixOSServer {
+          hostname = "phobos";
+        };
 
-        "deimos" =
-          let
-            system = "x86_64-linux";
-            constants = import ./lib/constants.nix;
-            nixPkgs = import nixpkgs {
-              inherit system;
-              overlays = [
-                (final: prev: {
-                  unstable = import nixpkgs-unstable {
-                    system = prev.system;
-                    config = prev.config;
-                  };
-                })
-              ];
-            };
-          in
-          nixpkgs.lib.nixosSystem {
-            pkgs = nixPkgs;
-            specialArgs = { inherit inputs constants; };
-            modules = [
-              ./hosts/mars/deimos/configuration.nix
-              sops-nix.nixosModules.sops
-              quadlet-nix.nixosModules.quadlet
-            ];
-          };
+        "deimos" = lib.mkNixOSServer {
+          hostname = "deimos";
+          extraModules = [
+            quadlet-nix.nixosModules.quadlet
+          ];
+        };
 
-        "curiosity" =
-          let
-            system = "x86_64-linux";
-            constants = import ./lib/constants.nix;
-            nixPkgs = import nixpkgs {
-              inherit system;
-              overlays = [
-                (final: prev: {
-                  unstable = import nixpkgs-unstable {
-                    system = prev.system;
-                    config = prev.config;
-                  };
-                })
-              ];
-            };
-          in
-          nixpkgs.lib.nixosSystem {
-            pkgs = nixPkgs;
-            specialArgs = { inherit inputs constants; };
-            modules = [
-              ./hosts/mars/curiosity/configuration.nix
-              sops-nix.nixosModules.sops
-            ];
-          };
+        "curiosity" = lib.mkNixOSServer {
+          hostname = "curiosity";
+        };
 
-        "opportunity" =
-          let
-            system = "x86_64-linux";
-            constants = import ./lib/constants.nix;
-            nixPkgs = import nixpkgs {
-              inherit system;
-              overlays = [
-                (final: prev: {
-                  unstable = import nixpkgs-unstable {
-                    system = prev.system;
-                    config = prev.config;
-                  };
-                })
-              ];
-            };
-          in
-          nixpkgs.lib.nixosSystem {
-            pkgs = nixPkgs;
-            specialArgs = { inherit inputs constants; };
-            modules = [
-              ./hosts/mars/opportunity/configuration.nix
-              sops-nix.nixosModules.sops
-            ];
-          };
+        "opportunity" = lib.mkNixOSServer {
+          hostname = "opportunity";
+        };
       };
 
       # module decalrations
