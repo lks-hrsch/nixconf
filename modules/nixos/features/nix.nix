@@ -12,8 +12,8 @@
       automatic = true;
     };
     settings = {
+      auto-optimise-store = true;
       trusted-users = [
-        "root"
         "lkshrsch"
       ];
       substituters = [

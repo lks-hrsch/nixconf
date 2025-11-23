@@ -45,9 +45,6 @@ sudo darwin-rebuild switch --flake ".#lkshrsch-mbp-m3"
 ## working with git-crypt
 
 ``` bash
-
-
-
 # add a new gpg user
 gpg --armor --export <KEYID> > new-public-key.asc
 gpg --import new-public-key.asc

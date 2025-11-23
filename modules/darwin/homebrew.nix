@@ -36,7 +36,6 @@
       "aldente"
       "anki"
       "claude"
-      "discord"
       "fork"
       "google-chrome"
       "jetbrains-toolbox"
