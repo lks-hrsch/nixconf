@@ -13,6 +13,8 @@
     "${modulesPath}/virtualisation/lxc-container.nix"
   ];
 
+  nix.settings.sandbox = false;
+
   networking = {
     hostName = "opportunity";
     dhcpcd.enable = false;

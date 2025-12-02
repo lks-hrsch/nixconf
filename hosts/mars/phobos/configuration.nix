@@ -44,6 +44,8 @@
     ];
   };
 
+  nix.settings.sandbox = false;
+
   # Install LDAP and Kerberos management tools
   environment.systemPackages = with pkgs; [
     openldap # LDAP client tools (ldapsearch, ldapadd, etc.)

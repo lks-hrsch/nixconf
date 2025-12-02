@@ -42,6 +42,14 @@ sudo nix run nix-darwin -- switch --flake ".#lkshrsch-mbp-m3" # initial setup
 sudo darwin-rebuild switch --flake ".#lkshrsch-mbp-m3"
 ```
 
+build a nixos on darwin:
+
+<!-- https://github.com/NixOS/nixpkgs/issues/439945 -->
+
+``` bash
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@10.10.1.18 --target-host root@10.10.1.18 --option sandbox false
+```
+
 ## working with git-crypt
 
 ``` bash

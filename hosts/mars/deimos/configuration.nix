@@ -49,6 +49,8 @@
     };
   };
 
+  nix.settings.sandbox = false;
+
   networking = {
     hostName = "deimos";
     dhcpcd.enable = false;
