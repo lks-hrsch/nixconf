@@ -16,11 +16,12 @@
 
   home.packages = with pkgs; [
     azure-cli
-    fio
-    iperf3
     jq
-    nmap
     wget
+    nmap
+    iperf3
+    fio
+    smartmontools
 
     # latex
     (texliveSmall.withPackages (
