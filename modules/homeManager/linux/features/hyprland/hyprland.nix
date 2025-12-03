@@ -7,7 +7,7 @@
     pkgs.hyprsunset
     pkgs.wl-clipboard
     # hyprsysteminfo
-    inputs.hyprland-contrib.packages.${pkgs.system}.grimblast
+    inputs.hyprland-contrib.packages.${pkgs.stdenv.hostPlatform.system}.grimblast
   ];
 
   wayland.windowManager.hyprland = {
@@ -24,7 +24,6 @@
 
       exec-once = [
         "uswm app -- hyprpolkitagent"
-        "uwsm app -- hyprpaper"
         "uwsm app -- hyprsunset"
         "uwsm app -- dunst"
         "uwsm app -- 1password --silent"
@@ -33,7 +32,7 @@
       ];
 
       monitor = [
-        "DP-3,highrr,auto,1,cm,hdr,sdrbrightness,1.4,sdrsaturation,1,vrr,2"
+        "DP-3,highrr,auto,1,cm,hdr,sdrbrightness,1.5,sdrsaturation,1,vrr,2"
         "DP-2,highres,auto-left,1,transform,1,cm,hdr,sdrbrightness,1.2,sdrsaturation,1,vrr,2"
       ];
 

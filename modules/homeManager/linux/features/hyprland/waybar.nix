@@ -76,19 +76,19 @@ let
     };
     idle_inhibitor = {
       on-click-right = "hyprlock";
-      format = "{icon} ";
+      format = "<span size='12pt'>{icon}</span> ";
       format-icons = {
         activated = "";
         deactivated = "";
       };
     };
     pulseaudio = {
-      format = "{volume}% s";
+      format = "{volume}% <span size='12pt'></span>";
       on-click-right = "pavucontrol";
     };
     cpu = {
       interval = interval;
-      format = "{usage}% ({load}) ";
+      format = "{usage}% ({load}) <span size='12pt'></span>";
       states = {
         warning = 70;
         critical = 90;
@@ -97,21 +97,21 @@ let
     temperature = {
       interval = interval;
       hwmon-path = "/sys/class/hwmon/hwmon2/temp1_input";
-      format = "{temperatureC}°C  ";
+      format = "{temperatureC}°C <span size='12pt'> </span>";
     };
     "custom/gpu-utilization" = {
       exec = "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits";
-      format = "{}% ";
+      format = "{}% <span size='12pt'></span>";
       interval = interval;
     };
     "custom/gpu-temperature" = {
       exec = "nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits";
-      format = "{}°C  ";
+      format = "{}°C <span size='12pt'> </span>";
       interval = interval;
     };
     memory = {
       interval = interval;
-      format = "{used:0.1f}G/{total:0.1f}G ";
+      format = "{used:0.1f}G/{total:0.1f}G <span size='12pt'></span>";
       states = {
         warning = 70;
         critical = 90;
@@ -119,8 +119,8 @@ let
     };
     network = {
       interval = interval;
-      format-wifi = " {essid}({signalStrength}%) {bandwidthDownBytes} /{bandwidthUpBytes}";
-      format-ethernet = " {bandwidthDownBytes} /{bandwidthUpBytes}";
+      format-wifi = "<span size='12pt'></span> {essid}({signalStrength}%) {bandwidthDownBytes}<span size='12pt'></span> /{bandwidthUpBytes}<span size='12pt'></span>";
+      format-ethernet = "<span size='12pt'></span> {bandwidthDownBytes}<span size='12pt'></span> /{bandwidthUpBytes}<span size='12pt'></span>";
       format-disconnected = "Disconnected";
       tooltip-format = "{ifname}: {ipaddr}/{cidr}";
     };
@@ -161,10 +161,10 @@ let
     }
 
     #custom-nixos-menu {
-        font-size: 18px;
+        font-size: 28px;
         background-color: rgba(24, 24, 37, 1);
-        padding-left: 10px;
-        padding-right: 17px;
+        padding-left: 12px;
+        padding-right: 12px;
         margin-left: 1px;
         margin-right: 1px;
     }

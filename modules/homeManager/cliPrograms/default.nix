@@ -33,6 +33,9 @@
         latexmk
         datetime2
         biblatex
+        bbm
+        bbm-macros
+        minted # syntax highlighting
       ]
     ))
     ghostscript

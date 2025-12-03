@@ -18,7 +18,7 @@
         path = "${config.sops.secrets."git/user-lks-hrsch".path}";
       }
     ];
-    extraConfig = {
+    settings = {
       gpg = {
         format = "ssh";
       };

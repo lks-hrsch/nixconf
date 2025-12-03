@@ -130,8 +130,6 @@
       nvidia-vaapi-driver
       libva
       vulkan-loader
-      rocmPackages.rocm-smi
-      rocmPackages.clr
     ];
   };
 

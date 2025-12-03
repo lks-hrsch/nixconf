@@ -8,7 +8,7 @@
   config = lib.mkIf config.features.gaming.enable {
     environment.systemPackages = with pkgs; [
       mangohud
-      protonup
+      protonup-ng
     ];
 
     # STEAM
