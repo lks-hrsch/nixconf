@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 {
   # Linux-specific home-manager modules
   imports = [
@@ -7,5 +7,9 @@
     ./files/uwsm-env.nix
     ./guiProgramms/obsstudio.nix
     ./guiProgramms/thunderbird.nix
+  ];
+
+  home.packages = with pkgs; [
+    fio
   ];
 }

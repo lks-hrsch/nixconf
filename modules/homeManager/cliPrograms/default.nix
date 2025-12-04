@@ -20,7 +20,6 @@
     wget
     nmap
     iperf3
-    fio
     smartmontools
 
     # latex
