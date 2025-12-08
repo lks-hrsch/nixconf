@@ -12,17 +12,13 @@
       hostname,
       extraModules ? [ ],
     }:
-    let
-      system = "x86_64-linux";
-      nixPkgs = import nixpkgs {
-        inherit system;
-        overlays = [ custom-overlays.unstable ];
-      };
-    in
     nixpkgs.lib.nixosSystem {
-      pkgs = nixPkgs;
       specialArgs = { inherit inputs constants; };
       modules = [
+        {
+          nixpkgs.hostPlatform = "x86_64-linux";
+          nixpkgs.overlays = [ custom-overlays.unstable ];
+        }
         ../hosts/mars/${hostname}/configuration.nix
         sops-nix.nixosModules.sops
       ]

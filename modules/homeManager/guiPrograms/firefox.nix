@@ -1,6 +1,5 @@
 {
   pkgs,
-  firefox-addons-allow-unfree,
   ...
 }:
 let
@@ -113,7 +112,7 @@ in
         "dom.security.https_only_mode" = true;
       };
       extensions = {
-        packages = with firefox-addons-allow-unfree; [
+        packages = with pkgs.firefox-addons; [
           ublock-origin
           youtube-shorts-block
           onepassword-password-manager

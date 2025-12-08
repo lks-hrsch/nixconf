@@ -65,7 +65,7 @@
       ...
     }@inputs:
     let
-      custom-overlays = import ./overlays { inherit nixpkgs-unstable; };
+      custom-overlays = import ./overlays { inherit inputs; };
       constants = import ./secrets/constants.nix;
       lib = import ./lib {
         inherit
@@ -79,104 +79,92 @@
     in
     {
       darwinConfigurations = {
-        "lkshrsch-mbp-m3" =
-          let
-            system = "aarch64-darwin";
-            nixPkgs = import nixpkgs {
-              inherit system;
-              config = {
-                allowUnfree = true;
-              };
-              overlays = [
+        "lkshrsch-mbp-m3" = nix-darwin.lib.darwinSystem {
+          specialArgs = { inherit self inputs constants; };
+          modules = [
+            {
+              nixpkgs.hostPlatform = "aarch64-darwin";
+              nixpkgs.config.allowUnfree = true;
+              nixpkgs.overlays = [
                 nix-vscode-extensions.overlays.default
                 custom-overlays.unstable
+                custom-overlays.firefox-addons
               ];
-            };
-          in
-          nix-darwin.lib.darwinSystem {
-            pkgs = nixPkgs;
-            specialArgs = { inherit self inputs constants; };
-            modules = [
-              ./hosts/lkshrsch-mbp-m3/configuration.nix
-              sops-nix.darwinModules.sops
-              mac-app-util.darwinModules.default
+            }
+            ./hosts/lkshrsch-mbp-m3/configuration.nix
+            sops-nix.darwinModules.sops
+            mac-app-util.darwinModules.default
 
-              home-manager.darwinModules.home-manager
-              {
-                home-manager = {
-                  sharedModules = [
-                    sops-nix.homeManagerModules.sops
-                    mac-app-util.homeManagerModules.default
-                    stylix.homeModules.stylix
-                  ];
-                  extraSpecialArgs = {
-                    inherit inputs nixPkgs;
-                    firefox-addons-allow-unfree = nixPkgs.callPackage firefox-addons { };
-                  };
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  backupFileExtension = ".backup";
-                  users.lkshrsch = {
-                    imports = [
-                      ./hosts/lkshrsch-mbp-m3/home.nix
-                    ];
-                  };
+            home-manager.darwinModules.home-manager
+            {
+              home-manager = {
+                sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                  mac-app-util.homeManagerModules.default
+                  stylix.homeModules.stylix
+                ];
+                extraSpecialArgs = {
+                  inherit inputs;
                 };
-              }
-            ];
-          };
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                backupFileExtension = ".backup";
+                users.lkshrsch = {
+                  imports = [
+                    ./hosts/lkshrsch-mbp-m3/home.nix
+                  ];
+                };
+              };
+            }
+          ];
+        };
       };
 
       nixosConfigurations = {
-        "workstation-nixos" =
-          let
-            system = "x86_64-linux";
-            nixPkgs = import nixpkgs {
-              inherit system;
-              config = {
+        "workstation-nixos" = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs constants; };
+          modules = [
+            {
+              nixpkgs.hostPlatform = "x86_64-linux";
+              nixpkgs.config = {
                 allowUnfree = true;
                 cudaSupport = true;
               };
-              overlays = [
+              nixpkgs.overlays = [
                 nix-vscode-extensions.overlays.default
                 custom-overlays.unstable
+                custom-overlays.firefox-addons
               ];
-            };
-          in
-          nixpkgs.lib.nixosSystem {
-            pkgs = nixPkgs;
-            specialArgs = { inherit inputs constants; };
-            modules = [
-              ./hosts/workstation-nixos/configuration.nix
-              sops-nix.nixosModules.sops
-              quadlet-nix.nixosModules.quadlet
+            }
+            ./hosts/workstation-nixos/configuration.nix
+            sops-nix.nixosModules.sops
+            quadlet-nix.nixosModules.quadlet
 
-              # make home-manager as a module of nixos
-              # so that home-manager configuration will be deployed automatically when executing `nixos-rebuild switch`
-              home-manager.nixosModules.home-manager
-              {
-                home-manager = {
-                  sharedModules = [
-                    sops-nix.homeManagerModules.sops
-                    stylix.homeModules.stylix
-                  ];
-                  extraSpecialArgs = {
-                    inherit inputs nixPkgs;
-                    firefox-addons-allow-unfree = nixPkgs.callPackage firefox-addons { };
-                  };
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  backupFileExtension = ".backup";
-                  users.lkshrsch = {
-                    imports = [
-                      ./hosts/workstation-nixos/home.nix
-
-                    ];
-                  };
+            # make home-manager as a module of nixos
+            # so that home-manager configuration will be deployed automatically when executing `nixos-rebuild switch`
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                sharedModules = [
+                  sops-nix.homeManagerModules.sops
+                  stylix.homeModules.stylix
+                ];
+                extraSpecialArgs = {
+                  inherit inputs;
                 };
-              }
-            ];
-          };
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                backupFileExtension = ".backup";
+                users.lkshrsch = {
+                  imports = [
+                    ./hosts/workstation-nixos/home.nix
+
+                  ];
+                };
+              };
+            }
+          ];
+        };
 
         "phobos" = lib.mkNixOSServer {
           hostname = "phobos";

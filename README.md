@@ -3,7 +3,10 @@
 - <https://mynixos.com>
 
 ``` bash
+nix-store --gc
 sudo nix-store --gc
+
+nix-store --optimise
 sudo nix-store --optimise
 
 # list generations 
