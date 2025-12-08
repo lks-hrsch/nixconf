@@ -44,7 +44,6 @@
       "microsoft-edge"
       "mullvad-vpn"
       "notion"
-      "ollama-app"
       "onyx"
       "openvpn-connect"
       "podman-desktop"
