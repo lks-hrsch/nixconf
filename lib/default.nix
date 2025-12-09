@@ -5,18 +5,21 @@
   inputs,
   constants,
 }:
-
-{
+let
+  lib = nixpkgs.lib;
+in
+lib
+// {
   mkNixOSServer =
     {
       hostname,
       extraModules ? [ ],
     }:
-    nixpkgs.lib.nixosSystem {
+    lib.nixosSystem {
       specialArgs = { inherit inputs constants; };
       modules = [
         {
-          nixpkgs.hostPlatform = "x86_64-linux";
+          nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
           nixpkgs.overlays = [ custom-overlays.unstable ];
         }
         ../hosts/mars/${hostname}/configuration.nix

@@ -1,6 +1,5 @@
 {
   self,
-  lib,
   inputs,
   ...
 }:
@@ -21,8 +20,6 @@
 
   # this will allow you to use nix-darwin with Determinate.
   nix.enable = false;
-
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
 
   system = {
     primaryUser = "lkshrsch";

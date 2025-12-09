@@ -79,11 +79,11 @@
     in
     {
       darwinConfigurations = {
-        "lkshrsch-mbp-m3" = nix-darwin.lib.darwinSystem {
+        "MacBook-000553" = nix-darwin.lib.darwinSystem {
           specialArgs = { inherit self inputs constants; };
           modules = [
             {
-              nixpkgs.hostPlatform = "aarch64-darwin";
+              nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
               nixpkgs.config.allowUnfree = true;
               nixpkgs.overlays = [
                 nix-vscode-extensions.overlays.default
@@ -91,7 +91,7 @@
                 custom-overlays.firefox-addons
               ];
             }
-            ./hosts/lkshrsch-mbp-m3/configuration.nix
+            ./hosts/MacBook-000553/configuration.nix
             sops-nix.darwinModules.sops
             mac-app-util.darwinModules.default
 
@@ -111,7 +111,7 @@
                 backupFileExtension = ".backup";
                 users.lkshrsch = {
                   imports = [
-                    ./hosts/lkshrsch-mbp-m3/home.nix
+                    ./hosts/MacBook-000553/home.nix
                   ];
                 };
               };
@@ -125,7 +125,7 @@
           specialArgs = { inherit inputs constants; };
           modules = [
             {
-              nixpkgs.hostPlatform = "x86_64-linux";
+              nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
               nixpkgs.config = {
                 allowUnfree = true;
                 cudaSupport = true;

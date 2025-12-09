@@ -41,8 +41,8 @@ on darwin:
 sudo determinate-nixd upgrade
 
 # apply configuration
-sudo nix run nix-darwin -- switch --flake ".#lkshrsch-mbp-m3" # initial setup
-sudo darwin-rebuild switch --flake ".#lkshrsch-mbp-m3"
+sudo nix run nix-darwin -- switch --flake ".#MacBook-000553" # initial setup
+sudo darwin-rebuild switch --flake ".#MacBook-000553"
 ```
 
 build a nixos on darwin:
