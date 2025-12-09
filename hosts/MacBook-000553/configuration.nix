@@ -19,7 +19,14 @@
   };
 
   networking = {
+    computerName = "MacBook-000553";
     hostName = "MacBook-000553";
+    localHostName = "MacBook-000553";
+
+    applicationFirewall = {
+      enable = true;
+      enableStealthMode = true;
+    };
   };
 
   # this will allow you to use nix-darwin with Determinate.
@@ -33,9 +40,26 @@
 
     defaults = {
       finder = {
+        AppleShowAllFiles = true;
+        AppleShowAllExtensions = true;
+        FXEnableExtensionChangeWarning = false;
+        FXPreferredViewStyle = "Nlsv";
+        FXRemoveOldTrashItems = true;
+        ShowPathbar = true;
+      };
+      loginwindow = {
+        DisableConsoleAccess = true;
+        GuestEnabled = false;
+      };
+      NSGlobalDomain = {
+        AppleInterfaceStyle = "Dark";
+        AppleMeasurementUnits = "Centimeters";
         AppleShowAllExtensions = true;
         AppleShowAllFiles = true;
+        AppleShowScrollBars = "WhenScrolling";
+        AppleTemperatureUnit = "Celsius";
       };
+      smb.NetBIOSName = "MacBook-000553";
     };
   };
 }
