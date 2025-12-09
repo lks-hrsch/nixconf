@@ -20,13 +20,11 @@
     # CLI tools (formulae)
     brews = [
       "appium"
-      "docker-compose"
       "git-svn"
       "helm"
       "ios-deploy"
       "mas" # https://github.com/mas-cli/mas
       "podman"
-      "podman-compose"
       "rbenv"
       "subversion"
     ];
@@ -38,7 +36,6 @@
       "claude"
       "fork"
       "google-chrome"
-      "jetbrains-toolbox"
       "keepassxc"
       "languagetool-desktop"
       "microsoft-edge"

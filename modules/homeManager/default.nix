@@ -9,10 +9,7 @@
     ./cliPrograms
 
     # GUI programs (cross-platform)
-    ./guiPrograms/alacritty.nix
-    ./guiPrograms/firefox.nix
-    ./guiPrograms/obsidian.nix
-    ./guiPrograms/vscode.nix
+    ./guiPrograms
   ];
 
   # Note: Linux-specific modules in ./linux should be imported

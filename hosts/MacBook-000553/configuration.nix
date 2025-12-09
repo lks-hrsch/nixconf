@@ -18,6 +18,10 @@
     watchIdAuth = true;
   };
 
+  networking = {
+    hostName = "MacBook-000553";
+  };
+
   # this will allow you to use nix-darwin with Determinate.
   nix.enable = false;
 
