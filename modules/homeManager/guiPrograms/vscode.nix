@@ -1,11 +1,16 @@
 { pkgs, ... }:
 let
+  vscodePackage = pkgs.unstable.vscode;
+  vsCodeVersion = vscodePackage.version;
+  extensionsCompatible = pkgs.forVSCodeVersion vsCodeVersion;
+  marketplace = extensionsCompatible.vscode-marketplace;
+
   # extensions for all profiles
-  defaultExtensions = with pkgs.vscode-marketplace-release; [
+  defaultExtensions = with marketplace; [
     pkief.material-icon-theme
     christian-kohler.path-intellisense
     ms-vscode-remote.remote-containers
-    ms-vscode-remote.remote-ssh
+    pkgs.unstable.vscode-extensions.ms-vscode-remote.remote-ssh
     ms-vscode-remote.remote-ssh-edit
 
     # some useful tools
@@ -20,8 +25,8 @@ let
 
     # github
     github.copilot
-    github.copilot-chat
-    github.vscode-pull-request-github
+    pkgs.unstable.vscode-extensions.github.copilot-chat
+    pkgs.unstable.vscode-extensions.github.vscode-pull-request-github
     github.vscode-github-actions
 
     # nix extensions
@@ -81,7 +86,7 @@ in
 
   programs.vscode = {
     enable = true;
-    package = pkgs.unstable.vscode;
+    package = vscodePackage;
 
     profiles = {
       default = {
@@ -92,7 +97,7 @@ in
       lkshrsch = {
         extensions =
           defaultExtensions
-          ++ (with pkgs.vscode-marketplace-release; [
+          ++ (with marketplace; [
             # Add additional extensions specific to lkshrsch profile here
             # C/C++ extensions
             llvm-vs-code-extensions.vscode-clangd

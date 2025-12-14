@@ -35,6 +35,7 @@
         bbm
         bbm-macros
         minted # syntax highlighting
+        csquotes
       ]
     ))
     ghostscript

@@ -39,6 +39,7 @@ on darwin:
 ``` bash
 # update 
 sudo determinate-nixd upgrade
+sudo nix flake update
 
 # apply configuration
 sudo nix run nix-darwin -- switch --flake ".#MacBook-000553" # initial setup
