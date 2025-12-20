@@ -21,6 +21,35 @@
     secrets = {
       "ssh-public-key" = { };
     }
+    // lib.optionalAttrs (config.networking.hostName == "MacBook-000553") {
+      "wg0/preshared-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+      };
+      "wg0/private-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+      };
+      "wg0/public-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+      };
+      "wg-rustlers42/preshared-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+      };
+      "wg-rustlers42/private-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+      };
+      "wg-rustlers42/public-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+      };
+      "wg-impact-labs/preshared-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+      };
+      "wg-impact-labs/private-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+      };
+      "wg-impact-labs/public-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+      };
+    }
     // lib.optionalAttrs (config.networking.hostName == "workstation-nixos") {
       "smb-credentials-mars" = {
         owner = "lkshrsch";

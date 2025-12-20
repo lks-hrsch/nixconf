@@ -7,6 +7,9 @@
   imports = [
     inputs.self.outputs.modules.darwin.default
     inputs.self.outputs.modules.shared.default
+
+    # vpn
+    ./vpn.nix
   ];
 
   features = {

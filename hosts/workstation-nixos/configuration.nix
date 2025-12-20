@@ -14,8 +14,8 @@
     inputs.self.outputs.modules.nixos.default
     inputs.self.outputs.modules.shared.default
 
-    # openvpn
-    ./openvpn.nix
+    # vpn
+    ./vpn.nix
 
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -27,31 +27,6 @@
     virtualisation.podman.enable = true;
     zfs.enable = true;
     nas.enable = true;
-    wireguard = {
-      enable = true;
-      address = "10.10.1.65/24";
-      dns = [
-        "10.10.1.1"
-        "10.10.1.3"
-      ];
-      peers = [
-        {
-          publicKey = "eTYFEILoUH8pbFVU9WJpzdNGTPm4eLiDAQXmyO1M7wE=";
-          allowedIPs = [
-            "10.10.1.1/32"
-            "10.10.1.4/32"
-            "10.10.1.17/32"
-            "10.10.1.18/32"
-          ];
-          endpoint = "mercury.lukashirsch.de:51821";
-        }
-        {
-          publicKey = "65mINKiTOCgTIiGCSk5YpbSFdryFEnTrr9vGcHEL5yI=";
-          allowedIPs = [ "10.10.1.3/32" ];
-          endpoint = "earth.staudenstuebler.de:51821";
-        }
-      ];
-    };
   };
 
   # Use the systemd-boot EFI boot loader.

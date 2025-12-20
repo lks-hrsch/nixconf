@@ -80,7 +80,14 @@
     {
       darwinConfigurations = {
         "MacBook-000553" = nix-darwin.lib.darwinSystem {
-          specialArgs = { inherit self inputs constants; };
+          specialArgs = {
+            inherit
+              self
+              inputs
+              constants
+              lib
+              ;
+          };
           modules = [
             {
               nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
@@ -122,7 +129,7 @@
 
       nixosConfigurations = {
         "workstation-nixos" = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs constants; };
+          specialArgs = { inherit inputs constants lib; };
           modules = [
             {
               nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

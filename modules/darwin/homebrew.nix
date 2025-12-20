@@ -57,7 +57,6 @@
     masApps = {
       "1Password for Safari" = 1569813296; # Safari extension
       "LanguageTool" = 1534275760; # Safari extension
-      "WireGuard" = 1451685025;
       "Tailscale" = 1475387142;
 
       # University

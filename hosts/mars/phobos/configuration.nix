@@ -8,7 +8,6 @@
   pkgs,
   ...
 }:
-
 {
   imports = [
     inputs.self.outputs.modules.nixos.default
@@ -16,33 +15,10 @@
 
     # Include the default incus configuration.
     "${modulesPath}/virtualisation/lxc-container.nix"
-  ];
 
-  features.wireguard = {
-    enable = true;
-    address = "10.10.1.17/24";
-    dns = [
-      "10.10.1.1"
-      "10.10.1.3"
-    ];
-    peers = [
-      {
-        publicKey = "eTYFEILoUH8pbFVU9WJpzdNGTPm4eLiDAQXmyO1M7wE=";
-        allowedIPs = [
-          "10.10.1.1/32"
-          "10.10.1.64/28"
-        ];
-        endpoint = "mercury.lukashirsch.de:51821";
-        persistentKeepalive = 25;
-      }
-      {
-        publicKey = "65mINKiTOCgTIiGCSk5YpbSFdryFEnTrr9vGcHEL5yI=";
-        allowedIPs = [ "10.10.1.3/32" ];
-        endpoint = "earth.staudenstuebler.de:51821";
-        persistentKeepalive = 25;
-      }
-    ];
-  };
+    # vpn
+    ./vpn.nix
+  ];
 
   nix.settings.sandbox = false;
 
