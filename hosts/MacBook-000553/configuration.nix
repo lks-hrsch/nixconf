@@ -1,5 +1,4 @@
 {
-  self,
   inputs,
   ...
 }:
@@ -38,7 +37,7 @@
   system = {
     primaryUser = "lkshrsch";
 
-    configurationRevision = self.rev or self.dirtyRev or null; # Set Git commit hash for darwin-version.
+    configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null; # Set Git commit hash for darwin-version.
     stateVersion = 6; # $ darwin-rebuild changelog
 
     defaults = {

@@ -82,7 +82,6 @@
         "MacBook-000553" = nix-darwin.lib.darwinSystem {
           specialArgs = {
             inherit
-              self
               inputs
               constants
               lib
