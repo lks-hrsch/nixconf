@@ -32,8 +32,8 @@
       ];
 
       monitor = [
-        "DP-3,highrr,auto,1,cm,hdr,sdrbrightness,1.5,sdrsaturation,1,vrr,2"
-        "DP-2,highres,auto-left,1,transform,1,cm,hdr,sdrbrightness,1.2,sdrsaturation,1,vrr,2"
+        "DP-3,highrr,auto,1,vrr,2"
+        "DP-2,highres,auto-left,1,transform,1,vrr,2"
       ];
 
       windowrule = [
