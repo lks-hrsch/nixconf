@@ -46,7 +46,6 @@
       "microsoft-edge"
       "mullvad-vpn"
       "notion"
-      "onyx"
       "openvpn-connect"
       "podman-desktop"
       "postman"
