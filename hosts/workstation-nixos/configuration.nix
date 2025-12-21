@@ -124,11 +124,7 @@
     # Support is limited to the Turing and later architectures. Full list of
     # supported GPUs is at:
     # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
-    # Currently alpha-quality/buggy, so false is currently the recommended setting.
-    open = false;
-
-    # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    open = true;
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
