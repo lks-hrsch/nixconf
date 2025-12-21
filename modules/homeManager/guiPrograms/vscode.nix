@@ -6,11 +6,12 @@ let
   marketplace = extensionsCompatible.vscode-marketplace;
 
   # extensions for all profiles
+  # if they are not working properly append pkgs.unstable.vscode-extensions. in front of the extension id
   defaultExtensions = with marketplace; [
     pkief.material-icon-theme
     christian-kohler.path-intellisense
     ms-vscode-remote.remote-containers
-    pkgs.unstable.vscode-extensions.ms-vscode-remote.remote-ssh
+    ms-vscode-remote.remote-ssh
     ms-vscode-remote.remote-ssh-edit
 
     # some useful tools
@@ -24,9 +25,8 @@ let
     donjayamanne.githistory
 
     # github
-    github.copilot
-    pkgs.unstable.vscode-extensions.github.copilot-chat
-    pkgs.unstable.vscode-extensions.github.vscode-pull-request-github
+    github.copilot-chat
+    github.vscode-pull-request-github
     github.vscode-github-actions
 
     # nix extensions

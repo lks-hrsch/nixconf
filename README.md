@@ -3,18 +3,16 @@
 - <https://mynixos.com>
 
 ``` bash
-nix-store --gc
 sudo nix-store --gc
-
-nix-store --optimise
 sudo nix-store --optimise
 
 # list generations 
 sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
 nix-env --list-generations --profile ~/.local/state/nix/profiles/home-manager
 
-# delete generations older than 1d
-sudo nix-env --delete-generations 1d --profile /nix/var/nix/profiles/system
+# delete generations older than 7d
+sudo nix-env --delete-generations 7d --profile /nix/var/nix/profiles/system
+nix-env --delete-generations 7d --profile ~/.local/state/nix/profiles/home-manager
 
 # complet clean up which deletes all generations
 sudo nix-collect-garbage --delete-old

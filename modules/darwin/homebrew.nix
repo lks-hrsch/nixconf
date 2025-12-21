@@ -17,6 +17,10 @@
       cleanup = "zap";
     };
 
+    taps = [
+      "tw93/tap" # for mole
+    ];
+
     # CLI tools (formulae)
     brews = [
       "appium"
@@ -24,6 +28,7 @@
       "helm"
       "ios-deploy"
       "mas" # https://github.com/mas-cli/mas
+      "tw93/tap/mole" # https://github.com/tw93/Mole
       "podman"
       "rbenv"
       "subversion"
