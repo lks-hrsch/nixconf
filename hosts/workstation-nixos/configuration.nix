@@ -3,7 +3,6 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
 {
-  config,
   pkgs,
   inputs,
   ...
@@ -32,7 +31,6 @@
   # Use the systemd-boot EFI boot loader.
   boot.loader = {
     systemd-boot.enable = true;
-    systemd-boot.configurationLimit = 5; # keep only a few generations on the ESP to avoid filling /boot
     efi.canTouchEfiVariables = true;
   };
 

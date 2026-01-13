@@ -1,9 +1,12 @@
 { pkgs, config, ... }:
 let
-  ###############################################################
-  # Catppuccin Mocha Palette (Full) with Base16 Mapping Override
-  ###############################################################
+  #################################################################################
+  # Catppuccin Mocha Palette (Full) with Base16 Mapping Override and change to OLED
+  #################################################################################
   # Define each color using its common name, then build a Base16 mapping.
+  # https://catppuccin.com/palette/
+  # https://github.com/catppuccin/infinity/issues/3#issuecomment-1581791124
+
   catppuccinMocha = {
     # Full Palette Definitions
     rosewater = "#f5e0dc"; # Soft pastel rose
@@ -16,7 +19,7 @@ let
     yellow = "#f9e2af"; # Soft, warm yellow
     green = "#a6e3a1"; # Calming green
     teal = "#94e2d5"; # Light teal
-    sky = "#89dceb"; # Soothing sky blue
+    sky = "#89dceb"; # Soothing sky blues
     sapphire = "#74c7ec"; # Cool sapphire blue
     blue = "#89b4fa"; # Vivid blue tone
     lavender = "#b4befe"; # Delicate lavender for highlights
@@ -29,12 +32,13 @@ let
     surface2 = "#585b70"; # Darker background for panels
     surface1 = "#45475a"; # Medium surface background
     surface0 = "#313244"; # Lighter surface background
-    base = "#1e1e2e"; # Original base (kept for reference)
-    mantle = "#181825"; # Slightly lighter than base (e.g. for status bars)
-    crust = "#11111b"; # Deepest shade (used as base00 below)
+    base = "#040404"; # "#1e1e2e"; # Original base (kept for reference)
+    mantle = "#080808"; # "#181825"; # Slightly lighter than base (e.g. for status bars)
+    crust = "#000000"; # "#11111b"; # Deepest shade (used as base00 below)
 
   };
   # Base16 Mapping: Building the mapping by referencing the named colors.
+  # https://github.com/catppuccin/base16/blob/main/base16/mocha.yaml
   # Note: Here we want base00 to use "crust".
   base16 = {
     base00 = catppuccinMocha.crust; # Default Background
