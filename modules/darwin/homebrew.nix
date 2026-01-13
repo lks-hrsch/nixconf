@@ -19,6 +19,7 @@
 
     taps = [
       "tw93/tap" # for mole
+      "slp/krunkit" # for krunkit
     ];
 
     # CLI tools (formulae)
@@ -31,6 +32,7 @@
       "tw93/tap/mole" # https://github.com/tw93/Mole
       "podman"
       "rbenv"
+      "slp/krunkit/krunkit"
       "subversion"
     ];
 

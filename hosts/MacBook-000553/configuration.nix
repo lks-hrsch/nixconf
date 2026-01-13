@@ -62,6 +62,11 @@
         AppleTemperatureUnit = "Celsius";
       };
       smb.NetBIOSName = "MacBook-000553";
+      CustomUserPreferences = {
+        "com.apple.desktopservices" = {
+          DSDontWriteNetworkStores = true;
+        };
+      };
     };
   };
 }

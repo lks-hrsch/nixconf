@@ -95,6 +95,7 @@
                 nix-vscode-extensions.overlays.default
                 custom-overlays.unstable
                 custom-overlays.firefox-addons
+                custom-overlays.python-fixes
               ];
             }
             ./hosts/MacBook-000553/configuration.nix
