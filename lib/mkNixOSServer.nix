@@ -22,6 +22,7 @@ lib.nixosSystem {
     }
     ../hosts/mars/${hostname}/configuration.nix
     sops-nix.nixosModules.sops
+    inputs.nixvim.nixosModules.nixvim
   ]
   ++ extraModules;
 }

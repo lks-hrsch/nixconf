@@ -24,6 +24,9 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-25.11";
+    };
     nix-vscode-extensions = {
       url = "github:nix-community/nix-vscode-extensions";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -58,6 +61,7 @@
       home-manager,
       stylix,
       firefox-addons,
+      nixvim,
       nix-vscode-extensions,
       sops-nix,
       quadlet-nix,
@@ -101,6 +105,7 @@
             ./hosts/MacBook-000553/configuration.nix
             sops-nix.darwinModules.sops
             mac-app-util.darwinModules.default
+            nixvim.nixDarwinModules.nixvim
 
             home-manager.darwinModules.home-manager
             {
@@ -146,6 +151,7 @@
             ./hosts/workstation-nixos/configuration.nix
             sops-nix.nixosModules.sops
             quadlet-nix.nixosModules.quadlet
+            nixvim.nixosModules.nixvim
 
             # make home-manager as a module of nixos
             # so that home-manager configuration will be deployed automatically when executing `nixos-rebuild switch`
