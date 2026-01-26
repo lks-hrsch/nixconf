@@ -1,1 +1,1 @@
-darwin-rebuild switch --flake ".#lkshrsch-mbp-m3"
+darwin-rebuild switch --flake ".#MacBook-000553"

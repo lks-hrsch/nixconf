@@ -58,9 +58,6 @@ let
       };
     };
 
-    "github.copilot.enable" = {
-      "*" = true;
-    };
     "github.copilot.nextEditSuggestions.enabled" = true;
     "github.copilot.nextEditSuggestions.fixes" = true;
     "github.copilot.chat.editor.temporalContext.enabled" = true;
@@ -81,7 +78,10 @@ in
     nil
     nixfmt-rfc-style
     nixpkgs-fmt
+
+    # vscode forks with AI
     code-cursor
+    antigravity
   ];
 
   programs.vscode = {

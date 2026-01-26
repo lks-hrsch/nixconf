@@ -79,7 +79,6 @@
 
       # Random useful apps
       "AusweisApp" = 948660805;
-      "Blackmagic Disk Speed Test" = 425264550;
       "Slack for Desktop" = 803453959;
     };
   };

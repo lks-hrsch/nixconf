@@ -49,6 +49,18 @@
       "wg-impact-labs/public-key" = {
         sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
       };
+      "wg-toronto/preshared-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+        key = "wg-privadovpn-toronto/preshared-key";
+      };
+      "wg-toronto/private-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+        key = "wg-privadovpn-toronto/private-key";
+      };
+      "wg-toronto/public-key" = {
+        sopsFile = ../../secrets/wireguard-macbook-000553.yaml;
+        key = "wg-privadovpn-toronto/public-key";
+      };
     }
     // lib.optionalAttrs (config.networking.hostName == "workstation-nixos") {
       "smb-credentials-mars" = {

@@ -3,7 +3,7 @@
   ...
 }:
 let
-  firefox-bin = pkgs.unstable.firefox;
+  firefox-bin = pkgs.unstable.firefox-bin;
 in
 {
   # On macOS, programs.firefox.package doesn't automatically create app symlinks

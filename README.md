@@ -67,3 +67,10 @@ git-crypt add-gpg-user <KEYID>
 # unlock the repository
 git-crypt unlock
 ```
+
+## working with sops
+
+``` bash
+# edit secrets
+SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt sops secrets/secrets.yaml
+```
