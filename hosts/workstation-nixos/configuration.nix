@@ -7,7 +7,9 @@
   inputs,
   ...
 }:
-
+let
+  nv-fan-control = import ./nv-fan-control.nix { inherit pkgs; };
+in
 {
   imports = [
     inputs.self.outputs.modules.nixos.default
@@ -43,7 +45,7 @@
     wireless.iwd.enable = true; # Enables wireless support via iwd.
     # networkmanager.enable = true; # Easiest to use and most distros use this by default.
     firewall.allowedTCPPorts = [ 27040 ];
-    firewall.extraCommands = ''iptables -t raw -A OUTPUT -p udp -m udp --dport 137 -j CT --helper netbios-ns'';
+    firewall.extraCommands = "iptables -t raw -A OUTPUT -p udp -m udp --dport 137 -j CT --helper netbios-ns";
   };
 
   systemd.network = {
@@ -142,11 +144,7 @@
     daemon.enable = true;
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   environment.systemPackages = with pkgs; [
-    #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    #   wget
     nixos-icons
     libva-utils # vainfo
     vulkan-tools # vulkaninfo, vkcube
@@ -154,6 +152,8 @@
     ffmpeg_6-full
     gnugrep
     dig
+
+    nv-fan-control
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -165,6 +165,16 @@
   # };
 
   # List services that you want to enable:
+
+  systemd.services.nvidia-fan-startup = {
+    description = "Set NVIDIA Fan Speed at Startup";
+    after = [ "multi-user.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${nv-fan-control}/bin/nv-fan-control 55";
+    };
+  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
