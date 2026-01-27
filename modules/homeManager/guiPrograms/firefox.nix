@@ -71,6 +71,9 @@ in
         "layers.acceleration.force-enabled" = true;
         "gfx.webrender.all" = true;
 
+        "media.av1.enabled" = true;
+        "media.hevc.enabled" = false;
+
         # Disable Pocket
         "extensions.pocket.enabled" = false;
         "extensions.pocket.onSaveRecs" = false;
