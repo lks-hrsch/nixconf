@@ -7,6 +7,7 @@
     ./git.nix
     ./gpg.nix
     ./k9s.nix
+    ./mcp.nix
     ./ssh.nix
     ./starship.nix
     ./tmux.nix
@@ -37,6 +38,7 @@
         csquotes
         inconsolata
         mwe
+        enumitem
       ]
     ))
     ghostscript

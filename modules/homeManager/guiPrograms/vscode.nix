@@ -47,7 +47,7 @@ let
 
     "git.autofetch" = "all";
 
-    "nix.formatterPath" = "nixpkgs-fmt";
+    "nix.formatterPath" = "nixfmt";
     "nix.enableLanguageServer" = true;
     "nix.serverPath" = "nil";
     "nix.serverSettings" = {
@@ -92,6 +92,7 @@ in
       default = {
         extensions = defaultExtensions;
         userSettings = defaultSettings;
+        enableMcpIntegration = true;
       };
 
       lkshrsch = {
@@ -129,6 +130,7 @@ in
           "playwright.pickLocatorCopyToClipboard" = true;
           "playwright.reuseBrowser" = true;
         };
+        enableMcpIntegration = true;
       };
     };
   };
