@@ -78,10 +78,6 @@ in
     nil
     nixfmt-rfc-style
     nixpkgs-fmt
-
-    # vscode forks with AI
-    code-cursor
-    antigravity
   ];
 
   programs.vscode = {

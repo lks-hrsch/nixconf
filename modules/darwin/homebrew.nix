@@ -40,6 +40,7 @@
     casks = [
       "aldente"
       "anki"
+      "antigravity"
       "fork"
       "google-chrome"
       "keepassxc"

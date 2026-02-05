@@ -20,6 +20,13 @@
         command = "uvx";
         args = [ "mcp-nixos" ];
       };
+      obsidian = {
+        command = "npx";
+        args = [
+          "@mauricio.wolff/mcp-obsidian@latest"
+          "/Users/lkshrsch/Obsidian.nosync/private"
+        ];
+      };
     };
   };
 }
