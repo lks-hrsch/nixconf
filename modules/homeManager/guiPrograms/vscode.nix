@@ -78,6 +78,10 @@ in
     nil
     nixfmt-rfc-style
     nixpkgs-fmt
+
+    # for MCP
+    uv
+    nodejs_24
   ];
 
   programs.vscode = {

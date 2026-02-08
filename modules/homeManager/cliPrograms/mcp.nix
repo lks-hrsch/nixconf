@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 {
   programs.mcp = {
     enable = true;
@@ -24,7 +24,7 @@
         command = "npx";
         args = [
           "@mauricio.wolff/mcp-obsidian@latest"
-          "/Users/lkshrsch/Obsidian.nosync/private"
+          "${config.home.homeDirectory}/Obsidian.nosync/private"
         ];
       };
     };
