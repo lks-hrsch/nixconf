@@ -25,7 +25,7 @@ let
     donjayamanne.githistory
 
     # github
-    pkgs.unstable.vscode-extensions.github.copilot-chat
+    github.copilot-chat
     github.vscode-pull-request-github
     github.vscode-github-actions
 
