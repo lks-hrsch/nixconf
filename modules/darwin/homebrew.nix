@@ -44,7 +44,6 @@
       "fork"
       "google-chrome"
       "keepassxc"
-      "languagetool-desktop"
       "microsoft-edge"
       "openvpn-connect"
       "podman-desktop"
@@ -60,7 +59,6 @@
     # https://nix-darwin.github.io/nix-darwin/manual/index.html#opt-homebrew.masApps
     masApps = {
       "1Password for Safari" = 1569813296; # Safari extension
-      "LanguageTool" = 1534275760; # Safari extension
 
       # University
       "eduVPN" = 1317704208;
