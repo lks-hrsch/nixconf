@@ -1,17 +1,17 @@
 { pkgs, ... }:
 {
   imports = [
-    ./btop.nix
-    ./direnv.nix
-    ./fastfetch.nix
+    # ./btop.nix
+    # ./direnv.nix
+    # ./fastfetch.nix
     # ./git.nix
     ./gpg.nix
     ./k9s.nix
     ./mcp.nix
     # ./ssh.nix
-    ./starship.nix
-    ./tmux.nix
-    ./zsh.nix
+    # ./starship.nix
+    # ./tmux.nix
+    # ./zsh.nix
   ];
 
   home.packages = with pkgs; [

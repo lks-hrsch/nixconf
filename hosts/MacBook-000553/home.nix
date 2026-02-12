@@ -10,6 +10,7 @@
     inputs.self.outputs.modules.homeManager.default
     inputs.self.homeManagerModules.git
     inputs.self.homeManagerModules.ssh
+    inputs.self.homeManagerModules.shell
   ];
 
   home = {

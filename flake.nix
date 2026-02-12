@@ -94,6 +94,7 @@
       imports = [
         ./modules/git.nix
         ./modules/ssh.nix
+        ./modules/shell.nix
         ./modules/flake-options.nix
       ];
       flake = {

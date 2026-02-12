@@ -11,6 +11,7 @@
     inputs.self.outputs.modules.homeManager.linux # Linux-specific modules
     inputs.self.homeManagerModules.git
     inputs.self.homeManagerModules.ssh
+    inputs.self.homeManagerModules.shell
   ];
 
   home = {
