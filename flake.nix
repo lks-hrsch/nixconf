@@ -50,6 +50,10 @@
       url = "github:hraban/mac-app-util";
       inputs.cl-nix-lite.url = "github:r4v3n6101/cl-nix-lite/url-fix"; # https://github.com/hraban/mac-app-util/issues/39#issuecomment-3503946041
     };
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -66,6 +70,7 @@
       sops-nix,
       quadlet-nix,
       mac-app-util,
+      flake-parts,
       ...
     }@inputs:
     let
@@ -81,7 +86,15 @@
           ;
       };
     in
-    {
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+      imports = [
+        ./modules/git.nix
+      ];
+      flake = {
       darwinConfigurations = {
         "MacBook-000553" = nix-darwin.lib.darwinSystem {
           specialArgs = {
@@ -210,4 +223,5 @@
         };
       };
     };
+  };
 }

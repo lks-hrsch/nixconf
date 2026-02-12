@@ -4,7 +4,7 @@
     ./btop.nix
     ./direnv.nix
     ./fastfetch.nix
-    ./git.nix
+    # ./git.nix
     ./gpg.nix
     ./k9s.nix
     ./mcp.nix

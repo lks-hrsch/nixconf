@@ -1,6 +1,14 @@
 { pkgs, ... }:
 let
-  vscodePackage = pkgs.unstable.vscode;
+  # vscodePackage = pkgs.unstable.vscode;
+  vscodePackage = pkgs.unstable.vscode.overrideAttrs (old: rec {
+    version = "1.109.2";
+    src = pkgs.fetchurl {
+      name = "VSCode_${version}_darwin-arm64.zip"; # This .zip extension fixes the unpack error
+      url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
+      sha256 = "1alpqxgnlpxmyn8qqyzwm3r5kchfsk9n0lwb080a56a56ldf21s6";
+    };
+  });
   vsCodeVersion = vscodePackage.version;
   extensionsCompatible = pkgs.forVSCodeVersion vsCodeVersion;
   marketplace = extensionsCompatible.vscode-marketplace;

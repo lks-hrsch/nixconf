@@ -9,6 +9,7 @@
   imports = [
     inputs.self.outputs.modules.homeManager.default
     inputs.self.outputs.modules.homeManager.linux # Linux-specific modules
+    inputs.self.homeManagerModules.git
   ];
 
   home = {
