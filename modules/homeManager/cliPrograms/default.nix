@@ -8,7 +8,7 @@
     ./gpg.nix
     ./k9s.nix
     ./mcp.nix
-    ./ssh.nix
+    # ./ssh.nix
     ./starship.nix
     ./tmux.nix
     ./zsh.nix

@@ -93,6 +93,8 @@
       ];
       imports = [
         ./modules/git.nix
+        ./modules/ssh.nix
+        ./modules/flake-options.nix
       ];
       flake = {
       darwinConfigurations = {
