@@ -7,6 +7,5 @@
     ./jetbrains.nix
     ./obsidian.nix
     ./podman-desktop.nix
-    ./vscode.nix
   ];
 }

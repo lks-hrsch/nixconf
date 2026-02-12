@@ -1,10 +1,6 @@
 { ... }:
 {
   imports = [
-    # Cross-platform features
-    ./features/sops.nix
-    ./features/stylix.nix
-
     # CLI programs (cross-platform)
     ./cliPrograms
 

@@ -95,136 +95,139 @@
         ./modules/git.nix
         ./modules/ssh.nix
         ./modules/shell.nix
+        ./modules/vscode.nix
+        ./modules/sops.nix
+        ./modules/stylix.nix
         ./modules/flake-options.nix
       ];
       flake = {
-      darwinConfigurations = {
-        "MacBook-000553" = nix-darwin.lib.darwinSystem {
-          specialArgs = {
-            inherit
-              inputs
-              constants
-              lib
-              ;
+        darwinConfigurations = {
+          "MacBook-000553" = nix-darwin.lib.darwinSystem {
+            specialArgs = {
+              inherit
+                inputs
+                constants
+                lib
+                ;
+            };
+            modules = [
+              {
+                nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
+                nixpkgs.config.allowUnfree = true;
+                nixpkgs.overlays = [
+                  nix-vscode-extensions.overlays.default
+                  custom-overlays.unstable
+                  custom-overlays.firefox-addons
+                  custom-overlays.python-fixes
+                ];
+              }
+              ./hosts/MacBook-000553/configuration.nix
+              sops-nix.darwinModules.sops
+              mac-app-util.darwinModules.default
+              nixvim.nixDarwinModules.nixvim
+
+              home-manager.darwinModules.home-manager
+              {
+                home-manager = {
+                  sharedModules = [
+                    sops-nix.homeManagerModules.sops
+                    mac-app-util.homeManagerModules.default
+                    stylix.homeModules.stylix
+                  ];
+                  extraSpecialArgs = {
+                    inherit inputs;
+                  };
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  backupFileExtension = ".backup";
+                  users.lkshrsch = {
+                    imports = [
+                      ./hosts/MacBook-000553/home.nix
+                    ];
+                  };
+                };
+              }
+            ];
           };
-          modules = [
-            {
-              nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
-              nixpkgs.config.allowUnfree = true;
-              nixpkgs.overlays = [
-                nix-vscode-extensions.overlays.default
-                custom-overlays.unstable
-                custom-overlays.firefox-addons
-                custom-overlays.python-fixes
-              ];
-            }
-            ./hosts/MacBook-000553/configuration.nix
-            sops-nix.darwinModules.sops
-            mac-app-util.darwinModules.default
-            nixvim.nixDarwinModules.nixvim
+        };
 
-            home-manager.darwinModules.home-manager
-            {
-              home-manager = {
-                sharedModules = [
-                  sops-nix.homeManagerModules.sops
-                  mac-app-util.homeManagerModules.default
-                  stylix.homeModules.stylix
+        nixosConfigurations = {
+          "workstation-nixos" = nixpkgs.lib.nixosSystem {
+            specialArgs = { inherit inputs constants lib; };
+            modules = [
+              {
+                nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+                nixpkgs.config = {
+                  allowUnfree = true;
+                  cudaSupport = true;
+                };
+                nixpkgs.overlays = [
+                  nix-vscode-extensions.overlays.default
+                  custom-overlays.unstable
+                  custom-overlays.firefox-addons
                 ];
-                extraSpecialArgs = {
-                  inherit inputs;
-                };
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                backupFileExtension = ".backup";
-                users.lkshrsch = {
-                  imports = [
-                    ./hosts/MacBook-000553/home.nix
+              }
+              ./hosts/workstation-nixos/configuration.nix
+              sops-nix.nixosModules.sops
+              quadlet-nix.nixosModules.quadlet
+              nixvim.nixosModules.nixvim
+
+              # make home-manager as a module of nixos
+              # so that home-manager configuration will be deployed automatically when executing `nixos-rebuild switch`
+              home-manager.nixosModules.home-manager
+              {
+                home-manager = {
+                  sharedModules = [
+                    sops-nix.homeManagerModules.sops
+                    stylix.homeModules.stylix
                   ];
+                  extraSpecialArgs = {
+                    inherit inputs;
+                  };
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  backupFileExtension = ".backup";
+                  users.lkshrsch = {
+                    imports = [
+                      ./hosts/workstation-nixos/home.nix
+
+                    ];
+                  };
                 };
-              };
-            }
-          ];
-        };
-      };
+              }
+            ];
+          };
 
-      nixosConfigurations = {
-        "workstation-nixos" = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs constants lib; };
-          modules = [
-            {
-              nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-              nixpkgs.config = {
-                allowUnfree = true;
-                cudaSupport = true;
-              };
-              nixpkgs.overlays = [
-                nix-vscode-extensions.overlays.default
-                custom-overlays.unstable
-                custom-overlays.firefox-addons
-              ];
-            }
-            ./hosts/workstation-nixos/configuration.nix
-            sops-nix.nixosModules.sops
-            quadlet-nix.nixosModules.quadlet
-            nixvim.nixosModules.nixvim
+          "phobos" = lib.mkNixOSServer {
+            hostname = "phobos";
+          };
 
-            # make home-manager as a module of nixos
-            # so that home-manager configuration will be deployed automatically when executing `nixos-rebuild switch`
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                sharedModules = [
-                  sops-nix.homeManagerModules.sops
-                  stylix.homeModules.stylix
-                ];
-                extraSpecialArgs = {
-                  inherit inputs;
-                };
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                backupFileExtension = ".backup";
-                users.lkshrsch = {
-                  imports = [
-                    ./hosts/workstation-nixos/home.nix
+          "deimos" = lib.mkNixOSServer {
+            hostname = "deimos";
+            extraModules = [
+              quadlet-nix.nixosModules.quadlet
+            ];
+          };
 
-                  ];
-                };
-              };
-            }
-          ];
+          "curiosity" = lib.mkNixOSServer {
+            hostname = "curiosity";
+          };
+
+          "opportunity" = lib.mkNixOSServer {
+            hostname = "opportunity";
+          };
         };
 
-        "phobos" = lib.mkNixOSServer {
-          hostname = "phobos";
-        };
-
-        "deimos" = lib.mkNixOSServer {
-          hostname = "deimos";
-          extraModules = [
-            quadlet-nix.nixosModules.quadlet
-          ];
-        };
-
-        "curiosity" = lib.mkNixOSServer {
-          hostname = "curiosity";
-        };
-
-        "opportunity" = lib.mkNixOSServer {
-          hostname = "opportunity";
-        };
-      };
-
-      # module decalrations
-      modules = {
-        nixos.default = ./modules/nixos;
-        darwin.default = ./modules/darwin;
-        shared.default = ./modules/shared;
-        homeManager = {
-          default = ./modules/homeManager;
-          linux = ./modules/homeManager/linux;
+        # module decalrations
+        modules = {
+          nixos.default = ./modules/nixos;
+          darwin.default = ./modules/darwin;
+          shared.default = ./modules/shared;
+          homeManager = {
+            default = ./modules/homeManager;
+            linux = ./modules/homeManager/linux;
+          };
         };
       };
     };
-  };
 }

@@ -11,6 +11,8 @@
     inputs.self.homeManagerModules.git
     inputs.self.homeManagerModules.ssh
     inputs.self.homeManagerModules.shell
+    inputs.self.homeManagerModules.stylix
+    inputs.self.homeManagerModules.sops
   ];
 
   home = {
