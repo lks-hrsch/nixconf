@@ -14,6 +14,7 @@
     inputs.self.homeManagerModules.shell
     inputs.self.homeManagerModules.stylix
     inputs.self.homeManagerModules.sops
+    inputs.self.homeManagerModules.vscode
   ];
 
   home = {
