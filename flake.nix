@@ -222,7 +222,6 @@
           darwin.default = ./modules/_darwin;
           shared.default = ./modules/_shared;
           homeManager = {
-            default = ./modules/_homeManager;
             linux = ./modules/_homeManager/linux;
           };
         };

@@ -16,10 +16,14 @@
 
         kubectl
         minikube
+
+        argocd
+        kubeseal
       ];
       # ++ (lib.optionals pkgs.stdenv.isDarwin [
       #   krunkit # https://mynixos.com/nixpkgs/package/krunkit
       # ])
 
+      programs.k9s.enable = true;
     };
 }

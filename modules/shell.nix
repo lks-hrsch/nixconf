@@ -19,6 +19,15 @@
     homeManagerModules.shell =
       { pkgs, ... }:
       {
+        home.packages = with pkgs; [
+          azure-cli
+          jq
+          wget
+          nmap
+          iperf3
+          smartmontools
+        ];
+
         programs.zsh = {
           enable = true;
           autosuggestion.enable = true;

@@ -6,7 +6,11 @@
       self.homeManagerModules.antigravity
       self.homeManagerModules.firefox
       self.homeManagerModules.git
+      self.homeManagerModules.gpg
       self.homeManagerModules.jetbrains
+      self.homeManagerModules.latex
+      self.homeManagerModules.manual
+      self.homeManagerModules.mcp
       self.homeManagerModules.obsidian
       self.homeManagerModules.podman
       self.homeManagerModules.shell
