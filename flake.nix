@@ -220,12 +220,12 @@
 
         # module decalrations
         modules = {
-          nixos.default = ./modules/nixos;
-          darwin.default = ./modules/darwin;
-          shared.default = ./modules/shared;
+          nixos.default = ./modules/_nixos;
+          darwin.default = ./modules/_darwin;
+          shared.default = ./modules/_shared;
           homeManager = {
-            default = ./modules/homeManager;
-            linux = ./modules/homeManager/linux;
+            default = ./modules/_homeManager;
+            linux = ./modules/_homeManager/linux;
           };
         };
       };
