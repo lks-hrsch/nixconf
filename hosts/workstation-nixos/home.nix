@@ -9,12 +9,7 @@
   imports = [
     inputs.self.outputs.modules.homeManager.default
     inputs.self.outputs.modules.homeManager.linux # Linux-specific modules
-    inputs.self.homeManagerModules.git
-    inputs.self.homeManagerModules.ssh
-    inputs.self.homeManagerModules.shell
-    inputs.self.homeManagerModules.stylix
-    inputs.self.homeManagerModules.sops
-    inputs.self.homeManagerModules.vscode
+    inputs.self.homeManagerModules.default
   ];
 
   home = {

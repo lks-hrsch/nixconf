@@ -54,6 +54,9 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
+    import-tree = {
+      url = "github:vic/import-tree";
+    };
   };
 
   outputs =
@@ -71,6 +74,7 @@
       quadlet-nix,
       mac-app-util,
       flake-parts,
+      import-tree,
       ...
     }@inputs:
     let
@@ -92,13 +96,7 @@
         "aarch64-darwin"
       ];
       imports = [
-        ./modules/git.nix
-        ./modules/ssh.nix
-        ./modules/shell.nix
-        ./modules/vscode.nix
-        ./modules/sops.nix
-        ./modules/stylix.nix
-        ./modules/flake-options.nix
+        (import-tree ./modules)
       ];
       flake = {
         darwinConfigurations = {

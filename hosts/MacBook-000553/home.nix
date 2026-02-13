@@ -8,12 +8,7 @@
   # Linux-specific modules will be automatically excluded on Darwin
   imports = [
     inputs.self.outputs.modules.homeManager.default
-    inputs.self.homeManagerModules.git
-    inputs.self.homeManagerModules.ssh
-    inputs.self.homeManagerModules.shell
-    inputs.self.homeManagerModules.stylix
-    inputs.self.homeManagerModules.sops
-    inputs.self.homeManagerModules.vscode
+    inputs.self.homeManagerModules.default
   ];
 
   home = {

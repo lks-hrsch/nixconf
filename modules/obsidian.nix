@@ -1,16 +1,21 @@
-{ config, pkgs, ... }:
-
-with config.lib.stylix.colors.withHashtag;
-
+{ ... }:
 {
-  home.packages = with pkgs; [
-    obsidian
-  ];
+  flake.homeManagerModules.obsidian =
+    {
+      config,
+      pkgs,
+      ...
+    }:
+    with config.lib.stylix.colors.withHashtag;
+    {
+      home.packages = with pkgs; [
+        obsidian
+      ];
 
-  home.file.obsidian-stylix-css = {
-    enable = true;
-    target = "Obsidian.nosync/private/.obsidian/snippets/obsidian-stylix-css.css";
-    text = "
+      home.file.obsidian-stylix-css = {
+        enable = true;
+        target = "Obsidian.nosync/private/.obsidian/snippets/obsidian-stylix-css.css";
+        text = ''
           :root .theme-dark {
               --background-primary:         ${base00};
               --background-primary-alt:     ${base01};
@@ -23,6 +28,7 @@ with config.lib.stylix.colors.withHashtag;
               --text-accent-hover:          ${base0B}; /*Links hover*/
 
           }
-      ";
-  };
+        '';
+      };
+    };
 }
