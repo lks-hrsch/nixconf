@@ -219,8 +219,6 @@
         # module decalrations
         modules = {
           nixos.default = ./modules/_nixos;
-          darwin.default = ./modules/_darwin;
-          shared.default = ./modules/_shared;
           homeManager = {
             linux = ./modules/_homeManager/linux;
           };

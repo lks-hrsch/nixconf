@@ -7,6 +7,13 @@
         environment.shells = with pkgs; [ zsh ];
         users.defaultUserShell = pkgs.zsh;
         programs.zsh.enable = true;
+
+        # global system packages
+        environment.systemPackages = with pkgs; [
+          btop
+          pciutils
+          usbutils
+        ];
       };
 
     darwinModules.shell =
@@ -14,6 +21,13 @@
       {
         environment.shells = with pkgs; [ zsh ];
         programs.zsh.enable = true;
+
+        # global system packages
+        environment.systemPackages = with pkgs; [
+          btop
+          pciutils
+          usbutils
+        ];
       };
 
     homeManagerModules.shell =

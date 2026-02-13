@@ -11,7 +11,15 @@
 {
   imports = [
     inputs.self.outputs.modules.nixos.default
-    inputs.self.outputs.modules.shared.default
+    inputs.self.nixosModules.features
+    inputs.self.nixosModules.users
+    inputs.self.nixosModules.time
+    inputs.self.nixosModules.sops
+    inputs.self.nixosModules.shell
+    inputs.self.nixosModules.ssh
+    inputs.self.nixosModules.nixvim
+    inputs.self.nixosModules.tmux
+    inputs.self.nixosModules.zsh
 
     # Include the default incus configuration.
     "${modulesPath}/virtualisation/lxc-container.nix"

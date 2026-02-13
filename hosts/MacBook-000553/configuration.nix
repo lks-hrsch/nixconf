@@ -4,8 +4,15 @@
 }:
 {
   imports = [
-    inputs.self.outputs.modules.darwin.default
-    inputs.self.outputs.modules.shared.default
+    inputs.self.darwinModules.features
+    inputs.self.darwinModules.homebrew
+    inputs.self.darwinModules.users
+    inputs.self.darwinModules.time
+    inputs.self.darwinModules.sops
+    inputs.self.darwinModules.shell
+    inputs.self.darwinModules.ssh
+    inputs.self.darwinModules.zsh
+    inputs.self.darwinModules.tmux
 
     # vpn
     ./vpn.nix

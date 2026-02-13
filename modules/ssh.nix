@@ -15,7 +15,7 @@
       {
         services.openssh = {
           enable = true;
-          authorizedKeysFiles = [ config.sops.secrets."ssh-public-key".path ];
+          # authorizedKeysFiles = [ config.sops.secrets."ssh-public-key".path ]; # Not supported on macOS/nix-darwin
         };
       };
 
