@@ -5,7 +5,6 @@
     ./cliPrograms
   ];
 
-
   # FIX: warning: Using 'builtins.toFile' to create a file named 'options.json' that references the store path '/nix/store/ws6jqxhhvy2nzjqmp7h8a1546ygrsfk6-source' without a proper context. The resulting file will not have a correct store reference, so this is unreliable and may stop working in the future.
   manual.manpages.enable = false;
 

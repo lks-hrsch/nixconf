@@ -1,6 +1,6 @@
 { ... }:
 {
-  flake.homeManagerModules.podman-desktop =
+  flake.homeManagerModules.podman =
     {
       pkgs,
       lib,
