@@ -8,7 +8,7 @@
       self.homeManagerModules.git
       self.homeManagerModules.jetbrains
       self.homeManagerModules.obsidian
-      self.homeManagerModules.podman-desktop
+      self.homeManagerModules.podman
       self.homeManagerModules.shell
       self.homeManagerModules.sops
       self.homeManagerModules.ssh
