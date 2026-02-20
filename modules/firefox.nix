@@ -1,21 +1,26 @@
-{ ... }:
 {
+  flake.darwinModules.firefox = {
+    # On macOS, programs.firefox.package doesn't automatically create app symlinks
+
+    homebrew = {
+      casks = [
+        "firefox"
+      ];
+    };
+  };
   flake.homeManagerModules.firefox =
-    {
-      pkgs,
-      ...
-    }:
+    { pkgs, ... }:
     let
-      firefox-bin = pkgs.unstable.firefox-bin;
+      firefox-package =
+        if pkgs.stdenv.isDarwin then
+          pkgs.lib.makeOverridable (args: pkgs.runCommand "firefox-0.0.0" { } "mkdir $out") { }
+        else
+          pkgs.unstable.firefox-bin;
     in
     {
-      # On macOS, programs.firefox.package doesn't automatically create app symlinks
-      # so we need to add it to home.packages as well
-      home.packages = [ firefox-bin ];
-
       programs.firefox = {
         enable = true;
-        package = firefox-bin; # use firefox-bin because of build error
+        package = firefox-package;
 
         profiles.lkshrsch = {
           search = {

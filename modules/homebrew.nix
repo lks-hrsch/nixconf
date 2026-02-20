@@ -22,7 +22,6 @@
 
         taps = [
           "tw93/tap" # for mole
-          "slp/krunkit" # for krunkit
         ];
 
         # CLI tools (formulae)
@@ -33,9 +32,7 @@
           "ios-deploy"
           "mas" # https://github.com/mas-cli/mas
           "tw93/tap/mole" # https://github.com/tw93/Mole
-          "podman"
           "rbenv"
-          "slp/krunkit/krunkit"
           "subversion"
         ];
 
@@ -49,7 +46,6 @@
           "keepassxc"
           "microsoft-edge"
           "openvpn-connect"
-          "podman-desktop"
           "postman"
           "rustdesk"
           "spotify"

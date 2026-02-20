@@ -16,6 +16,7 @@ in
     inputs.self.nixosModules.features
     inputs.self.nixosModules.users
     inputs.self.nixosModules.time
+    inputs.self.nixosModules.podman
     inputs.self.nixosModules.sops
     inputs.self.nixosModules.shell
     inputs.self.nixosModules.ssh

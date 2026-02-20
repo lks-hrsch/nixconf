@@ -1,5 +1,40 @@
 { ... }:
 {
+  flake.nixosModules.podman =
+    { pkgs, ... }:
+    {
+      home.packages = with pkgs; [
+        podman
+        podman-desktop
+        podman-compose
+        krunkit
+
+        docker
+        docker-compose
+      ];
+    };
+  flake.darwinModules.podman =
+    { ... }:
+    {
+      # https://github.com/podman-desktop/podman-desktop/issues/13922
+
+      homebrew = {
+        taps = [
+          "slp/krunkit"
+        ];
+        brews = [
+          "helm"
+          "docker"
+          "docker-compose"
+          "podman"
+          "podman-compose"
+          "slp/krunkit/krunkit"
+        ];
+        casks = [
+          "podman-desktop"
+        ];
+      };
+    };
   flake.homeManagerModules.podman =
     {
       pkgs,
@@ -8,21 +43,12 @@
     }:
     {
       home.packages = with pkgs; [
-        # podman
-        # podman-desktop # https://github.com/podman-desktop/podman-desktop/issues/13922
-
-        docker-compose
-        podman-compose
-
         kubectl
         minikube
 
         argocd
         kubeseal
       ];
-      # ++ (lib.optionals pkgs.stdenv.isDarwin [
-      #   krunkit # https://mynixos.com/nixpkgs/package/krunkit
-      # ])
 
       programs.k9s.enable = true;
     };

@@ -5,9 +5,11 @@
 {
   imports = [
     inputs.self.darwinModules.features
+    inputs.self.darwinModules.firefox
     inputs.self.darwinModules.homebrew
     inputs.self.darwinModules.users
     inputs.self.darwinModules.time
+    inputs.self.darwinModules.podman
     inputs.self.darwinModules.sops
     inputs.self.darwinModules.shell
     inputs.self.darwinModules.ssh
