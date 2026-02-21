@@ -45,7 +45,6 @@
           "google-chrome"
           "keepassxc"
           "microsoft-edge"
-          "openvpn-connect"
           "postman"
           "rustdesk"
           "spotify"
