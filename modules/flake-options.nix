@@ -1,17 +1,23 @@
-{ lib, ... }:
+{ inputs, ... }:
 {
-  options.flake = {
-    nixosModules = lib.mkOption {
-      type = lib.types.lazyAttrsOf lib.types.unspecified;
-      default = { };
+  options = {
+    flake = inputs.flake-parts.lib.mkSubmoduleOptions {
+      nixosModules = inputs.nixpkgs.lib.mkOption {
+        default = { };
+      };
+      darwinModules = inputs.nixpkgs.lib.mkOption {
+        default = { };
+      };
+      homeManagerModules = inputs.nixpkgs.lib.mkOption {
+        default = { };
+      };
     };
-    darwinModules = lib.mkOption {
-      type = lib.types.lazyAttrsOf lib.types.unspecified;
-      default = { };
-    };
-    homeManagerModules = lib.mkOption {
-      type = lib.types.lazyAttrsOf lib.types.unspecified;
-      default = { };
-    };
+  };
+
+  config = {
+    systems = [
+      "aarch64-darwin"
+      "x86_64-linux"
+    ];
   };
 }
