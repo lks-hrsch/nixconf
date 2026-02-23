@@ -74,3 +74,10 @@ git-crypt unlock
 # edit secrets
 SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt sops secrets/secrets.yaml
 ```
+
+## linting
+
+```
+❯ nix run nixpkgs#statix -- check overlays
+❯ nix run nixpkgs#statix -- fix overlays  
+```

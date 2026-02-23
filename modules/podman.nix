@@ -1,4 +1,4 @@
-{ ... }:
+_:
 {
   flake.nixosModules.podman =
     { pkgs, ... }:
@@ -14,7 +14,7 @@
       ];
     };
   flake.darwinModules.podman =
-    { ... }:
+    _:
     {
       # https://github.com/podman-desktop/podman-desktop/issues/13922
 

@@ -1,4 +1,4 @@
-{ ... }:
+_:
 {
   flake.homeManagerModules.latex =
     { pkgs, ... }:

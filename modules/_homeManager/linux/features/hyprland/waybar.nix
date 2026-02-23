@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   interval = 5;
 
@@ -87,7 +87,7 @@ let
       on-click-right = "pavucontrol";
     };
     cpu = {
-      interval = interval;
+      inherit interval;
       format = "{usage}% ({load}) <span size='12pt'></span>";
       states = {
         warning = 70;
@@ -95,22 +95,22 @@ let
       };
     };
     temperature = {
-      interval = interval;
+      inherit interval;
       hwmon-path = "/sys/class/hwmon/hwmon2/temp1_input";
       format = "{temperatureC}°C <span size='12pt'> </span>";
     };
     "custom/gpu-utilization" = {
       exec = "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits";
       format = "{}% <span size='12pt'></span>";
-      interval = interval;
+      inherit interval;
     };
     "custom/gpu-temperature" = {
       exec = "nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits";
       format = "{}°C <span size='12pt'> </span>";
-      interval = interval;
+      inherit interval;
     };
     memory = {
-      interval = interval;
+      inherit interval;
       format = "{used:0.1f}G/{total:0.1f}G <span size='12pt'></span>";
       states = {
         warning = 70;
@@ -118,7 +118,7 @@ let
       };
     };
     network = {
-      interval = interval;
+      inherit interval;
       format-wifi = "<span size='12pt'></span> {essid}({signalStrength}%) {bandwidthDownBytes}<span size='12pt'></span> /{bandwidthUpBytes}<span size='12pt'></span>";
       format-ethernet = "<span size='12pt'></span> {bandwidthDownBytes}<span size='12pt'></span> /{bandwidthUpBytes}<span size='12pt'></span>";
       format-disconnected = "Disconnected";

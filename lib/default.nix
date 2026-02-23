@@ -6,7 +6,7 @@
   constants,
 }:
 let
-  lib = nixpkgs.lib;
+  inherit (nixpkgs) lib;
 
   myLib = lib // {
     mkNixOSServer = import ./mkNixOSServer.nix {
