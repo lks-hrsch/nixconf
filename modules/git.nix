@@ -1,5 +1,4 @@
-_:
-{
+_: {
   flake.homeManagerModules.git =
     {
       config,
@@ -25,7 +24,11 @@ _:
             format = "ssh";
           };
           "gpg \"ssh\"" = {
-            program = "${lib.getExe' pkgs.unstable._1password-gui "op-ssh-sign"}";
+            program =
+              if pkgs.stdenv.isDarwin then
+                "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+              else
+                lib.getExe' pkgs.unstable._1password-gui "op-ssh-sign";
           };
           commit = {
             gpgsign = true;
