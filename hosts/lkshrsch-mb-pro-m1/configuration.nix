@@ -7,7 +7,7 @@
   ...
 }:
 {
-  flake.darwinConfigurations."MacBook-000553" = inputs.nix-darwin.lib.darwinSystem {
+  flake.darwinConfigurations."lkshrsch-mb-pro-m1" = inputs.nix-darwin.lib.darwinSystem {
     specialArgs = {
       inherit
         constants
@@ -16,21 +16,20 @@
       lib = myLib;
     };
     modules = [
-      self.darwinModules.hostMacBook-configuration
-      self.darwinModules.hostMacBook-vpn
+      self.darwinModules.hostlkshrsch-mb-pro-m1-configuration
     ];
   };
 
-  flake.darwinModules.hostMacBook-configuration =
+  flake.darwinModules.hostlkshrsch-mb-pro-m1-configuration =
     { lib, ... }:
     {
       imports = [
+        self.darwinModules."1password"
         self.darwinModules.features
         self.darwinModules.firefox
         self.darwinModules.homebrew
         self.darwinModules.users
         self.darwinModules.time
-        self.darwinModules.podman
         self.darwinModules.sops
         self.darwinModules.shell
         self.darwinModules.ssh
@@ -56,7 +55,7 @@
             backupFileExtension = ".backup";
             users.lkshrsch = {
               imports = [
-                self.homeManagerModules.hostMacBook-home
+                self.homeManagerModules.hostlkshrsch-mb-pro-m1-home
               ];
             };
           };
@@ -83,9 +82,9 @@
       };
 
       networking = {
-        computerName = "MacBook-000553";
-        hostName = "MacBook-000553";
-        localHostName = "MacBook-000553";
+        computerName = "lkshrsch-mb-pro-m1";
+        hostName = "lkshrsch-mb-pro-m1";
+        localHostName = "lkshrsch-mb-pro-m1";
 
         applicationFirewall = {
           enable = true;
@@ -123,7 +122,7 @@
             AppleShowScrollBars = "WhenScrolling";
             AppleTemperatureUnit = "Celsius";
           };
-          smb.NetBIOSName = "MacBook-000553";
+          smb.NetBIOSName = "lkshrsch-mb-pro-m1";
           CustomUserPreferences = {
             "com.apple.desktopservices" = {
               DSDontWriteNetworkStores = true;

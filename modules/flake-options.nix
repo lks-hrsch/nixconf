@@ -11,6 +11,14 @@
       homeManagerModules = inputs.nixpkgs.lib.mkOption {
         default = { };
       };
+      darwinConfigurations = inputs.nixpkgs.lib.mkOption {
+        type = inputs.nixpkgs.lib.types.lazyAttrsOf inputs.nixpkgs.lib.types.raw;
+        default = { };
+      };
+      nixosConfigurations = inputs.nixpkgs.lib.mkOption {
+        type = inputs.nixpkgs.lib.types.lazyAttrsOf inputs.nixpkgs.lib.types.raw;
+        default = { };
+      };
     };
   };
 
