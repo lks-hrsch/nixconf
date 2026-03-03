@@ -1,15 +1,14 @@
-_:
-{
+_: {
   flake.homeManagerModules.vscode =
     { pkgs, ... }:
     let
       # vscodePackage = pkgs.unstable.vscode;
       vscodePackage = pkgs.unstable.vscode.overrideAttrs (old: rec {
-        version = "1.109.2";
+        version = "1.109.5";
         src = pkgs.fetchurl {
           name = "VSCode_${version}_darwin-arm64.zip"; # This .zip extension fixes the unpack error
           url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
-          sha256 = "1alpqxgnlpxmyn8qqyzwm3r5kchfsk9n0lwb080a56a56ldf21s6";
+          sha256 = "sha256-ckwFJ4P2hCy7TTUS+peUNad00ydk4RnAthkggrbYzAQ=";
         };
       });
       vsCodeVersion = vscodePackage.version;
@@ -75,6 +74,8 @@ _:
         "github.copilot.chat.edits.temporalContext.enabled" = true;
         "github.copilot.chat.codesearch.enabled" = true;
         "github.copilot.chat.useResponsesApi" = true;
+        "github.copilot.chat.githubMcpServer.enabled" = true;
+        "github.copilot.chat.newWorkspace.useContext7" = true;
 
         "chat.mcp.gallery.enabled" = true;
         "chat.mcp.discovery.enabled" = {
@@ -122,6 +123,7 @@ _:
                 # python extensions
                 ms-python.python
                 ms-python.vscode-pylance
+                ms-python.debugpy
                 charliermarsh.ruff
                 ms-toolsai.jupyter
                 ms-toolsai.jupyter-keymap
@@ -134,8 +136,18 @@ _:
                 ms-vscode.vscode-typescript-next
                 bradlc.vscode-tailwindcss
                 biomejs.biome
-                ms-playwright.playwright
-              ]);
+                # ms-playwright.playwright
+              ])
+              ++ [
+                (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
+                  mktplcRef = {
+                    publisher = "ms-playwright";
+                    name = "playwright";
+                    version = "1.1.17";
+                    sha256 = "1w3gih8igk3hairqi90pd919rqf4vadk0mm49xs92k7kp3v15158";
+                  };
+                })
+              ];
             userSettings = defaultSettings // {
               # Add additional settings specific to lkshrsch profile here
               "playwright.pickLocatorCopyToClipboard" = true;
