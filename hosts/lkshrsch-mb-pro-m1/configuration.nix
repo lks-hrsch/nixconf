@@ -1,6 +1,7 @@
 {
   inputs,
   self,
+  config,
   myLib,
   constants,
   custom-overlays,
@@ -39,27 +40,7 @@
         inputs.sops-nix.darwinModules.sops
         inputs.mac-app-util.darwinModules.default
         inputs.nixvim.nixDarwinModules.nixvim
-        inputs.home-manager.darwinModules.home-manager
-        {
-          home-manager = {
-            sharedModules = [
-              inputs.sops-nix.homeManagerModules.sops
-              inputs.mac-app-util.homeManagerModules.default
-              inputs.stylix.homeModules.stylix
-            ];
-            extraSpecialArgs = {
-              inherit inputs;
-            };
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            backupFileExtension = ".backup";
-            users.lkshrsch = {
-              imports = [
-                self.homeManagerModules.hostlkshrsch-mb-pro-m1-home
-              ];
-            };
-          };
-        }
+        config.flake.modules.darwin.homeManager
       ];
 
       nixpkgs = {
