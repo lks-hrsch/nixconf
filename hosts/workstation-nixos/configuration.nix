@@ -48,6 +48,7 @@
         config.flake.modules.nixos.homeManager
 
         # Include the results of the hardware scan.
+        ./_home-nas-mounts.nix
         ./_hardware-configuration.nix
       ];
 

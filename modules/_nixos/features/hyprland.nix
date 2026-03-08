@@ -33,5 +33,8 @@
       portalPackage =
         inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     };
+
+    programs.dconf.enable = true;
+    programs.xwayland.enable = true;
   };
 }

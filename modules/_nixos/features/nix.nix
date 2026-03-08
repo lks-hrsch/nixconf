@@ -1,5 +1,4 @@
-_:
-{
+_: {
   # Nix settings
   nix = {
     extraOptions = "experimental-features = nix-command flakes";
@@ -30,4 +29,6 @@ _:
       ];
     };
   };
+
+  programs.nix-ld.enable = true;
 }

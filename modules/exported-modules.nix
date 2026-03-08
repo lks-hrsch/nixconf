@@ -4,7 +4,16 @@ _: {
       { inputs, ... }:
       {
         imports = [
-          ./_nixos
+          inputs.self.nixosModules.avahi
+          inputs.self.nixosModules.desktop-hyprland
+          inputs.self.nixosModules.flatpak
+          inputs.self.nixosModules.gaming-base
+          inputs.self.nixosModules.internationalisation
+          inputs.self.nixosModules.nixos-nix
+          inputs.self.nixosModules.pipewire
+          inputs.self.nixosModules.syncthing
+          inputs.self.nixosModules.xserver
+          inputs.self.nixosModules.zfs
           inputs.sops-nix.nixosModules.sops
           inputs.quadlet-nix.nixosModules.quadlet
         ];
