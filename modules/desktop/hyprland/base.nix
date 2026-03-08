@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.desktop-hyprland =
+  flake.nixosModules.desktop-hyprland-base =
     {
       lib,
       config,
@@ -38,4 +38,5 @@ _: {
       programs.dconf.enable = true;
       programs.xwayland.enable = true;
     };
+
 }

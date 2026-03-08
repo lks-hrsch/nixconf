@@ -24,7 +24,7 @@
           }
         )
         config.flake.modules.homeManager.base
-        config.flake.homeManagerModules.linux
+        
         (
           { pkgs, ... }:
           {
@@ -55,9 +55,26 @@
               grub2
               libisoburn
               qemu
+
+              # extra tools
+              fio
             ];
           }
         )
+
+        inputs.self.homeManagerModules.desktop-base
+        inputs.self.homeManagerModules.desktop-apps-obsstudio
+        inputs.self.homeManagerModules.desktop-apps-thunderbird
+        inputs.self.homeManagerModules.desktop-hyprland-uwsm-env
+        inputs.self.homeManagerModules.desktop-hyprland-cliphist
+        inputs.self.homeManagerModules.desktop-hyprland-dunst
+        inputs.self.homeManagerModules.desktop-hyprland-hypridle
+        inputs.self.homeManagerModules.desktop-hyprland-hyprland
+        inputs.self.homeManagerModules.desktop-hyprland-hyprlock
+        inputs.self.homeManagerModules.desktop-hyprland-hyprpaper
+        inputs.self.homeManagerModules.desktop-hyprland-hyprpolkitagent
+        inputs.self.homeManagerModules.desktop-hyprland-rofi
+        inputs.self.homeManagerModules.desktop-hyprland-waybar
       ];
     };
   };

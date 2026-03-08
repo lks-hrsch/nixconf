@@ -18,5 +18,4 @@ _: {
       };
   };
 
-  flake.homeManagerModules.linux = ./_homeManager/linux;
 }
