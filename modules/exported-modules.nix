@@ -6,7 +6,6 @@ _: {
         imports = [
           inputs.self.nixosModules.avahi
           inputs.self.nixosModules.flatpak
-          inputs.self.nixosModules.gaming-base
           inputs.self.nixosModules.internationalisation
           inputs.self.nixosModules.nixos-nix
           inputs.self.nixosModules.pipewire

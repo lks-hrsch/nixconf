@@ -1,12 +1,10 @@
-_:
-{
+_: {
   flake = {
     nixosModules.features =
       { lib, ... }:
       {
         options.features = {
           desktop.enable = lib.mkEnableOption "desktop environment";
-          gaming.enable = lib.mkEnableOption "gaming features";
 
           virtualisation.podman.enable = lib.mkEnableOption "Podman support";
 

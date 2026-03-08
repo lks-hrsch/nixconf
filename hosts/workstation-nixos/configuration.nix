@@ -44,6 +44,7 @@
         self.nixosModules."1password"
 
         inputs.self.nixosModules.desktop-hyprland
+        inputs.self.nixosModules.gaming-base
 
         inputs.nixvim.nixosModules.nixvim
 
@@ -69,7 +70,6 @@
 
       features = {
         desktop.enable = true;
-        gaming.enable = true;
         virtualisation.podman.enable = true;
         zfs.enable = true;
         nas.enable = true;
