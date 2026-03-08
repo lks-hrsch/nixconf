@@ -2,15 +2,25 @@ _: {
   flake.homeManagerModules.vscode =
     { pkgs, ... }:
     let
-      # vscodePackage = pkgs.unstable.vscode;
-      vscodePackage = pkgs.unstable.vscode.overrideAttrs (old: rec {
-        version = "1.109.5";
-        src = pkgs.fetchurl {
-          name = "VSCode_${version}_darwin-arm64.zip"; # This .zip extension fixes the unpack error
-          url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
-          sha256 = "sha256-ckwFJ4P2hCy7TTUS+peUNad00ydk4RnAthkggrbYzAQ=";
-        };
-      });
+      vscodePackage =
+        if pkgs.stdenv.hostPlatform.isDarwin then
+          pkgs.unstable.vscode.overrideAttrs (old: rec {
+            version = "1.110.1";
+            src = pkgs.fetchurl {
+              name = "VSCode_${version}_darwin-arm64.zip"; # This .zip extension fixes the unpack error
+              url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
+              sha256 = "sha256-ckwFJ4P2hCy7TTUS+peUNad00ydk4RnAthkggrbYzAQ=";
+            };
+          })
+        else
+          pkgs.unstable.vscode.overrideAttrs (old: rec {
+            version = "1.110.1";
+            src = pkgs.fetchurl {
+              name = "VSCode_${version}_linux-x64.tar.gz";
+              url = "https://update.code.visualstudio.com/${version}/linux-x64/stable";
+              sha256 = "sha256-nXxPuopZX8gOWrco++VYl0AAsCxDUykkoSgWOiHFUYw=";
+            };
+          });
       vsCodeVersion = vscodePackage.version;
       extensionsCompatible = pkgs.forVSCodeVersion vsCodeVersion;
       marketplace = extensionsCompatible.vscode-marketplace;

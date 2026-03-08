@@ -1,40 +1,69 @@
-_:
-{
+_: {
   flake.nixosModules.podman =
-    { pkgs, ... }:
     {
-      home.packages = with pkgs; [
-        podman
-        podman-desktop
-        podman-compose
-        krunkit
-
-        docker
-        docker-compose
-      ];
-    };
-  flake.darwinModules.podman =
-    _:
+      pkgs,
+      lib,
+      config,
+      ...
+    }:
+    let
+      feature = config.features.virtualisation.podman;
+    in
     {
-      # https://github.com/podman-desktop/podman-desktop/issues/13922
+      # podman
+      # https://mynixos.com/nixpkgs/options/virtualisation.podman
+      # https://nixos.wiki/wiki/Podman
+      config = lib.mkIf feature.enable {
 
-      homebrew = {
-        taps = [
-          "slp/krunkit"
+        # Useful other development tools
+        environment.systemPackages = with pkgs; [
+          podman
+          podman-compose # start group of containers for dev
+
+          docker
+          docker-compose # start group of containers for dev
         ];
-        brews = [
-          "helm"
-          "docker"
-          "docker-compose"
-          "podman"
-          "podman-compose"
-          "slp/krunkit/krunkit"
-        ];
-        casks = [
-          "podman-desktop"
-        ];
+
+        virtualisation = {
+          containers = {
+            enable = true;
+          };
+          podman = {
+            enable = true;
+            autoPrune.enable = true;
+            defaultNetwork.settings = {
+              dns_enabled = true;
+            };
+            dockerCompat = true; # Enable Docker compatibility mode
+            dockerSocket.enable = true; # Enable Docker socket for compatibility
+          };
+          quadlet = {
+            enable = true;
+            autoUpdate.enable = true;
+          };
+        };
       };
     };
+  flake.darwinModules.podman = _: {
+    # https://github.com/podman-desktop/podman-desktop/issues/13922
+
+    homebrew = {
+      taps = [
+        "slp/krunkit"
+      ];
+      brews = [
+        "helm"
+        "docker"
+        "docker-compose"
+        "podman"
+        "podman-compose"
+        "slp/krunkit/krunkit"
+      ];
+      casks = [
+        "podman-desktop"
+      ];
+    };
+  };
   flake.homeManagerModules.podman =
     {
       pkgs,
@@ -42,13 +71,18 @@ _:
       ...
     }:
     {
-      home.packages = with pkgs; [
-        kubectl
-        minikube
+      home.packages =
+        with pkgs;
+        [
+          kubectl
+          minikube
 
-        argocd
-        kubeseal
-      ];
+          argocd
+          kubeseal
+        ]
+        ++ lib.optionals pkgs.stdenv.isLinux [
+          podman-desktop
+        ];
 
       programs.k9s.enable = true;
     };

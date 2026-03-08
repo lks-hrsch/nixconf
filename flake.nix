@@ -54,6 +54,7 @@
       inputs.import-tree [
         ./hosts/MacBook-000553
         ./hosts/lkshrsch-mb-pro-m1
+        ./hosts/workstation-nixos
         ./modules
       ]
     );
