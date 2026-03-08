@@ -43,6 +43,8 @@
         self.nixosModules.zsh
         self.nixosModules."1password"
 
+        inputs.self.nixosModules.desktop-hyprland
+
         inputs.nixvim.nixosModules.nixvim
 
         config.flake.modules.nixos.homeManager

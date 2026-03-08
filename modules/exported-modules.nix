@@ -5,7 +5,6 @@ _: {
       {
         imports = [
           inputs.self.nixosModules.avahi
-          inputs.self.nixosModules.desktop-hyprland
           inputs.self.nixosModules.flatpak
           inputs.self.nixosModules.gaming-base
           inputs.self.nixosModules.internationalisation
