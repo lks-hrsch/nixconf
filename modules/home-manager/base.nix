@@ -2,6 +2,11 @@
 {
   # Kept as alias so workstation-nixos/home.nix can still import it
   flake.homeManagerModules.default = config.flake.modules.homeManager.base;
+  flake.homeManagerModules.work = {
+    imports = [
+      self.homeManagerModules.jetbrains
+    ];
+  };
 
   flake.modules.homeManager.base =
     { ... }:
@@ -12,7 +17,6 @@
         self.homeManagerModules.firefox
         self.homeManagerModules.git
         self.homeManagerModules.gpg
-        self.homeManagerModules.jetbrains
         self.homeManagerModules.latex
         self.homeManagerModules.manual
         self.homeManagerModules.mcp

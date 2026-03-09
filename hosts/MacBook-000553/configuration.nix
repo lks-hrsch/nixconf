@@ -28,6 +28,7 @@
       imports = with self.darwinModules; [
         base
         podman
+        work
       ];
 
       networking = {
