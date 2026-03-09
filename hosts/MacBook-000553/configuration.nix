@@ -11,6 +11,7 @@
   flake.darwinConfigurations."MacBook-000553" = inputs.nix-darwin.lib.darwinSystem {
     specialArgs = {
       inherit
+        inputs
         constants
         custom-overlays
         ;
@@ -26,7 +27,7 @@
     { lib, ... }:
     {
       imports = [
-        self.darwinModules.features
+        self.darwinModules."1password"
         self.darwinModules.firefox
         self.darwinModules.homebrew
         self.darwinModules.users
@@ -52,10 +53,6 @@
           self.outputs.custom-overlays.firefox-addons
           self.outputs.custom-overlays.nix-vscode-extensions
         ];
-      };
-
-      features = {
-        desktop.enable = true;
       };
 
       security.pam.services.sudo_local = {

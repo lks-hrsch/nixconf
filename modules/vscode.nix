@@ -7,9 +7,9 @@ _: {
           pkgs.unstable.vscode.overrideAttrs (old: rec {
             version = "1.110.1";
             src = pkgs.fetchurl {
-              name = "VSCode_${version}_darwin-arm64.zip"; # This .zip extension fixes the unpack error
+              name = "VSCode_${version}_darwin-arm64.zip";
               url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
-              sha256 = "sha256-ckwFJ4P2hCy7TTUS+peUNad00ydk4RnAthkggrbYzAQ=";
+              sha256 = "sha256-VvanGd8t4BWxE2O2SW39tY66R+/37WFhsDLskwYGMaM=";
             };
           })
         else

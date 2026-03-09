@@ -69,7 +69,6 @@
       };
 
       features = {
-        desktop.enable = true;
         virtualisation.podman.enable = true;
         zfs.enable = true;
         nas.enable = true;

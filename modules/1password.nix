@@ -1,5 +1,4 @@
-_:
-{
+_: {
   flake = {
     nixosModules."1password" =
       {
@@ -8,7 +7,7 @@ _:
         pkgs,
         ...
       }:
-      lib.mkIf config.features.desktop.enable {
+      {
         environment.systemPackages = with pkgs.unstable; [
           _1password-cli
           _1password-gui
