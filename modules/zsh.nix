@@ -5,7 +5,10 @@ _: {
       {
         environment.shells = with pkgs; [ zsh ];
         users.defaultUserShell = pkgs.zsh;
-        programs.zsh.enable = true;
+        programs = {
+          zsh.enable = true;
+          tmux.enable = true;
+        };
 
         # global system packages
         environment.systemPackages = with pkgs; [
@@ -19,7 +22,10 @@ _: {
       { pkgs, ... }:
       {
         environment.shells = with pkgs; [ zsh ];
-        programs.zsh.enable = true;
+        programs = {
+          zsh.enable = true;
+          tmux.enable = true;
+        };
 
         # global system packages
         environment.systemPackages = with pkgs; [

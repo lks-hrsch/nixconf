@@ -15,7 +15,6 @@
       self.darwinModules.sops
       self.darwinModules.ssh
       self.darwinModules.zsh
-      self.darwinModules.tmux
 
       config.flake.modules.darwin.homeManager
       inputs.mac-app-util.darwinModules.default
