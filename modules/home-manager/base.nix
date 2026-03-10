@@ -22,7 +22,7 @@
         self.homeManagerModules.mcp
         self.homeManagerModules.obsidian
         self.homeManagerModules.podman
-        self.homeManagerModules.shell
+        self.homeManagerModules.zsh
         self.homeManagerModules.sops
         self.homeManagerModules.ssh
         self.homeManagerModules.stylix

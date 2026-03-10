@@ -15,7 +15,6 @@
     inputs.self.nixosModules.users
     inputs.self.nixosModules.time
     inputs.self.nixosModules.sops
-    inputs.self.nixosModules.shell
     inputs.self.nixosModules.ssh
     inputs.self.nixosModules.nixvim
     inputs.self.nixosModules.tmux

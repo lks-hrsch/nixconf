@@ -13,7 +13,6 @@
       self.darwinModules.users
       self.darwinModules.time
       self.darwinModules.sops
-      self.darwinModules.shell
       self.darwinModules.ssh
       self.darwinModules.zsh
       self.darwinModules.tmux

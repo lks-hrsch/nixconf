@@ -36,7 +36,6 @@
         self.nixosModules.time
         self.nixosModules.podman
         self.nixosModules.sops
-        self.nixosModules.shell
         self.nixosModules.ssh
         self.nixosModules.nixvim
         self.nixosModules.tmux
