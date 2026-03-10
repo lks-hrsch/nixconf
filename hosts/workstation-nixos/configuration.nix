@@ -2,49 +2,31 @@
   inputs,
   self,
   config,
-  myLib,
-  constants,
-  custom-overlays,
   ...
 }:
 {
-  flake.nixosConfigurations."workstation-nixos" = inputs.nixpkgs.lib.nixosSystem {
-    specialArgs = {
-      inherit
-        inputs
-        constants
-        custom-overlays
-        ;
-      lib = myLib;
-    };
-    modules = [
-      self.nixosModules.hostworkstation-nixos-configuration
-      self.nixosModules.hostworkstation-nixos-vpn
-    ];
-  };
-
-  flake.nixosModules.hostworkstation-nixos-configuration =
+  configurations.nixos."workstation-nixos".module =
     { pkgs, ... }:
     let
       nv-fan-control = import ./_nv-fan-control.nix { inherit pkgs; };
     in
     {
-      imports = with config.flake.modules.nixos; [
-        default
-        features
-        users
-        time
-        podman
-        sops
-        ssh
-        nixvim
-        zsh
-        "1password"
+      imports = [
+        self.outputs.modules.nixos.default
+        self.outputs.modules.nixos.features
+        self.outputs.modules.nixos.users
+        self.outputs.modules.nixos.time
+        self.outputs.modules.nixos.podman
+        self.outputs.modules.nixos.sops
+        self.outputs.modules.nixos.ssh
+        self.outputs.modules.nixos.nixvim
+        self.outputs.modules.nixos.zsh
+        self.outputs.modules.nixos."1password"
 
-        desktop-hyprland-base
-        gaming-base
+        self.outputs.modules.nixos.desktop-hyprland-base
+        self.outputs.modules.nixos.gaming-base
 
-        homeManager
+        self.outputs.modules.nixos.homeManager
 
         inputs.nixvim.nixosModules.nixvim
 

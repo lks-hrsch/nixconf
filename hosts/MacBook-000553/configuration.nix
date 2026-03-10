@@ -1,34 +1,12 @@
+{ self, ... }:
 {
-  inputs,
-  self,
-  myLib,
-  constants,
-  custom-overlays,
-  ...
-}:
-{
-  flake.darwinConfigurations."MacBook-000553" = inputs.nix-darwin.lib.darwinSystem {
-    specialArgs = {
-      inherit
-        inputs
-        constants
-        custom-overlays
-        ;
-      lib = myLib;
-    };
-    modules = [
-      self.darwinModules.hostMacBook-configuration
-      self.darwinModules.hostMacBook-vpn
-    ];
-  };
-
-  flake.darwinModules.hostMacBook-configuration =
-    { lib, config, ... }:
+  configurations.darwin."MacBook-000553".module =
+    { ... }:
     {
-      imports = with config.flake.modules.darwin; [
-        base
-        podman
-        work
+      imports = [
+        self.outputs.modules.darwin.base
+        self.outputs.modules.darwin.podman
+        self.outputs.modules.darwin.work
       ];
 
       networking = {

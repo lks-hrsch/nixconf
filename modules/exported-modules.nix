@@ -1,16 +1,20 @@
-{ inputs, config, ... }:
+{ inputs, self, ... }:
 {
-  flake.modules.nixos.default.imports = [
-    config.flake.modules.nixos.avahi
-    config.flake.modules.nixos.flatpak
-    config.flake.modules.nixos.internationalisation
-    config.flake.modules.nixos.nixos-nix
-    config.flake.modules.nixos.pipewire
-    config.flake.modules.nixos.syncthing
-    config.flake.modules.nixos.xserver
-    config.flake.modules.nixos.zfs
+  flake.modules.nixos.default =
+    { ... }:
+    {
+      imports = [
+        self.outputs.modules.nixos.avahi
+        self.outputs.modules.nixos.flatpak
+        self.outputs.modules.nixos.internationalisation
+        self.outputs.modules.nixos.nixos-nix
+        self.outputs.modules.nixos.pipewire
+        self.outputs.modules.nixos.syncthing
+        self.outputs.modules.nixos.xserver
+        self.outputs.modules.nixos.zfs
 
-    inputs.sops-nix.nixosModules.sops
-    inputs.quadlet-nix.nixosModules.quadlet
-  ];
+        inputs.sops-nix.nixosModules.sops
+        inputs.quadlet-nix.nixosModules.quadlet
+      ];
+    };
 }

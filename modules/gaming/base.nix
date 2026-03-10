@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.gaming-base =
+  flake.modules.nixos.gaming-base =
     {
       lib,
       config,

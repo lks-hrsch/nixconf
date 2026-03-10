@@ -12,13 +12,13 @@
 {
   imports = [
     inputs.self.outputs.modules.nixos.default
-    config.flake.modules.nixos.features
-    config.flake.modules.nixos.users
-    config.flake.modules.nixos.time
-    config.flake.modules.nixos.sops
-    config.flake.modules.nixos.ssh
-    config.flake.modules.nixos.nixvim
-    config.flake.modules.nixos.zsh
+    inputs.self.outputs.modules.nixos.features
+    inputs.self.outputs.modules.nixos.users
+    inputs.self.outputs.modules.nixos.time
+    inputs.self.outputs.modules.nixos.sops
+    inputs.self.outputs.modules.nixos.ssh
+    inputs.self.outputs.modules.nixos.nixvim
+    inputs.self.outputs.modules.nixos.zsh
 
     # Include the default incus configuration.
     "${modulesPath}/virtualisation/lxc-container.nix"

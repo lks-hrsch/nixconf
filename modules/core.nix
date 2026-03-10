@@ -1,17 +1,26 @@
-{ inputs, ... }:
+{ inputs, lib, ... }:
 let
   custom-overlays = import ../overlays { inherit inputs; };
   constants = import ../secrets/constants.nix;
-  lib = import ../lib {
+  myLib = import ../lib {
     inherit (inputs) nixpkgs sops-nix;
     inherit inputs custom-overlays constants;
   };
 in
 {
-  _module.args = {
-    inherit custom-overlays constants;
-    myLib = lib;
+  options.flake.modules = lib.mkOption {
+    type = lib.types.lazyAttrsOf (lib.types.lazyAttrsOf lib.types.deferredModule);
+    default = { };
   };
 
-  flake = { inherit custom-overlays constants lib; };
+  config = {
+    _module.args = {
+      inherit custom-overlays constants myLib;
+    };
+
+    flake = {
+      inherit custom-overlays constants;
+      lib = myLib;
+    };
+  };
 }
