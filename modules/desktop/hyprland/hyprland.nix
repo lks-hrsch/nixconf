@@ -39,9 +39,9 @@ _: {
           ];
 
           windowrule = [
-            "pseudo, class:fcitx, title:fcitx"
-            "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0" # Prevents focus on empty XWayland windows
-            "suppressevent maximize, class:.*" # You'll probably like this.
+            "pseudo on, match:class fcitx, match:title fcitx"
+            "no_focus on, match:class ^$, match:title ^$, match:xwayland true, match:float true, match:fullscreen false, match:pin false" # Prevents focus on empty XWayland windows
+            "suppress_event maximize, match:class .*" # You'll probably like this.
           ];
 
           input = {
