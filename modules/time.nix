@@ -3,12 +3,12 @@ let
   timezone = "Europe/Berlin";
 in
 {
-  flake = {
-    nixosModules.time = {
+  flake.modules = {
+    nixos.time = {
       time.timeZone = timezone;
     };
 
-    darwinModules.time = {
+    darwin.time = {
       time.timeZone = timezone;
     };
   };

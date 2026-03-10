@@ -1,9 +1,9 @@
 {
-  self,
+  config,
   ...
 }:
 {
-  flake.darwinModules.work = {
+  flake.modules.darwin.work = {
     homebrew = {
       brews = [
         "appium"
@@ -30,7 +30,7 @@
     };
 
     home-manager.users.lkshrsch.imports = [
-      self.homeManagerModules.work
+      config.flake.modules.homeManager.work
     ];
   };
 }

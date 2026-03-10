@@ -1,33 +1,29 @@
-{ self, config, ... }:
+{ config, ... }:
 {
-  # Kept as alias so workstation-nixos/home.nix can still import it
-  flake.homeManagerModules.default = config.flake.modules.homeManager.base;
-  flake.homeManagerModules.work = {
-    imports = [
-      self.homeManagerModules.jetbrains
-      self.homeManagerModules.azure
-    ];
-  };
+  flake.modules.homeManager.work.imports = with config.flake.modules.homeManager; [
+    jetbrains
+    azure
+  ];
 
   flake.modules.homeManager.base =
     { ... }:
     {
-      imports = [
-        self.homeManagerModules.alacritty
-        self.homeManagerModules.antigravity
-        self.homeManagerModules.firefox
-        self.homeManagerModules.git
-        self.homeManagerModules.gpg
-        self.homeManagerModules.latex
-        self.homeManagerModules.manual
-        self.homeManagerModules.mcp
-        self.homeManagerModules.obsidian
-        self.homeManagerModules.podman
-        self.homeManagerModules.zsh
-        self.homeManagerModules.sops
-        self.homeManagerModules.ssh
-        self.homeManagerModules.stylix
-        self.homeManagerModules.vscode
+      imports = with config.flake.modules.homeManager; [
+        alacritty
+        antigravity
+        firefox
+        git
+        gpg
+        latex
+        manual
+        mcp
+        obsidian
+        podman
+        zsh
+        sops
+        ssh
+        stylix
+        vscode
       ];
 
       programs.home-manager.enable = true;

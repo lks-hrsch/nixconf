@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.xserver =
+  flake.modules.nixos.xserver =
     { lib, config, ... }:
     {
       # Load driver for Xorg and Wayland

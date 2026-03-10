@@ -24,7 +24,20 @@
           }
         )
         config.flake.modules.homeManager.base
-        
+        config.flake.modules.homeManager.desktop-base
+        config.flake.modules.homeManager.desktop-apps-obsstudio
+        config.flake.modules.homeManager.desktop-apps-thunderbird
+        config.flake.modules.homeManager.desktop-hyprland-uwsm-env
+        config.flake.modules.homeManager.desktop-hyprland-cliphist
+        config.flake.modules.homeManager.desktop-hyprland-dunst
+        config.flake.modules.homeManager.desktop-hyprland-hypridle
+        config.flake.modules.homeManager.desktop-hyprland-hyprland
+        config.flake.modules.homeManager.desktop-hyprland-hyprlock
+        config.flake.modules.homeManager.desktop-hyprland-hyprpaper
+        config.flake.modules.homeManager.desktop-hyprland-hyprpolkitagent
+        config.flake.modules.homeManager.desktop-hyprland-rofi
+        config.flake.modules.homeManager.desktop-hyprland-waybar
+
         (
           { pkgs, ... }:
           {
@@ -61,20 +74,6 @@
             ];
           }
         )
-
-        inputs.self.homeManagerModules.desktop-base
-        inputs.self.homeManagerModules.desktop-apps-obsstudio
-        inputs.self.homeManagerModules.desktop-apps-thunderbird
-        inputs.self.homeManagerModules.desktop-hyprland-uwsm-env
-        inputs.self.homeManagerModules.desktop-hyprland-cliphist
-        inputs.self.homeManagerModules.desktop-hyprland-dunst
-        inputs.self.homeManagerModules.desktop-hyprland-hypridle
-        inputs.self.homeManagerModules.desktop-hyprland-hyprland
-        inputs.self.homeManagerModules.desktop-hyprland-hyprlock
-        inputs.self.homeManagerModules.desktop-hyprland-hyprpaper
-        inputs.self.homeManagerModules.desktop-hyprland-hyprpolkitagent
-        inputs.self.homeManagerModules.desktop-hyprland-rofi
-        inputs.self.homeManagerModules.desktop-hyprland-waybar
       ];
     };
   };

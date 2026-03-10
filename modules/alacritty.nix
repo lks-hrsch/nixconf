@@ -1,8 +1,5 @@
-_:
-{
-  flake.homeManagerModules.alacritty =
-    _:
-    {
-      programs.alacritty.enable = true;
-    };
+_: {
+  flake.modules.homeManager.alacritty = _: {
+    programs.alacritty.enable = true;
+  };
 }

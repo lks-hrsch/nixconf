@@ -1,7 +1,6 @@
-_:
-{
+_: {
   flake = {
-    nixosModules.ssh =
+    modules.nixos.ssh =
       { config, ... }:
       {
         services.openssh = {
@@ -10,7 +9,7 @@ _:
         };
       };
 
-    darwinModules.ssh =
+    modules.darwin.ssh =
       { config, ... }:
       {
         services.openssh = {
@@ -19,7 +18,7 @@ _:
         };
       };
 
-    homeManagerModules.ssh =
+    modules.homeManager.ssh =
       { pkgs, config, ... }:
       let
         # Platform-specific 1Password agent socket path

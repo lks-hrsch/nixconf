@@ -1,5 +1,5 @@
 _: {
-  flake.homeManagerModules.desktop-hyprland-cliphist = _: {
+  flake.modules.homeManager.desktop-hyprland-cliphist = _: {
     services.cliphist = {
       enable = true;
       extraOptions = [

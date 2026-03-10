@@ -1,5 +1,5 @@
 _: {
-  flake.homeManagerModules.desktop-hyprland-hyprlock =
+  flake.modules.homeManager.desktop-hyprland-hyprlock =
     { lib, ... }:
     {
       programs.hyprlock = {

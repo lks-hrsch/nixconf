@@ -1,5 +1,5 @@
 _: {
-  flake.homeManagerModules.desktop-base =
+  flake.modules.homeManager.desktop-base =
     { lib, osConfig, ... }:
     {
       xdg = {

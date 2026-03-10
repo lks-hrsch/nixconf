@@ -1,6 +1,6 @@
 _: {
   flake = {
-    nixosModules.zsh =
+    modules.nixos.zsh =
       { pkgs, ... }:
       {
         environment.shells = with pkgs; [ zsh ];
@@ -18,7 +18,7 @@ _: {
         ];
       };
 
-    darwinModules.zsh =
+    modules.darwin.zsh =
       { pkgs, ... }:
       {
         environment.shells = with pkgs; [ zsh ];
@@ -35,7 +35,7 @@ _: {
         ];
       };
 
-    homeManagerModules.zsh =
+    modules.homeManager.zsh =
       { pkgs, ... }:
       {
         home.packages = with pkgs; [

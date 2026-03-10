@@ -1,38 +1,36 @@
 _: {
-  flake.nixosModules.nixos-nix =
-    _:
-    {
-      # Nix settings
-      nix = {
-        extraOptions = "experimental-features = nix-command flakes";
-        gc = {
-          automatic = true; # Automatically run garbage collection
-          dates = "weekly"; # Run garbage collection weekly
-          options = "--delete-older-than 21d";
-        };
-        optimise = {
-          automatic = true;
-        };
-        settings = {
-          auto-optimise-store = true;
-          trusted-users = [
-            "lkshrsch"
-          ];
-          substituters = [
-            "https://cache.nixos.org/"
-            "https://nix-community.cachix.org"
-            "https://hyprland.cachix.org"
-            "https://cuda-maintainers.cachix.org"
-          ];
-          trusted-public-keys = [
-            "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-            "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-            "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-            "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
-          ];
-        };
+  flake.modules.nixos.nixos-nix = _: {
+    # Nix settings
+    nix = {
+      extraOptions = "experimental-features = nix-command flakes";
+      gc = {
+        automatic = true; # Automatically run garbage collection
+        dates = "weekly"; # Run garbage collection weekly
+        options = "--delete-older-than 21d";
       };
-
-      programs.nix-ld.enable = true;
+      optimise = {
+        automatic = true;
+      };
+      settings = {
+        auto-optimise-store = true;
+        trusted-users = [
+          "lkshrsch"
+        ];
+        substituters = [
+          "https://cache.nixos.org/"
+          "https://nix-community.cachix.org"
+          "https://hyprland.cachix.org"
+          "https://cuda-maintainers.cachix.org"
+        ];
+        trusted-public-keys = [
+          "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+          "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+          "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+        ];
+      };
     };
+
+    programs.nix-ld.enable = true;
+  };
 }

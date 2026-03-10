@@ -22,9 +22,9 @@
   };
 
   flake.darwinModules.hostlkshrsch-mb-pro-m1-configuration =
-    { lib, ... }:
+    { lib, config, ... }:
     {
-      imports = with self.darwinModules; [
+      imports = with config.flake.modules.darwin; [
         base
       ];
 

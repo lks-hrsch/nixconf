@@ -23,9 +23,9 @@
   };
 
   flake.darwinModules.hostMacBook-configuration =
-    { lib, ... }:
+    { lib, config, ... }:
     {
-      imports = with self.darwinModules; [
+      imports = with config.flake.modules.darwin; [
         base
         podman
         work

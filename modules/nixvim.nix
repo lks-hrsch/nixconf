@@ -1,7 +1,6 @@
-_:
-{
+_: {
   flake = {
-    nixosModules.nixvim = {
+    modules.nixos.nixvim = {
       programs.nixvim = {
         enable = true;
         nixpkgs.useGlobalPackages = true;
@@ -23,7 +22,7 @@ _:
       };
     };
 
-    darwinModules.nixvim = {
+    modules.darwin.nixvim = {
       programs.nixvim = {
         enable = true;
         nixpkgs.useGlobalPackages = true;

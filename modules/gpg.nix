@@ -1,6 +1,5 @@
-_:
-{
-  flake.homeManagerModules.gpg =
+_: {
+  flake.modules.homeManager.gpg =
     { pkgs, ... }:
     {
       programs.gpg.enable = true;

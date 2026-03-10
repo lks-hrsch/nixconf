@@ -1,5 +1,5 @@
 _: {
-  flake.darwinModules.homebrew = _: {
+  flake.modules.darwin.homebrew = _: {
     # issues in newer macOS versions with mas package use brew version
     # https://github.com/mas-cli/mas/issues/1029
     # environment.systemPackages = with pkgs; [

@@ -1,6 +1,5 @@
-_:
-{
-  flake.homeManagerModules.stylix =
+_: {
+  flake.modules.homeManager.stylix =
     {
       pkgs,
       config,

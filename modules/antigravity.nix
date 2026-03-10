@@ -1,6 +1,5 @@
-_:
-{
-  flake.homeManagerModules.antigravity =
+_: {
+  flake.modules.homeManager.antigravity =
     {
       pkgs,
       lib,

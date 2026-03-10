@@ -5,18 +5,19 @@
   ...
 }:
 {
-  flake.darwinModules.base = {
+  flake.modules.darwin.base = {
     imports = [
-      self.darwinModules."1password"
-      self.darwinModules.firefox
-      self.darwinModules.homebrew
-      self.darwinModules.users
-      self.darwinModules.time
-      self.darwinModules.sops
-      self.darwinModules.ssh
-      self.darwinModules.zsh
+      config.flake.modules.darwin."1password"
+      config.flake.modules.darwin.firefox
+      config.flake.modules.darwin.homebrew
+      config.flake.modules.darwin.users
+      config.flake.modules.darwin.time
+      config.flake.modules.darwin.sops
+      config.flake.modules.darwin.ssh
+      config.flake.modules.darwin.zsh
 
       config.flake.modules.darwin.homeManager
+
       inputs.mac-app-util.darwinModules.default
       inputs.nixvim.nixDarwinModules.nixvim
       inputs.sops-nix.darwinModules.sops

@@ -1,6 +1,6 @@
 _: {
   flake = {
-    nixosModules.users =
+    modules.nixos.users =
       {
         pkgs,
         lib,
@@ -40,7 +40,7 @@ _: {
         };
       };
 
-    darwinModules.users =
+    modules.darwin.users =
       {
         pkgs,
         lib,

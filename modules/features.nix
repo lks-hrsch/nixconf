@@ -1,6 +1,6 @@
 _: {
   flake = {
-    nixosModules.features =
+    modules.nixos.features =
       { lib, ... }:
       {
         options.features = {

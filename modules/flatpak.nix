@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.flatpak =
+  flake.modules.nixos.flatpak =
     {
       lib,
       config,

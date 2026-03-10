@@ -1,6 +1,5 @@
-_:
-{
-  flake.homeManagerModules.obsidian =
+_: {
+  flake.modules.homeManager.obsidian =
     {
       config,
       pkgs,

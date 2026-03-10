@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.internationalisation =
+  flake.modules.nixos.internationalisation =
     { pkgs, ... }:
     {
       # Select internationalisation properties.

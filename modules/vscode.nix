@@ -1,5 +1,5 @@
 _: {
-  flake.homeManagerModules.vscode =
+  flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
       vscodePackage =

@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.syncthing =
+  flake.modules.nixos.syncthing =
     { lib, config, ... }:
     let
       username = "lkshrsch";

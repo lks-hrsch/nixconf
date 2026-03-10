@@ -1,6 +1,5 @@
-_:
-{
-  flake.homeManagerModules.latex =
+_: {
+  flake.modules.homeManager.latex =
     { pkgs, ... }:
     {
       home.packages = with pkgs; [

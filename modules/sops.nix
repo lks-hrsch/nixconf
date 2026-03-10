@@ -1,8 +1,7 @@
-_:
-{
+_: {
   flake = {
     # System-level SOPS configuration (NixOS and Darwin)
-    nixosModules.sops =
+    modules.nixos.sops =
       {
         config,
         pkgs,
@@ -101,7 +100,7 @@ _:
         };
       };
 
-    darwinModules.sops =
+    modules.darwin.sops =
       {
         config,
         pkgs,
@@ -170,7 +169,7 @@ _:
       };
 
     # Home-Manager level SOPS configuration
-    homeManagerModules.sops =
+    modules.homeManager.sops =
       { config, lib, ... }:
       {
         sops = {

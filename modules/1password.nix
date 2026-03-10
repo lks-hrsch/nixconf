@@ -1,6 +1,6 @@
 _: {
   flake = {
-    nixosModules."1password" =
+    modules.nixos."1password" =
       {
         config,
         lib,
@@ -24,7 +24,7 @@ _: {
         };
       };
 
-    darwinModules."1password" =
+    modules.darwin."1password" =
       {
         config,
         lib,

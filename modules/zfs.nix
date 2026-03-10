@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.zfs =
+  flake.modules.nixos.zfs =
     { lib, config, ... }:
     {
       config = lib.mkIf config.features.zfs.enable {

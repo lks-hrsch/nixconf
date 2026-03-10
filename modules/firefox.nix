@@ -1,5 +1,5 @@
 {
-  flake.darwinModules.firefox = {
+  flake.modules.darwin.firefox = {
     # On macOS, programs.firefox.package doesn't automatically create app symlinks
 
     homebrew = {
@@ -8,7 +8,7 @@
       ];
     };
   };
-  flake.homeManagerModules.firefox =
+  flake.modules.homeManager.firefox =
     { pkgs, ... }:
     let
       firefox-package =

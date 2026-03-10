@@ -1,5 +1,5 @@
 _: {
-  flake.homeManagerModules.desktop-hyprland-waybar =
+  flake.modules.homeManager.desktop-hyprland-waybar =
     _:
     let
       interval = 5;

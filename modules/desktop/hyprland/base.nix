@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.desktop-hyprland-base =
+  flake.modules.nixos.desktop-hyprland-base =
     {
       lib,
       config,

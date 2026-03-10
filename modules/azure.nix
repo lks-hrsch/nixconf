@@ -1,5 +1,5 @@
 _: {
-  flake.homeManagerModules.azure =
+  flake.modules.homeManager.azure =
     { pkgs, ... }:
     {
       home.packages = with pkgs; [

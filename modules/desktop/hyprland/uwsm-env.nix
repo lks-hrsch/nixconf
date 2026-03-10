@@ -1,5 +1,5 @@
 _: {
-  flake.homeManagerModules.desktop-hyprland-uwsm-env =
+  flake.modules.homeManager.desktop-hyprland-uwsm-env =
     { pkgs, ... }:
     {
       home.file.uwsm-env = {

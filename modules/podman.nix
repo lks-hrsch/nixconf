@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.podman =
+  flake.modules.nixos.podman =
     {
       pkgs,
       lib,
@@ -44,7 +44,7 @@ _: {
         };
       };
     };
-  flake.darwinModules.podman = _: {
+  flake.modules.darwin.podman = _: {
     # https://github.com/podman-desktop/podman-desktop/issues/13922
 
     homebrew = {
@@ -64,7 +64,7 @@ _: {
       ];
     };
   };
-  flake.homeManagerModules.podman =
+  flake.modules.homeManager.podman =
     {
       pkgs,
       lib,

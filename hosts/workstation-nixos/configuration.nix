@@ -29,25 +29,24 @@
       nv-fan-control = import ./_nv-fan-control.nix { inherit pkgs; };
     in
     {
-      imports = [
-        self.nixosModules.default
-        self.nixosModules.features
-        self.nixosModules.users
-        self.nixosModules.time
-        self.nixosModules.podman
-        self.nixosModules.sops
-        self.nixosModules.ssh
-        self.nixosModules.nixvim
-        self.nixosModules.tmux
-        self.nixosModules.zsh
-        self.nixosModules."1password"
+      imports = with config.flake.modules.nixos; [
+        default
+        features
+        users
+        time
+        podman
+        sops
+        ssh
+        nixvim
+        zsh
+        "1password"
 
-        inputs.self.nixosModules.desktop-hyprland-base
-        inputs.self.nixosModules.gaming-base
+        desktop-hyprland-base
+        gaming-base
+
+        homeManager
 
         inputs.nixvim.nixosModules.nixvim
-
-        config.flake.modules.nixos.homeManager
 
         # Include the results of the hardware scan.
         ./_home-nas-mounts.nix

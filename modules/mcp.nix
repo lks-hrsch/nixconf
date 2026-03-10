@@ -1,6 +1,5 @@
-_:
-{
-  flake.homeManagerModules.mcp =
+_: {
+  flake.modules.homeManager.mcp =
     { config, ... }:
     {
       programs.mcp = {

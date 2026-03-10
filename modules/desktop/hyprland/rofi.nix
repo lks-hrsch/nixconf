@@ -1,5 +1,5 @@
 _: {
-  flake.homeManagerModules.desktop-hyprland-rofi =
+  flake.modules.homeManager.desktop-hyprland-rofi =
     { pkgs, ... }:
     {
       programs.rofi = {

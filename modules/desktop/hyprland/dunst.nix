@@ -1,5 +1,5 @@
 _: {
-  flake.homeManagerModules.desktop-hyprland-dunst = _: {
+  flake.modules.homeManager.desktop-hyprland-dunst = _: {
     services.dunst = {
       enable = true;
     };
