@@ -1,60 +1,51 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+## Edit this configuration file to define what should be installed on
+## your system. Help is available in the configuration.nix(5) man page
+## and in the NixOS manual (accessible by running `nixos-help`).
 
+{ self, ... }:
 {
-  modulesPath,
-  inputs,
-  ...
-}:
+  configurations.nixos."deimos".module =
+    { modulesPath, ... }:
+    {
+      imports = with self.outputs.modules.nixos; [
+        base
+        podman
 
-{
-  imports = [
-    inputs.self.outputs.modules.nixos.base
+        # Include the default incus configuration.
+        "${modulesPath}/virtualisation/lxc-container.nix"
+      ];
 
-    # Include the default incus configuration.
-    "${modulesPath}/virtualisation/lxc-container.nix"
+      # Podman stacks are provided by the host-specific modules in ./stacks.
+      features.virtualisation.podman.enable = true;
 
-    # vpn
-    ./vpn.nix
+      nix.settings.sandbox = false;
 
-    # Include podman stacks
-    ./stacks
-  ];
-
-  features = {
-    virtualisation.podman.enable = true;
-  };
-
-  nix.settings.sandbox = false;
-
-  networking = {
-    hostName = "deimos";
-    dhcpcd.enable = false;
-    useDHCP = false;
-    useHostResolvConf = false;
-    firewall = {
-      enable = true;
-    };
-  };
-
-  systemd.network = {
-    enable = true;
-    networks."50-eth0" = {
-      matchConfig.Name = "eth0";
-      networkConfig = {
-        Address = "192.168.1.13/24";
-        Gateway = "192.168.1.1";
-        DNS = [
-          "192.168.1.1"
-          "5.45.99.133" # mercury.lukashirsch.de
-          "85.209.49.247" # earth.lukashirsch.de
-        ];
-        IPv6AcceptRA = true;
+      networking = {
+        hostName = "deimos";
+        dhcpcd.enable = false;
+        useDHCP = false;
+        useHostResolvConf = false;
+        firewall.enable = true;
       };
-      linkConfig.RequiredForOnline = "routable";
-    };
-  };
 
-  system.stateVersion = "25.05"; # Did you read the comment?
+      systemd.network = {
+        enable = true;
+        networks."50-eth0" = {
+          matchConfig.Name = "eth0";
+          networkConfig = {
+            Address = "192.168.1.13/24";
+            Gateway = "192.168.1.1";
+            DNS = [
+              "192.168.1.1"
+              "5.45.99.133" # mercury.lukashirsch.de
+              "85.209.49.247" # earth.lukashirsch.de
+            ];
+            IPv6AcceptRA = true;
+          };
+          linkConfig.RequiredForOnline = "routable";
+        };
+      };
+
+      system.stateVersion = "25.05"; # Did you read the comment?
+    };
 }

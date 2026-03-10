@@ -52,9 +52,7 @@
     { flake-parts, import-tree, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } (
       inputs.import-tree [
-        ./hosts/MacBook-000553
-        ./hosts/lkshrsch-mb-pro-m1
-        ./hosts/workstation-nixos
+        ./hosts
         ./modules
       ]
     );
