@@ -1,8 +1,4 @@
-{
-  inputs,
-  self,
-  ...
-}:
+{ self, ... }:
 {
   configurations.nixos."workstation-nixos".module =
     { pkgs, ... }:
@@ -11,41 +7,27 @@
     in
     {
       imports = [
-        self.outputs.modules.nixos.default
-        self.outputs.modules.nixos.features
-        self.outputs.modules.nixos.users
-        self.outputs.modules.nixos.time
+        self.outputs.modules.nixos.base
         self.outputs.modules.nixos.podman
-        self.outputs.modules.nixos.sops
-        self.outputs.modules.nixos.ssh
-        self.outputs.modules.nixos.nixvim
-        self.outputs.modules.nixos.zsh
         self.outputs.modules.nixos."1password"
+        self.outputs.modules.nixos.flatpak
+        self.outputs.modules.nixos.avahi
+        self.outputs.modules.nixos.pipewire
+        self.outputs.modules.nixos.xserver
+        self.outputs.modules.nixos.zfs
+        self.outputs.modules.nixos.syncthing
 
         self.outputs.modules.nixos.desktop-hyprland-base
         self.outputs.modules.nixos.gaming-base
 
         self.outputs.modules.nixos.homeManager
 
-        inputs.nixvim.nixosModules.nixvim
-
         # Include the results of the hardware scan.
         ./_home-nas-mounts.nix
         ./_hardware-configuration.nix
       ];
 
-      nixpkgs = {
-        hostPlatform = "x86_64-linux";
-        config = {
-          allowUnfree = true;
-          cudaSupport = true;
-        };
-        overlays = [
-          self.outputs.custom-overlays.unstable
-          self.outputs.custom-overlays.firefox-addons
-          self.outputs.custom-overlays.nix-vscode-extensions
-        ];
-      };
+      nixpkgs.config.cudaSupport = true;
 
       features = {
         virtualisation.podman.enable = true;
@@ -158,9 +140,6 @@
         };
       };
 
-      system = {
-        configurationRevision = self.rev or self.dirtyRev or null;
-        stateVersion = "24.11";
-      };
+      system.stateVersion = "24.11";
     };
 }
