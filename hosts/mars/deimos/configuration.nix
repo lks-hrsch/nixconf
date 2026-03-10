@@ -15,9 +15,6 @@
         "${modulesPath}/virtualisation/lxc-container.nix"
       ];
 
-      # Podman stacks are provided by the host-specific modules in ./stacks.
-      features.virtualisation.podman.enable = true;
-
       nix.settings.sandbox = false;
 
       networking = {

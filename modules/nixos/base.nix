@@ -8,7 +8,6 @@
     { ... }:
     {
       imports = [
-        self.outputs.modules.nixos.features
         self.outputs.modules.nixos.internationalisation
         self.outputs.modules.nixos.nixvim
         self.outputs.modules.nixos.sops

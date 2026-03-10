@@ -29,12 +29,6 @@
 
       nixpkgs.config.cudaSupport = true;
 
-      features = {
-        virtualisation.podman.enable = true;
-        zfs.enable = true;
-        nas.enable = true;
-      };
-
       # Use the systemd-boot EFI boot loader.
       boot.loader = {
         systemd-boot.enable = true;
@@ -140,7 +134,7 @@
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = "${nv-fan-control}/bin/nv-fan-control 55";s
+          ExecStart = "${nv-fan-control}/bin/nv-fan-control 55";
         };
       };
 

@@ -4,45 +4,37 @@ _: {
       nixos.podman =
         {
           pkgs,
-          lib,
-          config,
           ...
         }:
-        let
-          feature = config.features.virtualisation.podman;
-        in
         {
           # podman
           # https://mynixos.com/nixpkgs/options/virtualisation.podman
           # https://nixos.wiki/wiki/Podman
-          config = lib.mkIf feature.enable {
+          # Useful other development tools
+          environment.systemPackages = with pkgs; [
+            podman
+            podman-compose # start group of containers for dev
 
-            # Useful other development tools
-            environment.systemPackages = with pkgs; [
-              podman
-              podman-compose # start group of containers for dev
+            docker
+            docker-compose # start group of containers for dev
+          ];
 
-              docker
-              docker-compose # start group of containers for dev
-            ];
-
-            virtualisation = {
-              containers = {
-                enable = true;
+          virtualisation = {
+            containers = {
+              enable = true;
+            };
+            podman = {
+              enable = true;
+              autoPrune.enable = true;
+              defaultNetwork.settings = {
+                dns_enabled = true;
               };
-              podman = {
-                enable = true;
-                autoPrune.enable = true;
-                defaultNetwork.settings = {
-                  dns_enabled = true;
-                };
-                dockerCompat = true; # Enable Docker compatibility mode
-                dockerSocket.enable = true; # Enable Docker socket for compatibility
-              };
-              quadlet = {
-                enable = true;
-                autoUpdate.enable = true;
-              };
+              dockerCompat = true; # Enable Docker compatibility mode
+              dockerSocket.enable = true; # Enable Docker socket for compatibility
+            };
+            quadlet = {
+              enable = true;
+              autoUpdate.enable = true;
             };
           };
         };
