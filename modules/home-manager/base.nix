@@ -5,6 +5,7 @@
   flake.homeManagerModules.work = {
     imports = [
       self.homeManagerModules.jetbrains
+      self.homeManagerModules.azure
     ];
   };
 
