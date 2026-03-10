@@ -14,7 +14,6 @@
         self.outputs.modules.nixos.ssh
         self.outputs.modules.nixos.time
         self.outputs.modules.nixos.users
-
         self.outputs.modules.nixos.zsh
 
         inputs.nixvim.nixosModules.nixvim
