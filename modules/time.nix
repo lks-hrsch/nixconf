@@ -1,12 +1,15 @@
 _:
+let
+  timezone = "Europe/Berlin";
+in
 {
   flake = {
     nixosModules.time = {
-      time.timeZone = "Europe/Berlin";
+      time.timeZone = timezone;
     };
 
     darwinModules.time = {
-      time.timeZone = "Europe/Berlin";
+      time.timeZone = timezone;
     };
   };
 }
