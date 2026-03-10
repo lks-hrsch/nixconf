@@ -11,6 +11,7 @@
         self.outputs.modules.darwin."1password"
         self.outputs.modules.darwin.firefox
         self.outputs.modules.darwin.homebrew
+        self.outputs.modules.darwin.nixvim
         self.outputs.modules.darwin.users
         self.outputs.modules.darwin.time
         self.outputs.modules.darwin.sops
