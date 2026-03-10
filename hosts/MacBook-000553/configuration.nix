@@ -3,10 +3,10 @@
   configurations.darwin."MacBook-000553".module =
     { ... }:
     {
-      imports = [
-        self.outputs.modules.darwin.base
-        self.outputs.modules.darwin.podman
-        self.outputs.modules.darwin.work
+      imports = with self.outputs.modules.darwin; [
+        base
+        podman
+        work
       ];
 
       networking = {

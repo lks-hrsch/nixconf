@@ -3,8 +3,8 @@
   configurations.darwin."lkshrsch-mb-pro-m1".module =
     { ... }:
     {
-      imports = [
-        self.outputs.modules.darwin.base
+      imports = with self.outputs.modules.darwin; [
+        base
       ];
 
       networking = {

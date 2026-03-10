@@ -5,7 +5,6 @@
 {
   modulesPath,
   inputs,
-  config,
   ...
 }:
 

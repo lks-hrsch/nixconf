@@ -1,7 +1,7 @@
 { self, ... }:
 {
   flake.modules.darwin.work =
-    { ... }:
+    _:
     {
       homebrew = {
         brews = [
