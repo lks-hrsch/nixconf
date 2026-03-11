@@ -1,10 +1,10 @@
-_: {
+{ config, ... }:
+{
   flake = {
     modules.nixos.users =
       {
         pkgs,
         lib,
-        constants,
         ...
       }:
       {
@@ -28,7 +28,7 @@ _: {
           lkshrsch = {
             home = "/home/lkshrsch";
             shell = pkgs.zsh;
-            openssh.authorizedKeys.keys = [ constants.sshPublicKey ];
+            openssh.authorizedKeys.keys = [ config.repo.constants.sshPublicKey ];
             isNormalUser = true;
             extraGroups = [
               "wheel"
@@ -44,7 +44,6 @@ _: {
       {
         pkgs,
         lib,
-        constants,
         ...
       }:
       {
@@ -57,7 +56,7 @@ _: {
           lkshrsch = {
             home = "/Users/lkshrsch";
             shell = pkgs.zsh;
-            openssh.authorizedKeys.keys = [ constants.sshPublicKey ];
+            openssh.authorizedKeys.keys = [ config.repo.constants.sshPublicKey ];
           };
         };
       };

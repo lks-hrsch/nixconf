@@ -1,4 +1,5 @@
 {
+  config,
   self,
   inputs,
   ...
@@ -8,17 +9,17 @@
     { ... }:
     {
       imports = [
-        self.outputs.modules.darwin."1password"
-        self.outputs.modules.darwin.firefox
-        self.outputs.modules.darwin.homebrew
-        self.outputs.modules.darwin.nixvim
-        self.outputs.modules.darwin.users
-        self.outputs.modules.darwin.time
-        self.outputs.modules.darwin.sops
-        self.outputs.modules.darwin.ssh
-        self.outputs.modules.darwin.zsh
+        config.flake.modules.darwin."1password"
+        config.flake.modules.darwin.firefox
+        config.flake.modules.darwin.homebrew
+        config.flake.modules.darwin.nixvim
+        config.flake.modules.darwin.users
+        config.flake.modules.darwin.time
+        config.flake.modules.darwin.sops
+        config.flake.modules.darwin.ssh
+        config.flake.modules.darwin.zsh
 
-        self.outputs.modules.darwin.homeManager
+        config.flake.modules.darwin.homeManager
 
         inputs.mac-app-util.darwinModules.default
         inputs.nixvim.nixDarwinModules.nixvim
@@ -29,9 +30,9 @@
         hostPlatform = "aarch64-darwin";
         config.allowUnfree = true;
         overlays = [
-          self.outputs.custom-overlays.unstable
-          self.outputs.custom-overlays.firefox-addons
-          self.outputs.custom-overlays.nix-vscode-extensions
+          config.repo.overlays.unstable
+          config.repo.overlays.firefox-addons
+          config.repo.overlays.nix-vscode-extensions
         ];
       };
 

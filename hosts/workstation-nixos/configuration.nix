@@ -1,4 +1,4 @@
-{ self, ... }:
+{ config, ... }:
 {
   configurations.nixos."workstation-nixos".module =
     { pkgs, ... }:
@@ -7,20 +7,20 @@
     in
     {
       imports = [
-        self.outputs.modules.nixos.base
-        self.outputs.modules.nixos.podman
-        self.outputs.modules.nixos."1password"
-        self.outputs.modules.nixos.flatpak
-        self.outputs.modules.nixos.avahi
-        self.outputs.modules.nixos.pipewire
-        self.outputs.modules.nixos.xserver
-        self.outputs.modules.nixos.zfs
-        self.outputs.modules.nixos.syncthing
+        config.flake.modules.nixos.base
+        config.flake.modules.nixos.podman
+        config.flake.modules.nixos."1password"
+        config.flake.modules.nixos.flatpak
+        config.flake.modules.nixos.avahi
+        config.flake.modules.nixos.pipewire
+        config.flake.modules.nixos.xserver
+        config.flake.modules.nixos.zfs
+        config.flake.modules.nixos.syncthing
 
-        self.outputs.modules.nixos.desktop-hyprland-base
-        self.outputs.modules.nixos.gaming-base
+        config.flake.modules.nixos.desktop-hyprland-base
+        config.flake.modules.nixos.gaming-base
 
-        self.outputs.modules.nixos.homeManager
+        config.flake.modules.nixos.homeManager
 
         # Include the results of the hardware scan.
         ./_home-nas-mounts.nix

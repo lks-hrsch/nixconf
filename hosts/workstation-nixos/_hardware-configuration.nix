@@ -5,7 +5,6 @@
   config,
   lib,
   modulesPath,
-  constants,
   ...
 }:
 
@@ -38,7 +37,7 @@
           enable = true;
           port = 2222; # connect with: ssh -p 2222 root@<initrd-ip>
           hostKeys = [ "/etc/ssh/ssh_host_ed25519_key" ];
-          authorizedKeys = [ constants.sshPublicKey ];
+          authorizedKeys = [ config.repo.constants.sshPublicKey ];
           # shell = "/bin/cryptsetup-askpass";
         };
         udhcpc.enable = false;

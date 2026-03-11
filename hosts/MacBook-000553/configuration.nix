@@ -1,9 +1,9 @@
-{ self, ... }:
+{ config, ... }:
 {
   configurations.darwin."MacBook-000553".module =
     { ... }:
     {
-      imports = with self.outputs.modules.darwin; [
+      imports = with config.flake.modules.darwin; [
         base
         podman
         work

@@ -2,9 +2,6 @@
   inputs,
   config,
   lib,
-  myLib,
-  constants,
-  custom-overlays,
   ...
 }:
 {
@@ -22,14 +19,6 @@
     _:
     { module }:
     inputs.nixpkgs.lib.nixosSystem {
-      specialArgs = {
-        inherit
-          inputs
-          constants
-          custom-overlays
-          ;
-        lib = myLib;
-      };
       modules = [ module ];
     }
   ) config.configurations.nixos;

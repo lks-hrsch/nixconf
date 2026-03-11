@@ -1,4 +1,5 @@
 {
+  config,
   self,
   inputs,
   ...
@@ -8,13 +9,13 @@
     { ... }:
     {
       imports = [
-        self.outputs.modules.nixos.internationalisation
-        self.outputs.modules.nixos.nixvim
-        self.outputs.modules.nixos.sops
-        self.outputs.modules.nixos.ssh
-        self.outputs.modules.nixos.time
-        self.outputs.modules.nixos.users
-        self.outputs.modules.nixos.zsh
+        config.flake.modules.nixos.internationalisation
+        config.flake.modules.nixos.nixvim
+        config.flake.modules.nixos.sops
+        config.flake.modules.nixos.ssh
+        config.flake.modules.nixos.time
+        config.flake.modules.nixos.users
+        config.flake.modules.nixos.zsh
 
         inputs.nixvim.nixosModules.nixvim
         inputs.sops-nix.nixosModules.sops
@@ -25,9 +26,9 @@
         hostPlatform = "x86_64-linux";
         config.allowUnfree = true;
         overlays = [
-          self.outputs.custom-overlays.unstable
-          self.outputs.custom-overlays.firefox-addons
-          self.outputs.custom-overlays.nix-vscode-extensions
+          config.repo.overlays.unstable
+          config.repo.overlays.firefox-addons
+          config.repo.overlays.nix-vscode-extensions
         ];
       };
 

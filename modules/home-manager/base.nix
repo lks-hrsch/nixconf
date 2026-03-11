@@ -1,9 +1,9 @@
-{ self, ... }:
+{ config, ... }:
 {
   flake.modules.homeManager.work =
     { ... }:
     {
-      imports = with self.outputs.modules.homeManager; [
+      imports = with config.flake.modules.homeManager; [
         jetbrains
         azure
       ];
@@ -12,7 +12,7 @@
   flake.modules.homeManager.base =
     { ... }:
     {
-      imports = with self.outputs.modules.homeManager; [
+      imports = with config.flake.modules.homeManager; [
         alacritty
         antigravity
         firefox

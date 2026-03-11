@@ -1,4 +1,4 @@
-{ inputs, self, ... }:
+{ config, inputs, ... }:
 {
   flake.modules.darwin.homeManager =
     { ... }:
@@ -11,7 +11,6 @@
           inputs.mac-app-util.homeManagerModules.default
           inputs.stylix.homeModules.stylix
         ];
-        extraSpecialArgs = { inherit inputs; };
         useGlobalPkgs = true;
         useUserPackages = true;
         backupFileExtension = ".backup";
@@ -26,7 +25,7 @@
               };
             }
           )
-          self.outputs.modules.homeManager.base
+          config.flake.modules.homeManager.base
         ];
       };
     };

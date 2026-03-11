@@ -1,9 +1,9 @@
-{ self, ... }:
+{ config, ... }:
 {
   configurations.darwin."lkshrsch-mb-pro-m1".module =
     { ... }:
     {
-      imports = with self.outputs.modules.darwin; [
+      imports = with config.flake.modules.darwin; [
         base
       ];
 

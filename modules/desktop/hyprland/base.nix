@@ -1,10 +1,10 @@
-_: {
+{ inputs, ... }:
+{
   flake.modules.nixos.desktop-hyprland-base =
     {
       lib,
       config,
       pkgs,
-      inputs,
       ...
     }:
     {

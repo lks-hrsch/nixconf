@@ -49,11 +49,31 @@
   };
 
   outputs =
-    { flake-parts, import-tree, ... }@inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } (
-      inputs.import-tree [
-        ./hosts
-        ./modules
-      ]
-    );
+    inputs:
+    let
+      moduleTree = inputs.import-tree ./modules;
+      hostTree = inputs.import-tree ./hosts;
+      overlays = import ./overlays { inherit inputs; };
+      constants = import ./secrets/constants.nix;
+    in
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ inputs.flake-parts.flakeModules.modules ] ++ moduleTree.imports ++ hostTree.imports;
+
+      options.repo = {
+        constants = inputs.nixpkgs.lib.mkOption {
+          type = inputs.nixpkgs.lib.types.raw;
+          readOnly = true;
+        };
+
+        overlays = inputs.nixpkgs.lib.mkOption {
+          type = inputs.nixpkgs.lib.types.lazyAttrsOf inputs.nixpkgs.lib.types.raw;
+          readOnly = true;
+        };
+      };
+
+      config = {
+        repo.constants = constants;
+        repo.overlays = overlays;
+      };
+    };
 }

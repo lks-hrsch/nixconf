@@ -1,6 +1,7 @@
-_: {
+{ inputs, ... }:
+{
   flake.modules.homeManager.desktop-hyprland-hyprland =
-    { inputs, pkgs, ... }:
+    { pkgs, ... }:
     {
 
       # install extra packages
