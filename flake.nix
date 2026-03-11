@@ -27,7 +27,7 @@
     nixvim.url = "github:nix-community/nixvim/nixos-25.11";
     nix-vscode-extensions = {
       url = "github:nix-community/nix-vscode-extensions";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     hyprland = {
       url = "github:hyprwm/Hyprland/v0.54.2";
