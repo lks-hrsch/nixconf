@@ -17,7 +17,7 @@
         settings = rec {
           initial_session = {
             command = "${lib.getExe config.programs.uwsm.package} start hyprland-uwsm.desktop";
-            user = "lkshrsch";
+            user = config.flake.users.owner.username;
           };
           default_session = initial_session;
         };

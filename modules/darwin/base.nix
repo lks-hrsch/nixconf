@@ -13,8 +13,8 @@
         config.flake.modules.darwin.firefox
         config.flake.modules.darwin.homebrew
         config.flake.modules.darwin.nixvim
-        config.flake.modules.darwin.users
         config.flake.modules.darwin.time
+        config.flake.modules.darwin.users
         config.flake.modules.darwin.sops
         config.flake.modules.darwin.ssh
         config.flake.modules.darwin.zsh
@@ -50,8 +50,6 @@
       nix.enable = false;
 
       system = {
-        primaryUser = "lkshrsch";
-
         configurationRevision = self.rev or self.dirtyRev or null;
         stateVersion = 6;
 

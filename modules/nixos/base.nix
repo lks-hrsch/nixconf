@@ -42,7 +42,6 @@
         optimise.automatic = true;
         settings = {
           auto-optimise-store = true;
-          trusted-users = [ "lkshrsch" ];
           substituters = [
             "https://cache.nixos.org/"
             "https://nix-community.cachix.org"

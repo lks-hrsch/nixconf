@@ -14,13 +14,13 @@
         useGlobalPkgs = true;
         useUserPackages = true;
         backupFileExtension = ".backup";
-        users.lkshrsch.imports = [
+        users.${config.flake.users.owner.username}.imports = [
           (
             { lib, ... }:
             {
               home = {
-                username = "lkshrsch";
-                homeDirectory = lib.mkForce "/Users/lkshrsch";
+                username = config.flake.users.owner.username;
+                homeDirectory = lib.mkForce config.flake.users.owner.home.darwin;
                 stateVersion = "25.05";
               };
             }

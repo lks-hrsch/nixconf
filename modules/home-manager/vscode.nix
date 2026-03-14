@@ -1,15 +1,16 @@
-_: {
+{ config, ... }:
+{
   flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
       vscodePackage =
         if pkgs.stdenv.hostPlatform.isDarwin then
           pkgs.unstable.vscode.overrideAttrs (old: rec {
-            version = "1.110.1";
+            version = "1.111.0";
             src = pkgs.fetchurl {
               name = "VSCode_${version}_darwin-arm64.zip";
               url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
-              sha256 = "sha256-VvanGd8t4BWxE2O2SW39tY66R+/37WFhsDLskwYGMaM=";
+              sha256 = "sha256-DUjT+vqjct8WMiRecltPcL+Jn78DfnuyGTMWhaGVcRY=";
             };
           })
         else
@@ -44,7 +45,6 @@ _: {
         mhutchie.git-graph
         donjayamanne.githistory
 
-        # github
         github.copilot-chat
         github.vscode-pull-request-github
         github.vscode-github-actions
@@ -117,11 +117,11 @@ _: {
             enableMcpIntegration = true;
           };
 
-          lkshrsch = {
+          "${config.flake.users.owner.username}" = {
             extensions =
               defaultExtensions
               ++ (with marketplace; [
-                # Add additional extensions specific to lkshrsch profile here
+                # Add additional extensions specific to the owner profile here
                 # C/C++ extensions
                 llvm-vs-code-extensions.vscode-clangd
                 # vadimcn.vscode-lldb
@@ -159,7 +159,7 @@ _: {
                 })
               ];
             userSettings = defaultSettings // {
-              # Add additional settings specific to lkshrsch profile here
+              # Add additional settings specific to the owner profile here
               "playwright.pickLocatorCopyToClipboard" = true;
               "playwright.reuseBrowser" = true;
             };

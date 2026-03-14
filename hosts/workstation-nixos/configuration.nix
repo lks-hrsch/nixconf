@@ -6,23 +6,20 @@
       nv-fan-control = import ./_nv-fan-control.nix { inherit pkgs; };
     in
     {
-      imports = [
-        config.flake.modules.nixos.base
-        config.flake.modules.nixos.podman
-        config.flake.modules.nixos."1password"
-        config.flake.modules.nixos.flatpak
-        config.flake.modules.nixos.avahi
-        config.flake.modules.nixos.pipewire
-        config.flake.modules.nixos.xserver
-        config.flake.modules.nixos.zfs
-        config.flake.modules.nixos.syncthing
+      imports = with config.flake.modules.nixos; [
+        base
+        podman
+        "1password"
+        flatpak
+        avahi
+        pipewire
+        xserver
+        zfs
+        syncthing
+        desktop-hyprland-base
+        gaming-base
+        homeManager
 
-        config.flake.modules.nixos.desktop-hyprland-base
-        config.flake.modules.nixos.gaming-base
-
-        config.flake.modules.nixos.homeManager
-
-        # Include the results of the hardware scan.
         ./_home-nas-mounts.nix
         ./_hardware-configuration.nix
       ];
@@ -124,7 +121,6 @@
         ffmpeg_6-full
         gnugrep
         dig
-
         nv-fan-control
       ];
 

@@ -1,4 +1,5 @@
-_: {
+{ ... }:
+{
   flake.modules.homeManager.stylix =
     {
       pkgs,
@@ -116,15 +117,15 @@ _: {
 
         targets = {
           mako = {
-            enable = false; # lkshrsch profile: The option definition `services.mako.extraConfig' in `/nix/store/hfig46d452pr4i0g5ks17571z38cs1il-source/modules/mako/hm.nix' no longer has any effect; please remove it. Use services.mako.settings instead.
+            enable = false; # The option definition `services.mako.extraConfig' in `/nix/store/hfig46d452pr4i0g5ks17571z38cs1il-source/modules/mako/hm.nix' no longer has any effect; please remove it. Use services.mako.settings instead.
           };
           firefox = {
-            profileNames = [ "lkshrsch" ];
+            profileNames = [ config.home.username ];
           };
           vscode = {
             profileNames = [
               "default"
-              "lkshrsch"
+              config.home.username
             ];
           };
           waybar = {

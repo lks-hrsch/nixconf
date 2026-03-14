@@ -1,9 +1,9 @@
-_: {
+{ config, ... }:
+{
   flake.modules.nixos.syncthing =
     { ... }:
     let
-      username = "lkshrsch";
-      homeDir = "/home/${username}";
+      homeDir = config.home.homeDirectory;
     in
     {
       services.syncthing = {
@@ -13,7 +13,7 @@ _: {
         overrideDevices = true;
         overrideFolders = true;
 
-        user = "lkshrsch";
+        user = config.flake.users.owner.username;
         dataDir = homeDir;
         configDir = "${homeDir}/.config/syncthing";
 

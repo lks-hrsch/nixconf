@@ -1,4 +1,5 @@
-_: {
+{ ... }:
+{
   flake = {
     # System-level SOPS configuration (NixOS and Darwin)
     modules = {
@@ -28,7 +29,7 @@ _: {
             }
             // lib.optionalAttrs (config.networking.hostName == "workstation-nixos") {
               "smb-credentials-mars" = {
-                owner = "lkshrsch";
+                owner = config.flake.users.owner.username;
               };
               "wg0/preshared-key" = {
                 sopsFile = ../secrets/wireguard-workstation-nixos.yaml;

@@ -26,7 +26,7 @@
       };
     };
 
-    home-manager.users.lkshrsch.imports = [
+    home-manager.users.${config.flake.users.owner.username}.imports = [
       config.flake.modules.homeManager.work
     ];
   };

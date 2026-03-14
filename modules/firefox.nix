@@ -1,5 +1,6 @@
+{ config, ... }:
 {
-  flake.modules.darwin.firefox = {
+  flake.modules.darwin.firefox = _: {
     # On macOS, programs.firefox.package doesn't automatically create app symlinks
 
     homebrew = {
@@ -9,7 +10,10 @@
     };
   };
   flake.modules.homeManager.firefox =
-    { pkgs, ... }:
+    {
+      pkgs,
+      ...
+    }:
     let
       firefox-package =
         if pkgs.stdenv.isDarwin then
@@ -22,7 +26,7 @@
         enable = true;
         package = firefox-package;
 
-        profiles.lkshrsch = {
+        profiles.${config.flake.users.owner.username} = {
           search = {
             force = true;
             default = "ddg";

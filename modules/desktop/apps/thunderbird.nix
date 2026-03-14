@@ -1,4 +1,5 @@
-_: {
+{ config, ... }:
+{
   flake.modules.homeManager.desktop-apps-thunderbird =
     { pkgs, ... }:
     {
@@ -8,7 +9,7 @@ _: {
         enable = true;
         package = pkgs.thunderbird-bin;
 
-        profiles.lkshrsch = {
+        profiles.${config.flake.users.owner.username} = {
           isDefault = true;
           withExternalGnupg = true;
         };
