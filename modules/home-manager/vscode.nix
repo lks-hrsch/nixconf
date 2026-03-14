@@ -22,9 +22,7 @@
               sha256 = "sha256-nXxPuopZX8gOWrco++VYl0AAsCxDUykkoSgWOiHFUYw=";
             };
           });
-      vsCodeVersion = vscodePackage.version;
-      extensionsCompatible = pkgs.forVSCodeVersion vsCodeVersion;
-      marketplace = extensionsCompatible.vscode-marketplace;
+      marketplace = pkgs.vscode-marketplace-release;
 
       # extensions for all profiles
       # if they are not working properly append pkgs.unstable.vscode-extensions. in front of the extension id
