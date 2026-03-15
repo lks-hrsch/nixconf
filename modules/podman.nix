@@ -13,10 +13,7 @@ _: {
           # Useful other development tools
           environment.systemPackages = with pkgs; [
             podman
-            podman-compose # start group of containers for dev
-
-            docker
-            docker-compose # start group of containers for dev
+            podman-compose
           ];
 
           virtualisation = {

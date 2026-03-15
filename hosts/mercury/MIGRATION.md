@@ -62,13 +62,19 @@ mkdir -p "$HOME/mercury-extra/etc/sops/age"
 install -m 600 "$HOME/.config/sops/age/keys.txt" "$HOME/mercury-extra/etc/sops/age/keys.txt"
 ```
 
+<!-- --build-on remote \ -->
 ### Run Migration
 
 ```bash
 # Run as sudo on macOS to avoid restricted settings warnings and daemon disconnects
-sudo nix run github:nix-community/nixos-anywhere -- \
-  --show-trace \
+sudo -E nix run github:nix-community/nixos-anywhere -- \
+  --debug -L --show-trace \
   --build-on remote \
+  --option log-format bar-with-logs \
+  --option max-substitution-jobs 32 \
+  --option http-connections 50 \
+  --option substituters "https://cache.nixos.org/ https://nix-community.cachix.org https://numtide.cachix.org https://hyprland.cachix.org https://cuda-maintainers.cachix.org" \
+  --option trusted-public-keys "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE= hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc= cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E=" \
   --flake .#mercury \
   --generate-hardware-config nixos-facter hosts/mercury/facter.json \
   --extra-files "$HOME/mercury-extra" \

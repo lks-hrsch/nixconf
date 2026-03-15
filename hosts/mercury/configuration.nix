@@ -13,16 +13,12 @@
       ...
     }:
     {
-      imports =
-        with config.flake.modules.nixos;
-        [
-          base
-          podman
-          inputs.disko.nixosModules.default
-          inputs.nixos-facter-modules.nixosModules.facter
-          (modulesPath + "/installer/scan/not-detected.nix")
-          (modulesPath + "/profiles/qemu-guest.nix")
-        ];
+      imports = with config.flake.modules.nixos; [
+        base
+        podman
+        (modulesPath + "/installer/scan/not-detected.nix")
+        (modulesPath + "/profiles/qemu-guest.nix")
+      ];
 
       facter.reportPath =
         if builtins.pathExists ./facter.json then
@@ -31,6 +27,18 @@
           throw "Missing hosts/mercury/facter.json. Run nixos-anywhere with --generate-hardware-config nixos-facter hosts/mercury/facter.json.";
 
       networking.hostName = "mercury";
+      hardware.graphics.enable = false; # not needed on a headless VPS Servers
+
+      # Mercury boots in UEFI mode at the provider.
+      boot.loader = {
+        efi = {
+          canTouchEfiVariables = false;
+          efiSysMountPoint = "/boot";
+        };
+        systemd-boot = {
+          enable = true;
+        };
+      };
 
       system.stateVersion = "25.11";
     };

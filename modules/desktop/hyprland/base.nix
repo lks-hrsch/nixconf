@@ -8,6 +8,8 @@
       ...
     }:
     {
+      imports = [ config.flake.modules.nixos.desktop-base ];
+
       environment.systemPackages = with pkgs; [
         uwsm
       ];

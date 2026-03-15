@@ -1,6 +1,6 @@
 _: {
   flake.modules.nixos.internationalisation =
-    { pkgs, ... }:
+    { ... }:
     {
       # Select internationalisation properties.
       i18n = {
@@ -11,18 +11,6 @@ _: {
           "de_DE.UTF-8/UTF-8"
           "ja_JP.UTF-8/UTF-8"
         ];
-        inputMethod = {
-          enable = true;
-          type = "fcitx5";
-          fcitx5 = {
-            waylandFrontend = true;
-            addons = with pkgs; [
-              fcitx5-mozc
-              fcitx5-gtk
-              qt6Packages.fcitx5-configtool
-            ];
-          };
-        };
       };
     };
 }

@@ -100,6 +100,13 @@
               };
             }
             // lib.optionalAttrs (config.networking.hostName == "mercury") {
+              "root-password-hash" = {
+                sopsFile = ../secrets/secrets-mercury.yaml;
+                owner = "root";
+                group = "root";
+                mode = "0400";
+              };
+
               "wg0/private-key" = {
                 sopsFile = ../secrets/wireguard-mercury.yaml;
                 owner = "root";
