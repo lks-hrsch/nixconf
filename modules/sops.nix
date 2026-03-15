@@ -102,6 +102,7 @@
             // lib.optionalAttrs (config.networking.hostName == "mercury") {
               "root-password-hash" = {
                 sopsFile = ../secrets/secrets-mercury.yaml;
+                neededForUsers = true;
                 owner = "root";
                 group = "root";
                 mode = "0400";

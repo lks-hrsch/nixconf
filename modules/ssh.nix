@@ -6,16 +6,13 @@ _: {
         {
           services.openssh = {
             enable = true;
+            authorizedKeysFiles = [ config.sops.secrets."ssh-public-key".path ];
             settings = {
               PermitRootLogin = "prohibit-password";
               PasswordAuthentication = false;
               KbdInteractiveAuthentication = false;
             };
           };
-
-          users.users.root.openssh.authorizedKeys.keyFiles = [
-            config.sops.secrets."ssh-public-key".path
-          ];
         };
 
       darwin.ssh =

@@ -15,10 +15,10 @@
         "version": 0,
         "video_memory": 0
       },
-      "pnp": false,
+      "pnp": true,
       "pnp_id": 0,
       "lba_support": false,
-      "low_memory_size": 0,
+      "low_memory_size": 654336,
       "smbios_version": 520
     },
     "bridge": [
@@ -70,7 +70,7 @@
         "sysfs_bus_id": "0000:00:01.0",
         "detail": {
           "function": 0,
-          "command": 7,
+          "command": 259,
           "header_type": 0,
           "secondary_bus": 0,
           "irq": 0,
@@ -130,7 +130,7 @@
         "sysfs_bus_id": "0000:00:00.0",
         "detail": {
           "function": 0,
-          "command": 7,
+          "command": 259,
           "header_type": 0,
           "secondary_bus": 0,
           "irq": 0,
@@ -198,7 +198,7 @@
         ],
         "detail": {
           "function": 3,
-          "command": 7,
+          "command": 259,
           "header_type": 0,
           "secondary_bus": 0,
           "irq": 9,
@@ -538,7 +538,7 @@
         "resources": [
           {
             "type": "mem",
-            "base": 2147483648,
+            "base": 4261412864,
             "range": 8388608,
             "enabled": true,
             "access": "read_only",
@@ -546,7 +546,7 @@
           },
           {
             "type": "mem",
-            "base": 2156146688,
+            "base": 4273799168,
             "range": 4096,
             "enabled": true,
             "access": "read_write",
@@ -691,7 +691,7 @@
           {
             "type": "mem",
             "base": 0,
-            "range": 2062135296,
+            "range": 2066583552,
             "enabled": true,
             "access": "read_write",
             "prefetch": "unknown"
@@ -1155,24 +1155,24 @@
           },
           {
             "type": "mem",
-            "base": 2156134400,
-            "range": 4096,
+            "base": 4269834240,
+            "range": 16384,
             "enabled": true,
-            "access": "read_write",
+            "access": "read_only",
             "prefetch": "no"
           },
           {
             "type": "mem",
-            "base": 34359771136,
-            "range": 16384,
+            "base": 4273811456,
+            "range": 4096,
             "enabled": true,
-            "access": "read_only",
+            "access": "read_write",
             "prefetch": "no"
           }
         ],
         "detail": {
           "function": 0,
-          "command": 1031,
+          "command": 1287,
           "header_type": 0,
           "secondary_bus": 0,
           "irq": 11,
@@ -1249,24 +1249,24 @@
           },
           {
             "type": "mem",
-            "base": 2156138496,
-            "range": 4096,
+            "base": 4269817856,
+            "range": 16384,
             "enabled": true,
-            "access": "read_write",
+            "access": "read_only",
             "prefetch": "no"
           },
           {
             "type": "mem",
-            "base": 34359754752,
-            "range": 16384,
+            "base": 4273807360,
+            "range": 4096,
             "enabled": true,
-            "access": "read_only",
+            "access": "read_write",
             "prefetch": "no"
           }
         ],
         "detail": {
           "function": 0,
-          "command": 1031,
+          "command": 1287,
           "header_type": 0,
           "secondary_bus": 0,
           "irq": 11,
@@ -1329,7 +1329,7 @@
         "resources": [
           {
             "type": "io",
-            "base": 49280,
+            "base": 49408,
             "range": 64,
             "enabled": true,
             "access": "read_write"
@@ -1342,7 +1342,7 @@
           },
           {
             "type": "mem",
-            "base": 34359787520,
+            "base": 4269850624,
             "range": 16384,
             "enabled": true,
             "access": "read_only",
@@ -1351,7 +1351,7 @@
         ],
         "detail": {
           "function": 0,
-          "command": 7,
+          "command": 263,
           "header_type": 0,
           "secondary_bus": 0,
           "irq": 10,
@@ -1415,7 +1415,7 @@
         "resources": [
           {
             "type": "io",
-            "base": 49408,
+            "base": 49280,
             "range": 64,
             "enabled": true,
             "access": "read_write"
@@ -1428,7 +1428,15 @@
           },
           {
             "type": "mem",
-            "base": 2155872256,
+            "base": 4269801472,
+            "range": 16384,
+            "enabled": true,
+            "access": "read_only",
+            "prefetch": "no"
+          },
+          {
+            "type": "mem",
+            "base": 4273471488,
             "range": 262144,
             "enabled": false,
             "access": "read_only",
@@ -1436,24 +1444,16 @@
           },
           {
             "type": "mem",
-            "base": 2156142592,
+            "base": 4273803264,
             "range": 4096,
             "enabled": true,
             "access": "read_write",
-            "prefetch": "no"
-          },
-          {
-            "type": "mem",
-            "base": 34359738368,
-            "range": 16384,
-            "enabled": true,
-            "access": "read_only",
             "prefetch": "no"
           }
         ],
         "detail": {
           "function": 0,
-          "command": 1031,
+          "command": 1287,
           "header_type": 0,
           "secondary_bus": 0,
           "irq": 10,
@@ -1560,7 +1560,7 @@
         ],
         "detail": {
           "function": 1,
-          "command": 7,
+          "command": 263,
           "header_type": 0,
           "secondary_bus": 0,
           "irq": 0,
@@ -1757,7 +1757,7 @@
         ],
         "detail": {
           "function": 2,
-          "command": 7,
+          "command": 263,
           "header_type": 0,
           "secondary_bus": 0,
           "irq": 11,

@@ -29,15 +29,9 @@
       networking.hostName = "mercury";
       hardware.graphics.enable = false; # not needed on a headless VPS Servers
 
-      # Mercury boots in UEFI mode at the provider.
-      boot.loader = {
-        efi = {
-          canTouchEfiVariables = false;
-          efiSysMountPoint = "/boot";
-        };
-        systemd-boot = {
-          enable = true;
-        };
+      boot.loader.grub = {
+        efiSupport = true;
+        efiInstallAsRemovable = true;
       };
 
       system.stateVersion = "25.11";
