@@ -26,7 +26,15 @@
         else
           throw "Missing hosts/mercury/facter.json. Run nixos-anywhere with --generate-hardware-config nixos-facter hosts/mercury/facter.json.";
 
-      networking.hostName = "mercury";
+      networking = {
+        hostName = "mercury";
+        # netcup nameservers
+        nameservers = [
+          "46.38.225.230"
+          "46.38.252.230"
+          "2a03:4000:0:1::e1e6"
+        ];
+      };
       hardware.graphics.enable = false; # not needed on a headless VPS Servers
 
       boot.loader.grub = {
