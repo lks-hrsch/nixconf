@@ -23,7 +23,7 @@
           (modulesPath + "/installer/scan/not-detected.nix")
           (modulesPath + "/profiles/qemu-guest.nix")
         ]
-        ++ lib.optional (builtins.pathExists ./facter.nix) ./facter.nix;
+        ++ lib.optional (builtins.pathExists ./facter.json) ./facter.json;
 
       networking.hostName = "mercury";
 
