@@ -22,8 +22,13 @@
           inputs.nixos-facter-modules.nixosModules.facter
           (modulesPath + "/installer/scan/not-detected.nix")
           (modulesPath + "/profiles/qemu-guest.nix")
-        ]
-        ++ lib.optional (builtins.pathExists ./facter.json) ./facter.json;
+        ];
+
+      facter.reportPath =
+        if builtins.pathExists ./facter.json then
+          ./facter.json
+        else
+          throw "Missing hosts/mercury/facter.json. Run nixos-anywhere with --generate-hardware-config nixos-facter hosts/mercury/facter.json.";
 
       networking.hostName = "mercury";
 
