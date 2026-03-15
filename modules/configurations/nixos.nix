@@ -19,7 +19,12 @@
     _:
     { module }:
     inputs.nixpkgs.lib.nixosSystem {
-      modules = [ module ];
+      specialArgs = { inherit inputs; };
+      modules = [
+        inputs.disko.nixosModules.default
+        inputs.nixos-facter-modules.nixosModules.facter
+        module
+      ];
     }
   ) config.configurations.nixos;
 }

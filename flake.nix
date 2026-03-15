@@ -41,6 +41,13 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-facter-modules = {
+      url = "github:numtide/nixos-facter-modules";
+    };
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
     mac-app-util = {
       url = "github:hraban/mac-app-util";
