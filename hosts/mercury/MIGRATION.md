@@ -1,40 +1,40 @@
-# mercury — Ubuntu to NixOS Migration
+# mercury - Ubuntu to NixOS Migration
 
-This runbook migrates mercury from the current Ubuntu 24.04 Docker host to the new NixOS definition in this repository. Follow the steps chronologically. Do not skip ahead — each step has a clear checkpoint before you move on.
+Concise operator runbook for migrating mercury to the NixOS host definition in this repo.
 
----
+## Status
 
-## 0. Pre-Requisites (on your workstation)
-
-Before touching the server:
-
-- [ ] You have console access through the netcup panel so you can recover from a broken SSH or network state.
-- [ ] `nixos-anywhere` is available: `nix shell github:nix-community/nixos-anywhere`.
-- [ ] The flake in this repo evaluates cleanly: `nix flake check path:$PWD`.
-- [ ] You have committed `hosts/mercury/_hardware-configuration.nix` **or** `hosts/mercury/facter.nix` (see step 3).
-- [ ] Your SOPS age key is available at `~/.config/sops/age/keys.txt`.
+- [x] Step 1 backup completed (stacks, docker inventory, volume archives, wg0.conf)
+- [ ] Migration install not yet completed
 
 ---
 
-## 1. Back Up the Running Ubuntu Host
+## 0) Preconditions (workstation)
 
-SSH in and run:
+- [ ] netcup console access is available
+- [ ] nixos-anywhere is available
+  - nix shell github:nix-community/nixos-anywhere
+- [ ] flake evaluates
+  - nix flake check path:$PWD
+- [ ] one hardware source exists
+  - hosts/mercury/_hardware-configuration.nix or hosts/mercury/facter.nix
+- [ ] SOPS age key exists at ~/.config/sops/age/keys.txt
+
+---
+
+## 1) Back up the current Ubuntu host
+
+Status: already completed once, keep this as the re-run procedure.
 
 ```bash
 mkdir -p /root/mercury-backup
 
-# WireGuard private config (contains the server private key)
 cp /etc/wireguard/wg0.conf /root/mercury-backup/wg0.conf
-
-# All running stacks
 tar czf /root/mercury-backup/stacks.tgz /root/stacks
 
-# Container inventory
-docker ps -a  > /root/mercury-backup/docker-ps.txt
+docker ps -a > /root/mercury-backup/docker-ps.txt
 docker volume ls > /root/mercury-backup/docker-volumes.txt
 
-# IMPORTANT: the command above only lists volume names, it does NOT back up
-# volume content. Export every volume into its own archive.
 mkdir -p /root/mercury-backup/volumes
 for v in $(docker volume ls -q); do
   echo "Backing up volume: $v"
@@ -46,10 +46,7 @@ for v in $(docker volume ls -q); do
 done
 ```
 
-The `backup-of-<volume>.tar.gz` naming is compatible with
-`_before-migration/restore-docker-volumes.sh`.
-
-Copy everything off the box to your workstation before proceeding:
+Copy the backup set to the repo:
 
 ```bash
 scp -r root@mercury.lukashirsch.de:/root/mercury-backup ./hosts/mercury/_backup
@@ -57,94 +54,52 @@ scp -r root@mercury.lukashirsch.de:/root/mercury-backup ./hosts/mercury/_backup
 
 ---
 
-## 2. Capture and Extract Secrets From the Current Host
+## 2) Stage secrets and runtime files
 
-The new NixOS modules read runtime secrets from `/var/lib/mercury/secrets/`. You must convert the current Ubuntu files into that layout **before** the final install.
+Now managed by SOPS files in repo:
 
-### WireGuard private key
+- secrets/stacks-mercury.yaml
+- secrets/wireguard-mercury.yaml
 
-From `wg0.conf` (the `PrivateKey =` line under `[Interface]`):
+Runtime materialized paths (created by sops-nix):
 
-```bash
-# store locally — will be placed on NixOS in step 5
-echo "cCW8lzh8gGnKTPEQi+wPYKPirX8sT1j/RA4Bls4w/X8=" > ~/mercury-wg0-private-key
-```
+- /run/secrets/wg0/private-key
+- /run/secrets/wg0/preshared-keys/*
+- /run/secrets/mercury/*
+- /run/secrets-rendered/mercury/*.env
+- /run/secrets-rendered/mercury/*.yaml
 
-### WireGuard preshared keys
+Still required before first successful service bootstrap:
 
-Extract the `PresharedKey =` value for each peer from `wg0.conf` and write one file per peer. Name them to match what `vpn.nix` references:
+- authelia OIDC private key PEM
+- authelia OIDC client secret hash for netbird-dashboard
 
-```
-earth
-phobos
-deimos
-homeassistant-freitelsdorf
-homeassistant-dresden-florain
-lkshrsch-workstation-nixos
-florian-mbp
-mberger-mbp
-mschuett-win
-mberger-iphone
-mschuett-tablett
-```
+Important:
 
-Peers that have no `PresharedKey =` line (mbp-m3, iPad, iPhone, megan) need no file; their entries in `vpn.nix` omit `presharedKeyFile`.
-
-### Application secret files
-
-Collect the following into a local staging area (`~/mercury-stage/`):
-
-| Target path on NixOS | Source |
-| --- | --- |
-| `/var/lib/mercury/netbird/config.yaml` | `_before-migration/netbid-config.yaml` with one edit: change `auth.issuer` from `https://netbird.lukashirsch.de/oauth2` to `https://auth.lukashirsch.de` |
-| `/var/lib/mercury/netbird/dashboard.env` | `_before-migration/netbird-dashboard.env` with edits: set `AUTH_AUTHORITY=https://auth.lukashirsch.de`, `AUTH_CLIENT_ID=netbird-dashboard`, `AUTH_CLIENT_SECRET=<secret you generate>` |
-| `/var/lib/mercury/vaultwarden/vaultwarden.env` | `_before-migration/vaultwarden-stack.env` (keep as-is, just rename) |
-| `/var/lib/mercury/authelia/configuration.yml` | New file (see note below) |
-| `/var/lib/mercury/lldap/lldap.env` | New file (see note below) |
-
-**LLDAP** is new infrastructure. Create `/var/lib/mercury/lldap/lldap.env` with at minimum:
-
-```env
-LLDAP_JWT_SECRET=<generate with: openssl rand -base64 32>
-LLDAP_LDAP_USER_PASS=<your admin password>
-LLDAP_LDAP_BASE_DN=dc=lukashirsch,dc=de
-LLDAP_HTTP_PORT=17170
-LLDAP_LDAP_PORT=3890
-```
-
-**Authelia** is also new. Create `/var/lib/mercury/authelia/configuration.yml` with an LDAP backend pointing at `lldap:3890`, session secrets, storage, and an OIDC client block for `netbird-dashboard`. Refer to the official Authelia configuration docs; a skeleton is provided in the [Authelia docs](https://www.authelia.com/configuration/miscellaneous/introduction/).
+- `mercury/netbird/auth-secret-client` is the raw confidential OIDC client secret used by the NetBird dashboard.
+- `CHANGE_ME_NETBIRD_OIDC_CLIENT_SECRET_HASH` in Authelia is the hash of that same raw secret, not a second secret.
 
 ---
 
-## 3. Generate a Hardware Module
+## 3) Generate hardware module (if not already done)
 
-Boot the server into a NixOS installer image (using the netcup rescue or a custom ISO), then run one of the following from your workstation:
-
-### Option A — plain hardware config
+Option A:
 
 ```bash
-# from the installer running on mercury
+# run on installer
 nixos-generate-config --no-filesystems --root /
-# copy /etc/nixos/hardware-configuration.nix back to workstation
-scp root@<installer-ip>:/etc/nixos/hardware-configuration.nix \
-  hosts/mercury/_hardware-configuration.nix
+scp root@<installer-ip>:/etc/nixos/hardware-configuration.nix hosts/mercury/_hardware-configuration.nix
 ```
 
-### Option B — nixos-facter
+Option B:
 
 ```bash
-nix run github:nix-community/nixos-facter -- \
-  --host root@<installer-ip> \
-  --output hosts/mercury/facter.nix
+nix run github:nix-community/nixos-facter -- --host root@<installer-ip> --output hosts/mercury/facter.nix
 ```
-
-Commit the file before proceeding. The optional import in `configuration.nix` picks it up automatically.
 
 ---
 
-## 4. Stage the Runtime Files via nixos-anywhere `--extra-files`
-
-`nixos-anywhere` accepts an `--extra-files` overlay directory that gets copied verbatim onto the new system. Prepare it locally:
+## 4) Build extra-files overlay
 
 ```bash
 mkdir -p ~/mercury-extra/var/lib/mercury/secrets/wg0/preshared-keys
@@ -155,46 +110,26 @@ mkdir -p ~/mercury-extra/var/lib/mercury/vaultwarden/data
 mkdir -p ~/mercury-extra/var/lib/mercury/traefik/letsencrypt
 mkdir -p ~/mercury-extra/etc/sops/age
 
-# WireGuard keys
-cp ~/mercury-wg0-private-key \
-  ~/mercury-extra/var/lib/mercury/secrets/wg0/private-key
-# repeat for every preshared-key file:
-cp ~/mercury-stage/psk-earth \
-  ~/mercury-extra/var/lib/mercury/secrets/wg0/preshared-keys/earth
-# ... and so on for all peers
+# copy age key from this workstation into nixos-anywhere overlay
+install -m 600 ~/.config/sops/age/keys.txt ~/mercury-extra/etc/sops/age/keys.txt
 
-# Application secrets
-cp ~/mercury-stage/authelia-configuration.yml \
-  ~/mercury-extra/var/lib/mercury/authelia/configuration.yml
-cp ~/mercury-stage/lldap.env \
-  ~/mercury-extra/var/lib/mercury/lldap/lldap.env
-cp ~/mercury-stage/netbird-config.yaml \
-  ~/mercury-extra/var/lib/mercury/netbird/config.yaml
-cp ~/mercury-stage/netbird-dashboard.env \
-  ~/mercury-extra/var/lib/mercury/netbird/dashboard.env
-cp ~/mercury-stage/vaultwarden.env \
-  ~/mercury-extra/var/lib/mercury/vaultwarden/vaultwarden.env
-
-# Vaultwarden data (migrate from Ubuntu backup)
-rsync -a ~/mercury-backup-stacks/vaultwarden/data/ \
-  ~/mercury-extra/var/lib/mercury/vaultwarden/data/
-
-# SOPS age key so secrets.yaml is decryptable on the new host
-cp ~/.config/sops/age/keys.txt \
-  ~/mercury-extra/etc/sops/age/keys.txt
-
-# Lock down permissions on secrets
 chmod 700 ~/mercury-extra/var/lib/mercury/secrets
 chmod 600 ~/mercury-extra/var/lib/mercury/secrets/wg0/private-key
 chmod 600 ~/mercury-extra/var/lib/mercury/secrets/wg0/preshared-keys/*
 chmod 600 ~/mercury-extra/etc/sops/age/keys.txt
 ```
 
+Minimal overlay for sops key only (recommended when all service secrets are in repo SOPS files already):
+
+```bash
+rm -rf ~/mercury-extra
+mkdir -p ~/mercury-extra/etc/sops/age
+install -m 600 ~/.config/sops/age/keys.txt ~/mercury-extra/etc/sops/age/keys.txt
+```
+
 ---
 
-## 5. Install NixOS With nixos-anywhere
-
-With the installer still running on the server (and your `~/mercury-extra` staged):
+## 5) Install with nixos-anywhere
 
 ```bash
 nix run github:nix-community/nixos-anywhere -- \
@@ -203,67 +138,133 @@ nix run github:nix-community/nixos-anywhere -- \
   root@<installer-ip>
 ```
 
-`nixos-anywhere` will partition the disk, install the closures, copy your extra files, and reboot. Watch for the reboot; the server should come back on the same public IP.
-
-If you want to use `nixos-facter` as part of the install pass, add `--generate-hardware-config nixos-facter hosts/mercury/facter.nix` to the command instead of the manual step 3B above.
-
----
-
-## 6. First Boot Verification
-
-Use the netcup console first, not SSH, until you confirm `wg0` is up.
+With explicit local key path source (same result):
 
 ```bash
-# network
-ip addr
-ip route
+tmp_extra="$HOME/mercury-extra"
+rm -rf "$tmp_extra"
+mkdir -p "$tmp_extra/etc/sops/age"
+install -m 600 "$HOME/.config/sops/age/keys.txt" "$tmp_extra/etc/sops/age/keys.txt"
 
-# WireGuard
-systemctl status wg-quick-wg0.service
-wg show
-
-# Podman / quadlets
-podman ps -a
-systemctl status traefik.service blocky.service lldap.service \
-  authelia.service netbird-server.service netbird-dashboard.service \
-  vaultwarden.service
+nix run github:nix-community/nixos-anywhere -- \
+  --flake .#mercury \
+  --extra-files "$tmp_extra" \
+  root@<installer-ip>
 ```
 
-If `wg0` is up, switch to VPN-based SSH on `10.10.1.1`.
+Optional inline facter generation:
+
+```bash
+--generate-hardware-config nixos-facter hosts/mercury/facter.nix
+```
 
 ---
 
-## 7. Service Startup Order
+## 6) First boot checks (console first)
 
-The quadlets have explicit `After=` / `Requires=` wiring, but on first boot you may need to seed LLDAP and Authelia before NetBird starts. Recommended sequence:
+```bash
+ip addr
+ip route
+systemctl status wg-quick-wg0.service
+wg show
+podman ps -a
+systemctl status traefik.service blocky.service lldap.service authelia.service netbird-server.service netbird-dashboard.service vaultwarden.service
+```
 
-1. Confirm `traefik` is healthy: `podman logs traefik`
-2. Confirm `blocky` is healthy: `dig @10.10.1.1 mercury.lukashirsch.de`
-3. Bring up `lldap`: `systemctl start lldap.service`
-   - Create admin account and default groups via the LLDAP web UI on `http://10.10.1.1:17170`.
-4. Bring up `authelia`: `systemctl start authelia.service`
-   - Verify `https://auth.lukashirsch.de/.well-known/openid-configuration` resolves through Traefik.
-5. Start `netbird-server` and `netbird-dashboard`.
-6. Verify `vaultwarden` serves `https://vaultwarden.mars.lukashirsch.de`.
-
----
-
-## 8. External Behaviour Checklist
-
-- [ ] `dig @10.10.1.1 mercury.lukashirsch.de` returns `10.10.1.1`
-- [ ] `https://auth.lukashirsch.de` loads the Authelia portal
-- [ ] `https://netbird.lukashirsch.de` loads the NetBird dashboard
-- [ ] NetBird mobile/desktop client connects and authenticates via Authelia OIDC
-- [ ] `https://vaultwarden.mars.lukashirsch.de` loads the Vaultwarden vault
-- [ ] WireGuard peers (deimos, phobos, workstation-nixos, …) re-connect and reach `10.10.1.1`
+When wg0 is healthy, switch to SSH over 10.10.1.1.
 
 ---
 
-## 9. Post-Migration Hardening
+## 7) Service bring-up sequence
 
-Once the stack is stable:
+1. Verify Traefik health and TLS
+2. Verify Blocky DNS answers on 10.10.1.1
+3. Bring up LLDAP and seed admin/groups
+4. Bring up Authelia and verify OIDC discovery
+5. Start NetBird server + dashboard
+6. Verify Vaultwarden on both hosts (mars and mercury hostnames) from a public internet client (no VPN)
 
-1. **Move WireGuard keys into SOPS.** Add a `wireguard-mercury.yaml` sops file and add a `mercury` branch to `modules/sops.nix`, then update `vpn.nix` to reference `config.sops.secrets.*` paths instead of the plain `/var/lib/mercury/secrets` files.
-2. **Pin image versions.** Replace `latest` tags in `stacks/authelia.nix`, `stacks/netbird.nix`, and `stacks/vaultwarden.nix` with explicit version digests once you have confirmed the stack is healthy.
-3. **Authelia forward-auth.** Consider protecting Vaultwarden with an Authelia forward-auth middleware in Traefik rather than exposing it directly.
-4. **Restrict SSH.** Once `wg0` is stable, restrict the public firewall so SSH is not reachable from the internet at all (`networking.firewall.allowedTCPPorts` already excludes port 22 from the public list; `openssh.listenAddresses` in `configuration.nix` limits it to the WireGuard interface).
+### LLDAP bootstrap intent
+
+- The initial LLDAP admin login remains the built-in first admin account from LLDAP bootstrap.
+- After first login, create a human admin user `admin-lkshrsch`.
+- Also create a dedicated LDAP bind user `admin-authelia` for Authelia.
+- Store the bind DN for `admin-authelia` in `authelia/ldap-user` and its password in `authelia/ldap-password`.
+- Recommended bind DN value: `uid=admin-authelia,ou=people,dc=lukashirsch,dc=de`
+
+This keeps the human admin account and the service bind account separate.
+
+### Generate Authelia OIDC key material
+
+Recommended with Authelia CLI:
+
+```bash
+authelia crypto pair rsa generate --directory ./authelia-oidc
+```
+
+Portable `openssl` alternative:
+
+```bash
+openssl genrsa -out authelia-oidc-private.pem 2048
+openssl rsa -in authelia-oidc-private.pem -outform PEM -pubout -out authelia-oidc-public.pem
+```
+
+Use the private key PEM content for `CHANGE_ME_AUTHELIA_OIDC_PRIVATE_KEY`.
+
+Recommended SOPS target to add:
+
+```yaml
+authelia:
+  oidc-private-key: |
+    -----BEGIN PRIVATE KEY-----
+    ...
+    -----END PRIVATE KEY-----
+```
+
+### Generate the Authelia hash for the NetBird client secret
+
+Generate the hash from the same raw secret value stored in `netbird/auth-secret-client`:
+
+```bash
+authelia crypto hash generate pbkdf2 --variant sha512 --iterations 310000 --password '<raw-netbird-auth-secret-client>'
+```
+
+That output becomes the Authelia client entry value for `client_secret`.
+
+Recommended SOPS target to add:
+
+```yaml
+authelia:
+  netbird-oidc-client-secret-hash: "$pbkdf2-sha512$..."
+```
+
+---
+
+## 8) Validation checklist
+
+- [ ] dig @10.10.1.1 mercury.lukashirsch.de returns 10.10.1.1
+- [ ] [auth.lukashirsch.de](https://auth.lukashirsch.de) works
+- [ ] [netbird.lukashirsch.de](https://netbird.lukashirsch.de) works
+- [ ] NetBird login via Authelia OIDC works
+- [ ] [vaultwarden.mars.lukashirsch.de](https://vaultwarden.mars.lukashirsch.de) is reachable from public internet
+- [ ] [vaultwarden.mercury.lukashirsch.de](https://vaultwarden.mercury.lukashirsch.de) is reachable from public internet
+- [ ] WireGuard peers reconnect
+
+---
+
+## 10) Missing Inputs Checklist
+
+- [ ] Add `authelia/oidc-private-key` to secrets/stacks-mercury.yaml
+- [ ] Add `authelia/netbird-oidc-client-secret-hash` to secrets/stacks-mercury.yaml
+- [ ] Set `authelia/ldap-user` to `uid=admin-authelia,ou=people,dc=lukashirsch,dc=de`
+- [ ] Create LLDAP users `admin-lkshrsch` and `admin-authelia` after first initialization
+- [ ] Replace temporary CHANGE_ME values in authelia template with those SOPS keys
+
+---
+
+## 9) Post-migration hardening
+
+1. Move WireGuard keys to SOPS-managed secrets
+2. Pin image versions (replace latest tags)
+3. Optionally add Authelia forward-auth for Vaultwarden
+4. Keep SSH limited to VPN/admin paths
