@@ -317,7 +317,22 @@
                 mode = "0400";
                 restartUnits = [ "netbird-server.service" ];
               };
-
+              "mercury/netbird/proxy-token" = {
+                sopsFile = ../secrets/stacks-mercury.yaml;
+                key = "netbird/proxy-token";
+                owner = "root";
+                group = "root";
+                mode = "0400";
+                restartUnits = [ "netbird-proxy.service" ];
+              };
+              "mercury/netbird/proxy-token-id" = {
+                sopsFile = ../secrets/stacks-mercury.yaml;
+                key = "netbird/proxy-token-id";
+                owner = "root";
+                group = "root";
+                mode = "0400";
+                restartUnits = [ "netbird-proxy.service" ];
+              };
               "mercury/vaultwarden/admin-token" = {
                 sopsFile = ../secrets/stacks-mercury.yaml;
                 key = "vaultwarden/admin-token";
