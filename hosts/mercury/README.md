@@ -98,3 +98,11 @@ Backbone/admin plane
 - Keep wg0 small and admin-focused.
 - Use NetBird as the day-to-day user/device access plane.
 - Keep the public edge narrow: Traefik (including public Vaultwarden) + required VPN ports only.
+
+## deploy config
+
+via darwin
+
+``` bash
+❯ nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@mercury.lukashirsch.de --target-host root@mercury.lukashirsch.de
+```
