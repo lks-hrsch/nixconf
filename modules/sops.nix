@@ -317,6 +317,17 @@
                 mode = "0400";
                 restartUnits = [ "netbird-server.service" ];
               };
+              "mercury/netbird/setup-key" = {
+                sopsFile = ../secrets/secrets-mercury.yaml;
+                key = "netbird-setup-key";
+                owner = "root";
+                group = "root";
+                mode = "0400";
+                restartUnits = [
+                  "netbird-wt0.service"
+                  "netbird-wt0-login.service"
+                ];
+              };
               "mercury/netbird/proxy-token" = {
                 sopsFile = ../secrets/stacks-mercury.yaml;
                 key = "netbird/proxy-token";
