@@ -10,6 +10,7 @@
       imports = with config.flake.modules.nixos; [
         base
         podman
+        netbird
 
         # Include the default incus configuration.
         "${modulesPath}/virtualisation/lxc-container.nix"

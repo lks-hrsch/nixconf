@@ -16,6 +16,7 @@
       imports = with config.flake.modules.nixos; [
         base
         podman
+        netbird
         (modulesPath + "/installer/scan/not-detected.nix")
         (modulesPath + "/profiles/qemu-guest.nix")
       ];
@@ -37,9 +38,15 @@
       };
       hardware.graphics.enable = false; # not needed on a headless VPS Servers
 
-      boot.loader.grub = {
-        efiSupport = true;
-        efiInstallAsRemovable = true;
+      boot = {
+        loader.grub = {
+          efiSupport = true;
+          efiInstallAsRemovable = true;
+        };
+        kernel.sysctl = {
+          "net.core.rmem_max" = 7500000;
+          "net.core.wmem_max" = 7500000;
+        };
       };
 
       system.stateVersion = "25.11";

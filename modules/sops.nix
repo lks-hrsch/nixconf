@@ -75,6 +75,17 @@
                 mode = "0400";
                 restartUnits = [ "systemd-networkd.service" ];
               };
+              "mars-deimos/netbird/setup-key" = {
+                sopsFile = ../secrets/secrets-mars-deimos.yaml;
+                key = "netbird-setup-key";
+                owner = "root";
+                group = "root";
+                mode = "0400";
+                restartUnits = [
+                  "netbird-wt0.service"
+                  "netbird-wt0-login.service"
+                ];
+              };
             }
             // lib.optionalAttrs (config.networking.hostName == "phobos") {
               "wg0/preshared-key" = {
