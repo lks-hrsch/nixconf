@@ -33,6 +33,7 @@ _: {
         "aldente"
         "anki"
         "antigravity"
+        "claude"
         "postman"
         "rustdesk"
         "spotify"

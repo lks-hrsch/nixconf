@@ -47,6 +47,9 @@
         github.vscode-pull-request-github
         github.vscode-github-actions
 
+        # AI Tools
+        anthropic.claude-code
+
         # nix extensions
         jnoortheen.nix-ide
       ];

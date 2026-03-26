@@ -6,12 +6,14 @@ _: {
         enable = true;
         servers = {
           context7 = {
+            type = "http";
             url = "https://mcp.context7.com/mcp";
             # headers = {
             #   "CONTEXT7_API_KEY" = "YOUR_API_KEY"
             # };
           };
           time = {
+            ype = "stdio";
             command = "uvx";
             args = [
               "mcp-server-time"
@@ -19,10 +21,12 @@ _: {
             ];
           };
           nixos = {
+            ype = "stdio";
             command = "uvx";
             args = [ "mcp-nixos" ];
           };
           obsidian = {
+            type = "stdio";
             command = "npx";
             args = [
               "@mauricio.wolff/mcp-obsidian@latest"
