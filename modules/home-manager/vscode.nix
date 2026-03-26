@@ -38,6 +38,7 @@
         davidanson.vscode-markdownlint
         tamasfe.even-better-toml
         ms-azuretools.vscode-containers
+        mermaidchart.vscode-mermaid-chart
 
         # git
         mhutchie.git-graph

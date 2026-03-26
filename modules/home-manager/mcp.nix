@@ -5,25 +5,40 @@ _: {
       programs.mcp = {
         enable = true;
         servers = {
+          sequential-thinking = {
+            type = "stdio";
+            command = "npx";
+            args = [
+              "-y"
+              "@modelcontextprotocol/server-sequential-thinking"
+            ];
+            description = "Dynamic problem-solving through sequential reasoning steps, enabling structured thought revision and complex multi-step analysis";
+          };
+          time = {
+            type = "stdio";
+            command = "uvx";
+            args = [
+              "mcp-server-time"
+              "--local-timezone=Europe/Berlin"
+            ];
+            description = "Time awareness tools: current time, timezone conversion, and timestamp utilities (local timezone: Europe/Berlin)";
+          };
           context7 = {
             type = "http";
             url = "https://mcp.context7.com/mcp";
             # headers = {
             #   "CONTEXT7_API_KEY" = "YOUR_API_KEY"
             # };
+            description = "Fetches up-to-date, version-specific library documentation and code examples directly from source to prevent hallucinated APIs";
           };
-          time = {
-            ype = "stdio";
-            command = "uvx";
+          memory = {
+            type = "stdio";
+            command = "npx";
             args = [
-              "mcp-server-time"
-              "--local-timezone=Europe/Berlin"
+              "-y"
+              "@modelcontextprotocol/server-memory"
             ];
-          };
-          nixos = {
-            ype = "stdio";
-            command = "uvx";
-            args = [ "mcp-nixos" ];
+            description = "Persistent memory across sessions";
           };
           obsidian = {
             type = "stdio";
@@ -32,6 +47,13 @@ _: {
               "@mauricio.wolff/mcp-obsidian@latest"
               "${config.home.homeDirectory}/Obsidian.nosync/private"
             ];
+            description = "Read and manage notes in the local Obsidian private vault";
+          };
+          nixos = {
+            type = "stdio";
+            command = "uvx";
+            args = [ "mcp-nixos" ];
+            description = "Real-time NixOS package search, configuration options, Home Manager settings, and nix-darwin documentation";
           };
         };
       };
