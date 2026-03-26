@@ -68,49 +68,52 @@
         };
       };
 
-      hardware.nvidia-container-toolkit.enable = true;
+      hardware = {
+        nvidia-container-toolkit.enable = true;
 
-      # Enable OpenGL
-      hardware.graphics = {
-        enable = true;
-        enable32Bit = true;
-        extraPackages = with pkgs; [
-          nvidia-vaapi-driver
-          libva
-          vulkan-loader
-        ];
-      };
+        # Enable OpenGL
+        graphics = {
+          enable = true;
+          enable32Bit = true;
+          extraPackages = with pkgs; [
+            nvidia-vaapi-driver
+            libva
+            vulkan-loader
+          ];
+        };
 
-      hardware.nvidia = {
-        # Modesetting is required.
-        modesetting.enable = true;
+        nvidia = {
+          # Modesetting is required.
+          modesetting.enable = true;
 
-        # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-        # Enable this if you have graphical corruption issues or application crashes after waking
-        # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead
-        # of just the bare essentials.
-        powerManagement.enable = true;
+          # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
+          # Enable this if you have graphical corruption issues or application crashes after waking
+          # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead
+          # of just the bare essentials.
+          powerManagement.enable = true;
 
-        # Use the NVidia open source kernel module (not to be confused with the
-        # independent third-party "nouveau" open source driver).
-        # Support is limited to the Turing and later architectures. Full list of
-        # supported GPUs is at:
-        # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
-        open = true;
+          # Use the NVidia open source kernel module (not to be confused with the
+          # independent third-party "nouveau" open source driver).
+          # Support is limited to the Turing and later architectures. Full list of
+          # supported GPUs is at:
+          # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
+          open = true;
+        };
+
+        opentabletdriver = {
+          enable = true;
+          daemon.enable = true;
+        };
       };
 
       # https://discourse.nixos.org/t/how-to-automatically-mount-external-hard-drive/15563
       # https://www.reddit.com/r/NixOS/comments/185f0x4/how_to_mount_a_usb_drive/
-      services.devmon.enable = true;
-      services.gvfs.enable = true;
-      services.udisks2.enable = true;
-
       # https://mynixos.com/nixpkgs/option/services.upower.enable
-      services.upower.enable = true;
-
-      hardware.opentabletdriver = {
-        enable = true;
-        daemon.enable = true;
+      services = {
+        devmon.enable = true;
+        gvfs.enable = true;
+        udisks2.enable = true;
+        upower.enable = true;
       };
 
       environment.systemPackages = with pkgs; [

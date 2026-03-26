@@ -19,7 +19,7 @@
             { lib, ... }:
             {
               home = {
-                username = config.flake.users.owner.username;
+                inherit (config.flake.users.owner) username;
                 homeDirectory = lib.mkForce config.flake.users.owner.home.darwin;
                 stateVersion = "25.05";
               };

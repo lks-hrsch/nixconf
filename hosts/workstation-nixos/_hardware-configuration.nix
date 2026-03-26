@@ -73,40 +73,42 @@
     cpuFreqGovernor = "schedutil";
   };
 
-  fileSystems."/" = {
-    device = "zroot/system/root";
-    fsType = "zfs";
-  };
+  fileSystems = {
+    "/" = {
+      device = "zroot/system/root";
+      fsType = "zfs";
+    };
 
-  fileSystems."/var" = {
-    device = "zroot/system/var";
-    fsType = "zfs";
-  };
+    "/var" = {
+      device = "zroot/system/var";
+      fsType = "zfs";
+    };
 
-  fileSystems."/shared/games" = {
-    device = "zroot/shared/games";
-    fsType = "zfs";
-  };
+    "/shared/games" = {
+      device = "zroot/shared/games";
+      fsType = "zfs";
+    };
 
-  fileSystems."/nix" = {
-    device = "zroot/local/nix";
-    fsType = "zfs";
-  };
+    "/nix" = {
+      device = "zroot/local/nix";
+      fsType = "zfs";
+    };
 
-  fileSystems."/home/lkshrsch" = {
-    device = "zroot/user/home/lkshrsch";
-    fsType = "zfs";
-  };
+    "/home/lkshrsch" = {
+      device = "zroot/user/home/lkshrsch";
+      fsType = "zfs";
+    };
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/85D5-EFB5";
-    fsType = "vfat";
-    options = [
-      "fmask=0077"
-      "dmask=0077"
-      "umask=0077"
-      "defaults"
-    ];
+    "/boot" = {
+      device = "/dev/disk/by-uuid/85D5-EFB5";
+      fsType = "vfat";
+      options = [
+        "fmask=0077"
+        "dmask=0077"
+        "umask=0077"
+        "defaults"
+      ];
+    };
   };
 
   swapDevices = [

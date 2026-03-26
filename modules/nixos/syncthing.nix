@@ -1,7 +1,7 @@
 { config, ... }:
 {
   flake.modules.nixos.syncthing =
-    { ... }:
+    _:
     let
       homeDir = config.home.homeDirectory;
     in

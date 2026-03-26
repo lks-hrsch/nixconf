@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake = {
     # System-level SOPS configuration (NixOS and Darwin)
     modules = {

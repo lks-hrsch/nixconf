@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   configurations.nixos."mercury".module =
     { lib, ... }:
     {
