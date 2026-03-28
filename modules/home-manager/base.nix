@@ -14,7 +14,6 @@
     {
       imports = with config.flake.modules.homeManager; [
         alacritty
-        antigravity
         claude-code
         firefox
         git

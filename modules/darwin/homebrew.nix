@@ -32,7 +32,6 @@ _: {
       casks = [
         "aldente"
         "anki"
-        "antigravity"
         "claude"
         "postman"
         "rustdesk"
