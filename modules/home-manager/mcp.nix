@@ -31,6 +31,11 @@ _: {
             # };
             description = "Fetches up-to-date, version-specific library documentation and code examples directly from source to prevent hallucinated APIs";
           };
+          microsoft-learn = {
+            type = "http";
+            url = "https://learn.microsoft.com/api/mcp";
+            description = "Real-time access to Microsoft Learn documentation, code samples, and best practices for Azure services and Microsoft technologies, ensuring accurate and current information without hallucination";
+          };
           memory = {
             type = "stdio";
             command = "npx";
