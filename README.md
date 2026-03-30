@@ -50,6 +50,8 @@ build a nixos on darwin:
 <!-- https://github.com/NixOS/nixpkgs/issues/439945 -->
 
 ``` bash
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@192.168.1.13 --target-host root@192.168.1.13 --option sandbox false
+
 nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@10.10.1.18 --target-host root@10.10.1.18 --option sandbox false
 ```
 
