@@ -1,15 +1,15 @@
-{ inputs, ... }:
+{ config, inputs, ... }:
 {
   flake.modules.nixos.desktop-hyprland-base =
     {
       lib,
-      config,
       pkgs,
       ...
     }:
+    let
+      hyprlandPkg = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system};
+    in
     {
-      imports = [ config.flake.modules.nixos.desktop-base ];
-
       environment.systemPackages = with pkgs; [
         uwsm
       ];
@@ -18,7 +18,9 @@
         enable = true;
         settings = rec {
           initial_session = {
-            command = "${lib.getExe config.programs.uwsm.package} start hyprland-uwsm.desktop";
+            command = "${lib.getExe pkgs.uwsm} start -eD Hyprland ${
+              inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland
+            }/share/wayland-sessions/hyprland.desktop";
             user = config.flake.users.owner.username;
           };
           default_session = initial_session;
@@ -29,9 +31,8 @@
         hyprland = {
           enable = true;
           withUWSM = true;
-          package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-          portalPackage =
-            inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+          package = hyprlandPkg.hyprland;
+          portalPackage = hyprlandPkg.xdg-desktop-portal-hyprland;
         };
 
         dconf.enable = true;

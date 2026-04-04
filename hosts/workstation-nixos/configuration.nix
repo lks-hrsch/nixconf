@@ -9,19 +9,17 @@
       imports = with config.flake.modules.nixos; [
         base
         podman
-        "1password"
+        onepassword
         flatpak
         avahi
         pipewire
         xserver
         zfs
         syncthing
+        desktop-base
         desktop-hyprland-base
         gaming-base
         homeManager
-
-        ./_home-nas-mounts.nix
-        ./_hardware-configuration.nix
       ];
 
       nixpkgs.config.cudaSupport = true;

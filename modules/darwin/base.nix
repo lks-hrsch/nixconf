@@ -9,7 +9,7 @@
     { ... }:
     {
       imports = [
-        config.flake.modules.darwin."1password"
+        config.flake.modules.darwin.onepassword
         config.flake.modules.darwin.firefox
         config.flake.modules.darwin.homebrew
         config.flake.modules.darwin.nixvim

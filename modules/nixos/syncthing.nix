@@ -3,7 +3,7 @@
   flake.modules.nixos.syncthing =
     _:
     let
-      homeDir = config.home.homeDirectory;
+      homeDir = config.flake.users.owner.home.nixos;
     in
     {
       services.syncthing = {

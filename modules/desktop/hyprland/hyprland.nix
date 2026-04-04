@@ -26,7 +26,6 @@
           "$mod" = "SUPER";
 
           exec-once = [
-            "uswm app -- hyprpolkitagent"
             "uwsm app -- hyprsunset"
             "uwsm app -- dunst"
             "uwsm app -- 1password --silent"

@@ -3,10 +3,11 @@
   flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
+      vscodeVersion = "1.114.0";
       vscodePackage =
         if pkgs.stdenv.hostPlatform.isDarwin then
           pkgs.unstable.vscode.overrideAttrs (old: rec {
-            version = "1.113.0";
+            version = vscodeVersion;
             src = pkgs.fetchurl {
               name = "VSCode_${version}_darwin-arm64.zip";
               url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
@@ -15,11 +16,11 @@
           })
         else
           pkgs.unstable.vscode.overrideAttrs (old: rec {
-            version = "1.113.0";
+            version = vscodeVersion;
             src = pkgs.fetchurl {
               name = "VSCode_${version}_linux-x64.tar.gz";
               url = "https://update.code.visualstudio.com/${version}/linux-x64/stable";
-              sha256 = "sha256-nXxPuopZX8gOWrco++VYl0AAsCxDUykkoSgWOiHFUYw=";
+              sha256 = "sha256-D+2JWjC0kutfkEF5QKOKwh9Z8+jWgMgMN2b8pKwYays=";
             };
           });
       marketplace = pkgs.vscode-marketplace-release;
