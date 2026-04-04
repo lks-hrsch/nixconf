@@ -9,6 +9,7 @@
       imports = with config.flake.modules.nixos; [
         base
         podman
+        netbird
         onepassword
         flatpak
         avahi
@@ -36,7 +37,6 @@
         useNetworkd = true;
         wireless.iwd.enable = true;
         firewall.allowedTCPPorts = [ 27040 ];
-        firewall.extraCommands = "iptables -t raw -A OUTPUT -p udp -m udp --dport 137 -j CT --helper netbios-ns";
       };
 
       systemd.network = {

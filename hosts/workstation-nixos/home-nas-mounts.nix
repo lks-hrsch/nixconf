@@ -1,4 +1,4 @@
-outer@{ ... }:
+outer:
 {
   configurations.nixos."workstation-nixos".module =
     {
@@ -7,7 +7,7 @@ outer@{ ... }:
       ...
     }:
     let
-      owner = outer.config.flake.users.owner;
+      inherit (outer.config.flake.users) owner;
       ip = "192.168.1.11";
       automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s,x-systemd.requires=network-online.target,x-systemd.after=network-online.target";
     in

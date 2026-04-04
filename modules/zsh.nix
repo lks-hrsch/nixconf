@@ -1,40 +1,32 @@
 _: {
   flake = {
-    modules = {
-      nixos.zsh =
-        { pkgs, ... }:
-        {
-          environment.shells = with pkgs; [ zsh ];
-          users.defaultUserShell = pkgs.zsh;
-          programs = {
-            zsh.enable = true;
-            tmux.enable = true;
+    modules =
+      let
+        baseZshConfig =
+          { pkgs, ... }:
+          {
+            environment.shells = with pkgs; [ zsh ];
+            programs = {
+              zsh.enable = true;
+              tmux.enable = true;
+            };
+
+            # global system packages
+            environment.systemPackages = with pkgs; [
+              btop
+              pciutils
+              usbutils
+            ];
+          };
+      in
+      {
+        nixos.zsh =
+          { pkgs, ... }@args:
+          (baseZshConfig args) // {
+            users.defaultUserShell = pkgs.zsh;
           };
 
-          # global system packages
-          environment.systemPackages = with pkgs; [
-            btop
-            pciutils
-            usbutils
-          ];
-        };
-
-      darwin.zsh =
-        { pkgs, ... }:
-        {
-          environment.shells = with pkgs; [ zsh ];
-          programs = {
-            zsh.enable = true;
-            tmux.enable = true;
-          };
-
-          # global system packages
-          environment.systemPackages = with pkgs; [
-            btop
-            pciutils
-            usbutils
-          ];
-        };
+        darwin.zsh = baseZshConfig;
 
       homeManager.zsh =
         { pkgs, ... }:
