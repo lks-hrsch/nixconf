@@ -49,6 +49,7 @@
               Address = "192.168.1.40/24";
               Gateway = "192.168.1.1";
               DNS = [ "192.168.1.1" ];
+              Domains = "~mars.lukashirsch.de ~deimos.mars.lukashirsch.de";
               IPv6AcceptRA = true;
             };
           };
@@ -59,6 +60,7 @@
               Address = "192.168.1.41/24";
               Gateway = "192.168.1.1";
               DNS = [ "192.168.1.1" ];
+              Domains = "~mars.lukashirsch.de ~deimos.mars.lukashirsch.de";
               IPv6AcceptRA = true;
             };
             linkConfig.RequiredForOnline = "no";
