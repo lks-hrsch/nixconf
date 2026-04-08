@@ -68,6 +68,8 @@
         "editor.formatOnPaste" = true;
         "workbench.editorLargeFileConfirmation" = 100; # 100 MB
 
+        "diffEditor.ignoreTrimWhitespace" = false;
+
         "git.autofetch" = "all";
 
         "nix.formatterPath" = "nixfmt";
