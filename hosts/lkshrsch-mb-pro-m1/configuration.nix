@@ -7,12 +7,6 @@
         base
       ];
 
-      networking = {
-        computerName = "lkshrsch-mb-pro-m1";
-        hostName = "lkshrsch-mb-pro-m1";
-        localHostName = "lkshrsch-mb-pro-m1";
-      };
-
-      system.defaults.smb.NetBIOSName = "lkshrsch-mb-pro-m1";
+      networking.hostName = "lkshrsch-mb-pro-m1";
     };
 }

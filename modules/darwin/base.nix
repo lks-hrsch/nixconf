@@ -4,6 +4,10 @@
   inputs,
   ...
 }:
+let
+  overlays = config.repo.overlays;
+  revision = self.rev or self.dirtyRev or null;
+in
 {
   flake.modules.darwin.base =
     { ... }:
@@ -24,62 +28,72 @@
         inputs.mac-app-util.darwinModules.default
         inputs.nixvim.nixDarwinModules.nixvim
         inputs.sops-nix.darwinModules.sops
-      ];
-
-      nixpkgs = {
-        hostPlatform = "aarch64-darwin";
-        config.allowUnfree = true;
-        overlays = [
-          config.repo.overlays.unstable
-          config.repo.overlays.firefox-addons
-          config.repo.overlays.nix-vscode-extensions
-        ];
-      };
-
-      security.pam.services.sudo_local = {
-        touchIdAuth = true;
-        watchIdAuth = true;
-      };
-
-      networking.applicationFirewall = {
-        enable = true;
-        enableStealthMode = true;
-      };
-
-      # this will allow you to use nix-darwin with Determinate.
-      nix.enable = false;
-
-      system = {
-        configurationRevision = self.rev or self.dirtyRev or null;
-        stateVersion = 6;
-
-        defaults = {
-          finder = {
-            AppleShowAllFiles = true;
-            AppleShowAllExtensions = true;
-            FXEnableExtensionChangeWarning = false;
-            FXPreferredViewStyle = "Nlsv";
-            FXRemoveOldTrashItems = true;
-            ShowPathbar = true;
-          };
-          loginwindow = {
-            DisableConsoleAccess = true;
-            GuestEnabled = false;
-          };
-          NSGlobalDomain = {
-            AppleInterfaceStyle = "Dark";
-            AppleMeasurementUnits = "Centimeters";
-            AppleShowAllExtensions = true;
-            AppleShowAllFiles = true;
-            AppleShowScrollBars = "WhenScrolling";
-            AppleTemperatureUnit = "Celsius";
-          };
-          CustomUserPreferences = {
-            "com.apple.desktopservices" = {
-              DSDontWriteNetworkStores = true;
+      ]
+      ++ [
+        (
+          { config, lib, ... }:
+          {
+            nixpkgs = {
+              hostPlatform = "aarch64-darwin";
+              config.allowUnfree = true;
+              overlays = [
+                overlays.unstable
+                overlays.firefox-addons
+                overlays.nix-vscode-extensions
+              ];
             };
-          };
-        };
-      };
+
+            security.pam.services.sudo_local = {
+              touchIdAuth = true;
+              watchIdAuth = true;
+            };
+
+            networking.applicationFirewall = {
+              enable = true;
+              enableStealthMode = true;
+            };
+
+            networking.computerName = lib.mkDefault config.networking.hostName;
+            networking.localHostName = lib.mkDefault config.networking.hostName;
+
+            # this will allow you to use nix-darwin with Determinate.
+            nix.enable = false;
+
+            system = {
+              configurationRevision = revision;
+              stateVersion = 6;
+
+              defaults = {
+                finder = {
+                  AppleShowAllFiles = true;
+                  AppleShowAllExtensions = true;
+                  FXEnableExtensionChangeWarning = false;
+                  FXPreferredViewStyle = "Nlsv";
+                  FXRemoveOldTrashItems = true;
+                  ShowPathbar = true;
+                };
+                loginwindow = {
+                  DisableConsoleAccess = true;
+                  GuestEnabled = false;
+                };
+                NSGlobalDomain = {
+                  AppleInterfaceStyle = "Dark";
+                  AppleMeasurementUnits = "Centimeters";
+                  AppleShowAllExtensions = true;
+                  AppleShowAllFiles = true;
+                  AppleShowScrollBars = "WhenScrolling";
+                  AppleTemperatureUnit = "Celsius";
+                };
+                CustomUserPreferences = {
+                  "com.apple.desktopservices" = {
+                    DSDontWriteNetworkStores = true;
+                  };
+                };
+                smb.NetBIOSName = lib.mkDefault config.networking.hostName;
+              };
+            };
+          }
+        )
+      ];
     };
 }
