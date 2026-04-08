@@ -1,6 +1,6 @@
 { config, inputs, ... }:
 {
-  flake.modules.nixos.desktop-hyprland-base =
+  flake.modules.nixos.desktop-hyprland =
     {
       lib,
       pkgs,

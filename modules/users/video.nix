@@ -1,5 +1,11 @@
 {
-  flake.users.video.name = "video";
+  flake = {
+    users.video.name = "video";
 
-  flake.modules.nixos.users.users.groups.video = { };
+    modules.nixos."users-video" =
+      { ... }:
+      {
+        users.groups.video = { };
+      };
+  };
 }

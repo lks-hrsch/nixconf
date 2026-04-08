@@ -17,9 +17,9 @@
         xserver
         zfs
         syncthing
-        desktop-base
-        desktop-hyprland-base
-        gaming-base
+        desktop
+        desktop-hyprland
+        gaming
         homeManager
       ];
 

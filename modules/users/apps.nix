@@ -9,7 +9,7 @@
     };
 
     modules = {
-      nixos.users = {
+      nixos."users-apps" = {
         users.groups.${config.flake.users.apps.username}.gid = config.flake.users.apps.gid;
 
         users.users.${config.flake.users.apps.username} = {
@@ -20,7 +20,7 @@
         };
       };
 
-      darwin.users = {
+      darwin."users-apps" = {
         users.users.${config.flake.users.apps.username} = {
           inherit (config.flake.users.apps) uid;
           inherit (config.flake.users.apps) description;

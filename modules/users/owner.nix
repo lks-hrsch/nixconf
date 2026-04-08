@@ -16,7 +16,7 @@
     };
 
     modules = {
-      nixos.users =
+      nixos."users-owner" =
         {
           pkgs,
           ...
@@ -33,7 +33,7 @@
           };
         };
 
-      darwin.users =
+      darwin."users-owner" =
         {
           pkgs,
           ...

@@ -25,7 +25,7 @@
             }
           )
           config.flake.modules.homeManager.base
-          config.flake.modules.homeManager.desktop-base
+          config.flake.modules.homeManager.desktop
           config.flake.modules.homeManager.desktop-apps-obsstudio
           config.flake.modules.homeManager.desktop-apps-thunderbird
           config.flake.modules.homeManager.desktop-hyprland-uwsm-env

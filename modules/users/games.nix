@@ -1,5 +1,11 @@
 {
-  flake.users.games.name = "games";
+  flake = {
+    users.games.name = "games";
 
-  flake.modules.nixos.users.users.groups.games = { };
+    modules.nixos."users-games" =
+      { ... }:
+      {
+        users.groups.games = { };
+      };
+  };
 }

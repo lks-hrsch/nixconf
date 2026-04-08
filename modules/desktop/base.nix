@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.desktop-base =
+  flake.modules.nixos.desktop =
     { pkgs, ... }:
     {
       i18n.inputMethod = {
@@ -16,7 +16,7 @@ _: {
       };
     };
 
-  flake.modules.homeManager.desktop-base =
+  flake.modules.homeManager.desktop =
     { lib, osConfig, ... }:
     {
       xdg = {
