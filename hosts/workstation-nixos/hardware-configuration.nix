@@ -2,8 +2,7 @@
 ## and may be overwritten by future invocations.  Please make changes
 ## to /etc/nixos/configuration.nix instead.
 
-outer:
-{
+outer: {
   configurations.nixos."workstation-nixos".module =
     {
       config,
@@ -103,19 +102,21 @@ outer:
         };
 
         "/boot" = {
-          device = "/dev/disk/by-uuid/85D5-EFB5";
+          device = "/dev/disk/by-partlabel/EFI\\\\x20system\\\\x20partition";
           fsType = "vfat";
           options = [
             "fmask=0077"
             "dmask=0077"
-            "umask=0077"
             "defaults"
           ];
         };
       };
 
       swapDevices = [
-        { device = "/dev/disk/by-uuid/f00a98eb-9c92-4d75-8009-5ab76504c274"; }
+        {
+          device = "/dev/disk/by-partlabel/Linux\\\\x20swap";
+          randomEncryption = true;
+        }
       ];
 
       hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
