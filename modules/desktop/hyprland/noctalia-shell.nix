@@ -9,7 +9,6 @@
 
       # Install supporting packages
       home.packages = with pkgs; [
-        quickshell # Required for 'qs' command for IPC
         netbird # Required for netbird plugin
         dmenu # Fallback menu (needed for cliphist)
       ];

@@ -22,7 +22,7 @@
         settings = {
           "$terminal" = "uwsm app -- alacritty";
           "$fileManager" = "uwsm app -- nautilus";
-          "$ipc" = "qs -c noctalia-shell ipc call";
+          "$ipc" = "noctalia-shell ipc call";
           "$mod" = "SUPER";
 
           exec-once = [
