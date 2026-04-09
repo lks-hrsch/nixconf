@@ -22,12 +22,12 @@
         settings = {
           "$terminal" = "uwsm app -- alacritty";
           "$fileManager" = "uwsm app -- nautilus";
-          "$menu" = "uwsm app -- rofi";
+          "$ipc" = "qs -c noctalia-shell ipc call";
           "$mod" = "SUPER";
 
           exec-once = [
             "uwsm app -- hyprsunset"
-            "uwsm app -- dunst"
+            # Noctalia Shell starts automatically via home-manager module
             "uwsm app -- 1password --silent"
             "uwsm app -- fcitx5 -d --replace"
             "uwsm app -- fcitx5-remote -r"
@@ -107,7 +107,10 @@
             "$mod, T, exec, $terminal"
             "$mod, E, exec, $fileManager"
             "$mod, F, exec, uwsm app -- firefox"
-            "$mod, SPACE, exec, $menu -show drun"
+            "$mod, SPACE, exec, $ipc launcher toggle"
+            "$mod, S, exec, $ipc controlCenter toggle"
+            "$mod, comma, exec, $ipc settings toggle"
+
             "$mod, Q, killactive"
             "$mod CTRL, Q, exec, uwsm app -- hyprlock"
             "$mod CTRL, F, fullscreen,"
@@ -116,7 +119,7 @@
             "$mod, J, togglesplit," # dwindle
 
             # cliphist
-            "$mod ALT, C, exec, cliphist list | $menu -dmenu | cliphist decode | wl-copy"
+            "$mod ALT, C, exec, cliphist list | dmenu | cliphist decode | wl-copy"
 
             # grimblast
             "$mod SHIFT, 3, exec, grimblast --notify copysave active"
@@ -147,6 +150,19 @@
           bindm = [
             "$mod, mouse:272, movewindow"
             "$mod, mouse:273, resizewindow"
+          ];
+
+          # Media keys (continuous for volume/brightness)
+          bindel = [
+            ", XF86AudioRaiseVolume, exec, $ipc volume increase"
+            ", XF86AudioLowerVolume, exec, $ipc volume decrease"
+            ", XF86MonBrightnessUp, exec, $ipc brightness increase"
+            ", XF86MonBrightnessDown, exec, $ipc brightness decrease"
+          ];
+
+          # Media keys (one-shot for mute)
+          bindl = [
+            ", XF86AudioMute, exec, $ipc volume muteOutput"
           ];
         };
       };
