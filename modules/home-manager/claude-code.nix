@@ -6,7 +6,7 @@ _: {
         enable = true;
         # enableMcpIntegration = true; # TODO - currently not in home manager 25.11 check it later
         mcpServers = config.programs.mcp.servers;
-        package = pkgs.claude-code;
+        package = pkgs.unstable.claude-code;
       };
     };
 }
