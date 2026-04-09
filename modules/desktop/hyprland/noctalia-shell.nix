@@ -120,30 +120,46 @@
                 id = "brightness-card";
               }
               {
-                enabled = true;
+                enabled = false;
                 id = "weather-card";
               }
               {
-                enabled = true;
+                enabled = false;
                 id = "media-sysmon-card";
               }
             ];
             diskPath = "/";
             position = "close_to_bar_button";
             shortcuts = {
-              left = [ ];
-              right = [ { id = "NightLight"; } ];
+              left = [ { id = "NightLight"; } ];
+              right = [
+                { id = "Bluetooth"; }
+                { id = "WiFi"; }
+              ];
             };
           };
 
           # Desktop widgets (disabled by default)
           desktopWidgets = {
             enabled = false;
+            gridSnap = false;
+            gridSnapScale = false;
+            monitorWidgets = [ ];
+            overviewEnabled = true;
           };
 
           # Hooks configuration
           hooks = {
             enabled = false;
+            colorGeneration = "";
+            darkModeChange = "";
+            performanceModeDisabled = "";
+            performanceModeEnabled = "";
+            screenLock = "";
+            screenUnlock = "";
+            session = "";
+            startup = "";
+            wallpaperChange = "";
           };
 
           # Idle configuration
@@ -363,6 +379,7 @@
 
           # Bar configuration
           bar = {
+            position = "top";
             autoHideDelay = 500;
             autoShowDelay = 150;
             barType = "floating";
@@ -590,6 +607,7 @@
 
           # Notifications configuration
           notifications = {
+            enabled = true;
             clearDismissed = true;
             criticalUrgencyDuration = 15;
             density = "default";
