@@ -25,15 +25,10 @@
 
       nixpkgs.config.cudaSupport = true;
 
-      # Use the systemd-boot EFI boot loader.
-      boot.loader = {
-        systemd-boot.enable = true;
-        efi.canTouchEfiVariables = true;
-      };
-
       networking = {
         hostName = "workstation-nixos";
         hostId = "99c58a86"; # head -c 8 /etc/machine-id
+        networkmanager.enable = true;
         useNetworkd = true;
         wireless.iwd.enable = true;
         firewall.allowedTCPPorts = [ 27040 ];
@@ -69,6 +64,8 @@
       };
 
       hardware = {
+        bluetooth.enable = true;
+
         nvidia-container-toolkit.enable = true;
 
         # Enable OpenGL

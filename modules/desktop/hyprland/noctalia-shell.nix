@@ -9,7 +9,6 @@
 
       # Install supporting packages
       home.packages = with pkgs; [
-        netbird # Required for netbird plugin
         dmenu # Fallback menu (needed for cliphist)
       ];
 
@@ -26,7 +25,7 @@
             clipboardWrapText = true;
             customLaunchPrefix = "";
             customLaunchPrefixEnabled = false;
-            density = "default";
+            density = "compact";
             enableClipPreview = true;
             enableClipboardChips = true;
             enableClipboardHistory = true;
@@ -40,7 +39,7 @@
             pinnedApps = [ ];
             position = "center";
             screenshotAnnotationTool = "";
-            showCategories = true;
+            showCategories = false;
             showIconBackground = false;
             sortByMostUsed = true;
             terminalCommand = "uwsm app -- alacritty -e";
@@ -187,7 +186,7 @@
             name = "Dresden, Germany";
             showCalendarEvents = true;
             showCalendarWeather = true;
-            showWeekNumberInCalendar = false;
+            showWeekNumberInCalendar = true;
             use12hourFormat = false;
             useFahrenheit = false;
             weatherEnabled = true;
@@ -211,10 +210,6 @@
           nightLight = {
             enabled = true;
             autoSchedule = true;
-            dayTemp = "6500";
-            forced = false;
-            manualSunrise = "06:30";
-            manualSunset = "18:30";
             nightTemp = "4000";
           };
 
@@ -298,27 +293,8 @@
 
           # System Monitor configuration
           systemMonitor = {
-            batteryCriticalThreshold = 5;
-            batteryWarningThreshold = 20;
-            cpuCriticalThreshold = 90;
-            cpuWarningThreshold = 80;
-            criticalColor = "#f38ba8";
-            diskAvailCriticalThreshold = 10;
-            diskAvailWarningThreshold = 20;
-            diskCriticalThreshold = 90;
-            diskWarningThreshold = 80;
             enableDgpuMonitoring = true;
-            externalMonitor = "resources || missioncenter || jdsystemmonitor || corestats || system-monitoring-center || gnome-system-monitor || plasma-systemmonitor || mate-system-monitor || ukui-system-monitor || deepin-system-monitor || pantheon-system-monitor";
-            gpuCriticalThreshold = 90;
-            gpuWarningThreshold = 80;
-            memCriticalThreshold = 90;
-            memWarningThreshold = 80;
-            swapCriticalThreshold = 90;
-            swapWarningThreshold = 80;
-            tempCriticalThreshold = 90;
-            tempWarningThreshold = 80;
             useCustomColors = false;
-            warningColor = "#585b70";
           };
 
           # Templates
@@ -413,13 +389,13 @@
             widgets = {
               left = [
                 {
-                  colorizeDistroLogo = false;
-                  colorizeSystemIcon = "none";
-                  customIconPath = "";
-                  enableColorization = false;
-                  icon = "noctalia";
-                  useDistroLogo = false;
-                  id = "AppLauncher";
+                  enableColorization = true;
+                  useDistroLogo = true;
+                  id = "ControlCenter";
+                }
+                {
+                  defaultSettings = { };
+                  id = "plugin:workspace-overview";
                 }
                 {
                   characterCount = 2;
@@ -480,10 +456,16 @@
                   id = "SystemMonitor";
                 }
                 {
-                  displayMode = "onhover";
-                  iconColor = "none";
-                  textColor = "none";
-                  id = "Network";
+                  defaultSettings = {
+                    activeColor = "primary";
+                    enableToast = true;
+                    hideInactive = false;
+                    iconSpacing = 4;
+                    inactiveColor = "none";
+                    micFilterRegex = "";
+                    removeMargins = false;
+                  };
+                  id = "plugin:privacy-indicator";
                 }
                 {
                   iconColor = "none";
@@ -520,34 +502,7 @@
 
           # Dock configuration (disabled)
           dock = {
-            animationSpeed = 1;
-            colorizeIcons = false;
-            deadOpacity = 0.6;
-            displayMode = "auto_hide";
-            dockType = "floating";
             enabled = false;
-            floatingRatio = 1;
-            groupApps = false;
-            groupClickAction = "cycle";
-            groupContextMenuMode = "extended";
-            groupIndicatorStyle = "dots";
-            inactiveIndicators = false;
-            indicatorColor = "primary";
-            indicatorOpacity = 0.6;
-            indicatorThickness = 3;
-            launcherIcon = "";
-            launcherIconColor = "none";
-            launcherPosition = "end";
-            launcherUseDistroLogo = false;
-            monitors = [ ];
-            onlySameOutput = true;
-            pinnedApps = [ ];
-            pinnedStatic = false;
-            position = "bottom";
-            showDockIndicator = false;
-            showLauncherIcon = false;
-            sitOnFrame = false;
-            size = 1;
           };
 
           # General settings
@@ -568,7 +523,7 @@
             enableLockScreenMediaControls = false;
             enableShadows = false;
             forceBlackScreenCorners = false;
-            iRadiusRatio = 0.99;
+            iRadiusRatio = 1;
             keybinds = {
               keyDown = [ "Down" ];
               keyEnter = [
@@ -601,7 +556,7 @@
             showSessionButtonsOnLockScreen = true;
             smoothScrollEnabled = true;
             telemetryEnabled = false;
-            radiusRatio = 1;
+            radiusRatio = 0.75;
           };
 
           # Notifications configuration
@@ -639,16 +594,7 @@
 
           # OSD (On-Screen Display) configuration
           osd = {
-            autoHideMs = 2000;
             enabled = true;
-            enabledTypes = [
-              0
-              1
-              2
-            ];
-            location = "top_right";
-            monitors = [ ];
-            overlayLayer = true;
           };
 
           # Plugins configuration
@@ -690,24 +636,28 @@
               enabled = true;
               sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
             };
-            netbird = {
+            workspace-overview = {
               enabled = true;
               sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
             };
+
           };
           version = 2;
         };
 
         # Plugin-specific settings
         pluginSettings = {
-          "privacy-indicator" = { };
-          "polkit-agent" = { };
-          netbird = {
-            compactMode = false;
-            showIpAddress = true;
-            showPeerCount = true;
-            refreshInterval = 5000;
+          privacy-indicator = {
+            activeColor = "primary";
+            enableToast = true;
+            hideInactive = false;
+            iconSpacing = 4;
+            inactiveColor = "none";
+            micFilterRegex = "";
+            removeMargins = false;
           };
+          polkit-agent = { };
+          workspace-overview = { };
         };
       };
 

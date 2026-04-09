@@ -30,7 +30,6 @@ outer: {
             "nvidia_drm"
             "igc" # lspci -v | grep -iA8 'network\|ethernet'
           ];
-          kernelModules = [ ];
 
           # Remote unlock for encrypted ZFS: enable networking and SSH in initrd
           network = {
@@ -53,7 +52,6 @@ outer: {
         kernelModules = [
           "kvm-amd"
         ];
-        blacklistedKernelModules = [ ];
 
         kernelParams = [
           "acpi_enforce_resources=lax"
@@ -64,10 +62,12 @@ outer: {
           "zfs.zfs_prefetch_disable=1"
           "ip=192.168.1.40::192.168.1.1:255.255.255.0:workstation-nixos::none"
         ];
-        extraModulePackages = [ ];
 
-        # ZFS support (ensures ZFS is included in initrd too)
-        supportedFilesystems = [ "zfs" ];
+        # Use the systemd-boot EFI boot loader.
+        loader = {
+          systemd-boot.enable = true;
+          efi.canTouchEfiVariables = true;
+        };
       };
 
       powerManagement = {
@@ -102,7 +102,7 @@ outer: {
         };
 
         "/boot" = {
-          device = "/dev/disk/by-partlabel/EFI\\\\x20system\\\\x20partition";
+          device = "/dev/disk/by-partuuid/d7167427-97f5-492e-8abe-a2f75030d774";
           fsType = "vfat";
           options = [
             "fmask=0077"
