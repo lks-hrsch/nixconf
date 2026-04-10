@@ -7,7 +7,6 @@
       # install extra packages
       home.packages = [
         pkgs.hyprpicker
-        pkgs.hyprsunset
         pkgs.wl-clipboard
         inputs.hyprland-contrib.packages.${pkgs.stdenv.hostPlatform.system}.grimblast
       ];
@@ -25,7 +24,6 @@
           "$mod" = "SUPER";
 
           exec-once = [
-            "uwsm app -- hyprsunset"
             "uwsm app -- 1password --silent"
             "uwsm app -- fcitx5 -d --replace"
             "uwsm app -- fcitx5-remote -r"
@@ -110,14 +108,14 @@
             "$mod, comma, exec, $ipc settings toggle"
 
             "$mod, Q, killactive"
-            "$mod CTRL, Q, exec, uwsm app -- hyprlock"
+            "$mod CTRL, Q, exec, $ipc lockScreen lock"
             "$mod CTRL, F, fullscreen,"
             "$mod SHIFT, F, togglefloating,"
             "$mod, P, pseudo," # dwindle
             "$mod, J, togglesplit," # dwindle
 
-            # cliphist
-            "$mod ALT, C, exec, cliphist list | dmenu | cliphist decode | wl-copy"
+            # clipboard history (via Noctalia launcher)
+            "$mod ALT, C, exec, $ipc launcher clipboard"
 
             # grimblast
             "$mod SHIFT, 3, exec, grimblast --notify copysave active"

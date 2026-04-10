@@ -7,11 +7,6 @@
         inputs.noctalia.homeModules.default
       ];
 
-      # Install supporting packages
-      home.packages = with pkgs; [
-        dmenu # Fallback menu (needed for cliphist)
-      ];
-
       # Configure Noctalia Shell with full settings from v4.7.5
       programs.noctalia-shell = {
         enable = true;
@@ -151,10 +146,10 @@
             enableDgpuMonitoring = true;
           };
 
-          # Wallpaper configuration
+          # Wallpaper configuration (replaces hyprpaper)
           wallpaper = {
-            enabled = false;
-            directory = "/home/lkshrsch/Pictures/Wallpapers";
+            enabled = true;
+            directory = "/etc/nixos/wallpaper";
           };
 
           # Bar configuration
@@ -379,9 +374,12 @@
             radiusRatio = 0.75;
           };
 
-          # Idle configuration
+          # Idle configuration (replaces hypridle)
           idle = {
             enabled = true;
+            lockTimeout = 600; # Lock after 10 minutes
+            screenOffTimeout = 1800; # Turn off monitors after 30 minutes
+            suspendTimeout = 0; # Suspend disabled (0 = disabled)
           };
 
           # Notifications configuration

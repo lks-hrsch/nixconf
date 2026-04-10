@@ -30,12 +30,7 @@
           config.flake.modules.homeManager.desktop-apps-thunderbird
           config.flake.modules.homeManager.desktop-hyprland-uwsm-env
           config.flake.modules.homeManager.desktop-hyprland-cliphist
-          # Noctalia Shell replaces: dunst, rofi, waybar, and provides polkit-agent plugin
-          # Keeping hypridle, hyprlock, hyprpaper for lock screen and wallpaper
-          config.flake.modules.homeManager.desktop-hyprland-hypridle
           config.flake.modules.homeManager.desktop-hyprland-hyprland
-          config.flake.modules.homeManager.desktop-hyprland-hyprlock
-          config.flake.modules.homeManager.desktop-hyprland-hyprpaper
           config.flake.modules.homeManager.desktop-hyprland-noctalia-shell
 
           (
