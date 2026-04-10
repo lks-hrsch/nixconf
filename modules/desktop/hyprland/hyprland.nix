@@ -9,7 +9,6 @@
         pkgs.hyprpicker
         pkgs.hyprsunset
         pkgs.wl-clipboard
-        # hyprsysteminfo
         inputs.hyprland-contrib.packages.${pkgs.stdenv.hostPlatform.system}.grimblast
       ];
 
@@ -27,7 +26,6 @@
 
           exec-once = [
             "uwsm app -- hyprsunset"
-            # Noctalia Shell starts automatically via home-manager module
             "uwsm app -- 1password --silent"
             "uwsm app -- fcitx5 -d --replace"
             "uwsm app -- fcitx5-remote -r"

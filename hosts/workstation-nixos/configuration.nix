@@ -28,9 +28,11 @@
       networking = {
         hostName = "workstation-nixos";
         hostId = "99c58a86"; # head -c 8 /etc/machine-id
-        networkmanager.enable = true;
         useNetworkd = true;
-        wireless.iwd.enable = true;
+        networkmanager = {
+          enable = true;
+          wifi.powersave = true;
+        };
         firewall.allowedTCPPorts = [ 27040 ];
       };
 
@@ -47,18 +49,6 @@
               Domains = "~mars.lukashirsch.de ~deimos.mars.lukashirsch.de";
               IPv6AcceptRA = true;
             };
-          };
-          "20-wlan" = {
-            matchConfig.Name = "wlan0";
-            networkConfig = {
-              DHCP = "no";
-              Address = "192.168.1.41/24";
-              Gateway = "192.168.1.1";
-              DNS = [ "192.168.1.1" ];
-              Domains = "~mars.lukashirsch.de ~deimos.mars.lukashirsch.de";
-              IPv6AcceptRA = true;
-            };
-            linkConfig.RequiredForOnline = "no";
           };
         };
       };

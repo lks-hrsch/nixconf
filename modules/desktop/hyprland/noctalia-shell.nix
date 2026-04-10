@@ -19,83 +19,10 @@
         settings = {
           # AppLauncher configuration
           appLauncher = {
-            autoPasteClipboard = false;
-            clipboardWatchImageCommand = "wl-paste --type image --watch cliphist store";
-            clipboardWatchTextCommand = "wl-paste --type text --watch cliphist store";
-            clipboardWrapText = true;
-            customLaunchPrefix = "";
-            customLaunchPrefixEnabled = false;
-            density = "compact";
-            enableClipPreview = true;
-            enableClipboardChips = true;
             enableClipboardHistory = true;
-            enableClipboardSmartIcons = true;
-            enableSessionSearch = true;
-            enableSettingsSearch = true;
-            enableWindowsSearch = true;
-            iconMode = "tabler";
-            ignoreMouseInput = false;
-            overviewLayer = false;
-            pinnedApps = [ ];
-            position = "center";
-            screenshotAnnotationTool = "";
             showCategories = false;
-            showIconBackground = false;
-            sortByMostUsed = true;
             terminalCommand = "uwsm app -- alacritty -e";
-            viewMode = "list";
-          };
-
-          # Audio configuration
-          audio = {
-            mprisBlacklist = [ ];
-            preferredPlayer = "";
-            spectrumFrameRate = 30;
-            spectrumMirrored = true;
-            visualizerType = "none";
-            volumeFeedback = false;
-            volumeFeedbackSoundFile = "";
-            volumeOverdrive = false;
-            volumeStep = 5;
-          };
-
-          # Brightness configuration
-          brightness = {
-            backlightDeviceMappings = [ ];
-            brightnessStep = 5;
-            enableDdcSupport = false;
-            enforceMinimum = true;
-          };
-
-          # Calendar configuration
-          calendar = {
-            cards = [
-              {
-                enabled = true;
-                id = "calendar-header-card";
-              }
-              {
-                enabled = true;
-                id = "calendar-month-card";
-              }
-              {
-                enabled = true;
-                id = "weather-card";
-              }
-            ];
-          };
-
-          # Color schemes (Stylix will override predefinedScheme with Catppuccin)
-          colorSchemes = {
-            darkMode = true;
-            generationMethod = "tonal-spot";
-            manualSunrise = "06:30";
-            manualSunset = "18:30";
-            monitorForColors = "";
-            predefinedScheme = "Noctalia (default)";
-            schedulingMode = "off";
-            syncGsettings = true;
-            useWallpaperColors = false;
+            density = "compact";
           };
 
           # Control Center configuration
@@ -126,8 +53,6 @@
                 id = "media-sysmon-card";
               }
             ];
-            diskPath = "/";
-            position = "close_to_bar_button";
             shortcuts = {
               left = [ { id = "NightLight"; } ];
               right = [
@@ -137,86 +62,16 @@
             };
           };
 
-          # Desktop widgets (disabled by default)
-          desktopWidgets = {
-            enabled = false;
-            gridSnap = false;
-            gridSnapScale = false;
-            monitorWidgets = [ ];
-            overviewEnabled = true;
-          };
-
-          # Hooks configuration
-          hooks = {
-            enabled = false;
-            colorGeneration = "";
-            darkModeChange = "";
-            performanceModeDisabled = "";
-            performanceModeEnabled = "";
-            screenLock = "";
-            screenUnlock = "";
-            session = "";
-            startup = "";
-            wallpaperChange = "";
-          };
-
-          # Idle configuration
-          idle = {
-            enabled = true;
-            customCommands = "[]";
-            fadeDuration = 5;
-            lockCommand = "";
-            lockTimeout = 660;
-            resumeLockCommand = "";
-            resumeScreenOffCommand = "";
-            resumeSuspendCommand = "";
-            screenOffCommand = "";
-            screenOffTimeout = 600;
-            suspendCommand = "";
-            suspendTimeout = 1800;
-          };
-
           # Location configuration (Dresden, Germany)
           location = {
-            analogClockInCalendar = false;
-            autoLocate = false;
-            firstDayOfWeek = -1;
-            hideWeatherCityName = false;
-            hideWeatherTimezone = false;
             name = "Dresden, Germany";
-            showCalendarEvents = true;
-            showCalendarWeather = true;
             showWeekNumberInCalendar = true;
-            use12hourFormat = false;
-            useFahrenheit = false;
-            weatherEnabled = true;
-            weatherShowEffects = true;
-            weatherTaliaMascotAlways = false;
-          };
-
-          # Network configuration
-          network = {
-            bluetoothAutoConnect = true;
-            bluetoothDetailsViewMode = "grid";
-            bluetoothHideUnnamedDevices = false;
-            bluetoothRssiPollIntervalMs = 60000;
-            bluetoothRssiPollingEnabled = false;
-            disableDiscoverability = false;
-            networkPanelView = "wifi";
-            wifiDetailsViewMode = "grid";
+            autoLocate = false;
           };
 
           # Night Light configuration
           nightLight = {
             enabled = true;
-            autoSchedule = true;
-            nightTemp = "4000";
-          };
-
-          # Noctalia performance settings
-          noctaliaPerformance = {
-            disableDesktopWidgets = true;
-            disableWallpaper = true;
           };
 
           # Session menu (power options)
@@ -294,98 +149,99 @@
           # System Monitor configuration
           systemMonitor = {
             enableDgpuMonitoring = true;
-            useCustomColors = false;
-          };
-
-          # Templates
-          templates = {
-            activeTemplates = [ ];
-            enableUserTheming = false;
           };
 
           # Wallpaper configuration
           wallpaper = {
-            automationEnabled = false;
-            directory = "/home/lkshrsch/Pictures/Wallpapers";
-            enableMultiMonitorDirectories = false;
             enabled = false;
-            favorites = [ ];
-            fillColor = "#000000";
-            fillMode = "crop";
-            hideWallpaperFilenames = false;
-            linkLightAndDarkWallpapers = true;
-            monitorDirectories = [ ];
-            overviewBlur = 0.4;
-            overviewEnabled = false;
-            overviewTint = 0.6;
-            panelPosition = "follow_bar";
-            randomIntervalSec = 300;
-            setWallpaperOnAllMonitors = true;
-            showHiddenFiles = false;
-            skipStartupTransition = false;
-            solidColor = "#1a1a2e";
-            sortOrder = "name";
-            transitionDuration = 1500;
-            transitionEdgeSmoothness = 0.05;
-            transitionType = [
-              "fade"
-              "disc"
-              "stripes"
-              "wipe"
-              "pixelate"
-              "honeycomb"
-            ];
-            useOriginalImages = false;
-            useSolidColor = false;
-            useWallhaven = false;
-            viewMode = "single";
-            wallhavenApiKey = "";
-            wallhavenCategories = "111";
-            wallhavenOrder = "desc";
-            wallhavenPurity = "100";
-            wallhavenQuery = "";
-            wallhavenRatios = "";
-            wallhavenResolutionHeight = "";
-            wallhavenResolutionMode = "atleast";
-            wallhavenResolutionWidth = "";
-            wallhavenSorting = "relevance";
-            wallpaperChangeMode = "random";
+            directory = "/home/lkshrsch/Pictures/Wallpapers";
           };
 
           # Bar configuration
           bar = {
-            position = "top";
-            autoHideDelay = 500;
-            autoShowDelay = 150;
             barType = "floating";
-            capsuleColorKey = "none";
-            contentPadding = 2;
-            density = "default";
-            displayMode = "always_visible";
-            enableExclusionZoneInset = true;
-            fontScale = 1;
-            frameRadius = 12;
-            frameThickness = 8;
-            hideOnOverview = false;
-            marginHorizontal = 4;
-            marginVertical = 4;
-            middleClickAction = "none";
-            middleClickCommand = "";
-            middleClickFollowMouse = false;
-            monitors = [ ];
-            mouseWheelAction = "none";
-            mouseWheelWrap = true;
-            outerCorners = true;
-            reverseScroll = false;
-            rightClickAction = "controlCenter";
-            rightClickCommand = "";
-            rightClickFollowMouse = true;
-            screenOverrides = [ ];
-            showCapsule = true;
-            showOnWorkspaceSwitch = true;
-            showOutline = false;
-            useSeparateOpacity = false;
-            widgetSpacing = 6;
+            monitors = [
+              "DP-2"
+              "DP-3"
+            ];
+            screenOverrides = [
+              {
+                enabled = false;
+                name = "DP-3";
+                widgets = null;
+              }
+              {
+                enabled = true;
+                name = "DP-2";
+                widgets = {
+                  center = [
+                    {
+                      characterCount = 2;
+                      colorizeIcons = true;
+                      emptyColor = "secondary";
+                      enableScrollWheel = true;
+                      focusedColor = "primary";
+                      followFocusedScreen = false;
+                      fontWeight = "bold";
+                      groupedBorderOpacity = 1;
+                      hideUnoccupied = false;
+                      iconScale = 0.75;
+                      id = "Workspace";
+                      labelMode = "index";
+                      occupiedColor = "secondary";
+                      pillSize = 0.6;
+                      showApplications = true;
+                      showApplicationsHover = false;
+                      showBadge = true;
+                      showLabelsOnlyWhenOccupied = true;
+                      unfocusedIconsOpacity = 0.5;
+                    }
+                  ];
+                  left = [
+                    {
+                      compactMode = false;
+                      hideMode = "visible";
+                      hideWhenIdle = false;
+                      id = "MediaMini";
+                      maxWidth = 145;
+                      panelShowAlbumArt = true;
+                      scrollingMode = "hover";
+                      showAlbumArt = true;
+                      showArtistFirst = true;
+                      showProgressRing = true;
+                      showVisualizer = false;
+                      textColor = "none";
+                      useFixedWidth = false;
+                      visualizerType = "linear";
+                    }
+                  ];
+                  right = [
+                    {
+                      compactMode = false;
+                      diskPath = "/";
+                      iconColor = "none";
+                      id = "SystemMonitor";
+                      showCpuCores = false;
+                      showCpuFreq = false;
+                      showCpuTemp = true;
+                      showCpuUsage = true;
+                      showDiskAvailable = false;
+                      showDiskUsage = false;
+                      showDiskUsageAsPercent = false;
+                      showGpuTemp = true;
+                      showLoadAverage = false;
+                      showMemoryAsPercent = false;
+                      showMemoryUsage = true;
+                      showNetworkStats = true;
+                      showSwapUsage = false;
+                      textColor = "none";
+                      useMonospaceFont = true;
+                      usePadding = true;
+                    }
+                  ];
+                };
+              }
+            ];
             widgets = {
               left = [
                 {
@@ -430,8 +286,21 @@
                   pinned = [
                     "1Password"
                     "Fcitx"
+                    "spotify-client"
                   ];
                   id = "Tray";
+                }
+                {
+                  defaultSettings = {
+                    activeColor = "primary";
+                    enableToast = true;
+                    hideInactive = false;
+                    iconSpacing = 4;
+                    inactiveColor = "none";
+                    micFilterRegex = "";
+                    removeMargins = false;
+                  };
+                  id = "plugin:privacy-indicator";
                 }
                 {
                   compactMode = false;
@@ -456,18 +325,6 @@
                   id = "SystemMonitor";
                 }
                 {
-                  defaultSettings = {
-                    activeColor = "primary";
-                    enableToast = true;
-                    hideInactive = false;
-                    iconSpacing = 4;
-                    inactiveColor = "none";
-                    micFilterRegex = "";
-                    removeMargins = false;
-                  };
-                  id = "plugin:privacy-indicator";
-                }
-                {
                   iconColor = "none";
                   textColor = "none";
                   id = "KeepAwake";
@@ -478,6 +335,13 @@
                   middleClickCommand = "pwvucontrol || pavucontrol";
                   textColor = "none";
                   id = "Volume";
+                }
+                {
+                  displayMode = "alwaysShow";
+                  iconColor = "none";
+                  id = "Microphone";
+                  middleClickCommand = "pwvucontrol || pavucontrol";
+                  textColor = "none";
                 }
                 {
                   hideWhenZero = false;
@@ -507,113 +371,30 @@
 
           # General settings
           general = {
-            allowPanelsOnScreenWithoutBar = true;
-            allowPasswordWithFprintd = false;
-            animationDisabled = true;
-            animationSpeed = 1;
-            autoStartAuth = false;
             avatarImage = "/home/lkshrsch/.face";
-            boxRadiusRatio = 1;
-            clockFormat = "hh\\nmm";
-            clockStyle = "custom";
-            compactLockScreen = false;
+            animationDisabled = true;
             dimmerOpacity = 0;
-            enableBlurBehind = true;
-            enableLockScreenCountdown = true;
-            enableLockScreenMediaControls = false;
             enableShadows = false;
-            forceBlackScreenCorners = false;
-            iRadiusRatio = 1;
-            keybinds = {
-              keyDown = [ "Down" ];
-              keyEnter = [
-                "Return"
-                "Enter"
-              ];
-              keyEscape = [ "Esc" ];
-              keyLeft = [ "Left" ];
-              keyRemove = [ "Del" ];
-              keyRight = [ "Right" ];
-              keyUp = [ "Up" ];
-            };
-            language = "";
-            lockOnSuspend = true;
-            lockScreenAnimations = false;
-            lockScreenBlur = 0;
-            lockScreenCountdownDuration = 10000;
-            lockScreenMonitors = [ ];
-            lockScreenTint = 0;
-            passwordChars = false;
-            reverseScroll = false;
-            scaleRatio = 1;
-            screenRadiusRatio = 1;
-            shadowDirection = "bottom_right";
-            shadowOffsetX = 2;
-            shadowOffsetY = 3;
-            showChangelogOnStartup = true;
-            showHibernateOnLockScreen = false;
-            showScreenCorners = false;
-            showSessionButtonsOnLockScreen = true;
-            smoothScrollEnabled = true;
-            telemetryEnabled = false;
+            showChangelogOnStartup = false;
             radiusRatio = 0.75;
+          };
+
+          # Idle configuration
+          idle = {
+            enabled = true;
           };
 
           # Notifications configuration
           notifications = {
-            enabled = true;
-            clearDismissed = true;
-            criticalUrgencyDuration = 15;
-            density = "default";
-            enableBatteryToast = true;
-            enableKeyboardLayoutToast = true;
             enableMarkdown = true;
             enableMediaToast = true;
-            location = "top_right";
-            lowUrgencyDuration = 3;
-            monitors = [ ];
-            normalUrgencyDuration = 8;
-            overlayLayer = true;
             respectExpireTimeout = true;
-            saveToHistory = {
-              critical = true;
-              low = true;
-              normal = true;
-            };
-            sounds = {
-              criticalSoundFile = "";
-              enabled = false;
-              excludedApps = "discord,firefox,chrome,chromium,edge";
-              lowSoundFile = "";
-              normalSoundFile = "";
-              separateSounds = false;
-              volume = 0.5;
-            };
             backgroundOpacity = lib.mkForce 0.75;
-          };
-
-          # OSD (On-Screen Display) configuration
-          osd = {
-            enabled = true;
-          };
-
-          # Plugins configuration
-          plugins = {
-            autoUpdate = true;
-            notifyUpdates = true;
           };
 
           # UI configuration
           ui = {
-            boxBorderEnabled = false;
-            fontDefaultScale = 1;
-            fontFixedScale = 1;
-            panelsAttachedToBar = true;
-            scrollbarAlwaysVisible = true;
-            settingsPanelMode = "attached";
             settingsPanelSideBarCardStyle = true;
-            tooltipsEnabled = true;
-            translucentWidgets = false;
             panelBackgroundOpacity = lib.mkForce 0.0;
           };
         };
