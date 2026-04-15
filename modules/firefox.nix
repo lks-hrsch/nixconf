@@ -127,9 +127,11 @@
             "dom.security.https_only_mode" = true;
           };
           extensions = {
+            # search for addons here: https://github.com/nix-community/nur-combined/blob/main/repos/rycee/pkgs/firefox-addons/addons.json
             packages = with pkgs.firefox-addons; [
               ublock-origin
               youtube-shorts-block
+              web-clipper-obsidian
               onepassword-password-manager
             ];
           };
