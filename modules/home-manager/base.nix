@@ -26,6 +26,7 @@
         zsh
         sops
         ssh
+        opencode
         stylix
         vscode
       ];

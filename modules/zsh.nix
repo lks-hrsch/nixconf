@@ -67,6 +67,13 @@ _: {
 
               direnv = {
                 enable = true;
+                package =
+                  if pkgs.stdenv.hostPlatform.isDarwin then
+                    pkgs.direnv.overrideAttrs (_: {
+                      doCheck = false;
+                    })
+                  else
+                    pkgs.direnv;
                 nix-direnv.enable = true;
               };
 
