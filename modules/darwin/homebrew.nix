@@ -33,6 +33,7 @@ _: {
         "aldente"
         "anki"
         "claude"
+        "ollama-app"
         "postman"
         "rustdesk"
         "spotify"
