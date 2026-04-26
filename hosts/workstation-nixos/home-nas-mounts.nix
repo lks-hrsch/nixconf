@@ -1,5 +1,4 @@
-outer:
-{
+outer: {
   configurations.nixos."workstation-nixos".module =
     {
       config,
@@ -8,7 +7,7 @@ outer:
     }:
     let
       inherit (outer.config.flake.users) owner;
-      ip = "192.168.1.11";
+      ip = "192.168.1.16";
       automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s,x-systemd.requires=network-online.target,x-systemd.after=network-online.target";
     in
     {
@@ -65,6 +64,14 @@ outer:
 
         "/mnt/mars/university" = {
           device = "//${ip}/university";
+          fsType = "cifs";
+          options = [
+            "${automount_opts},credentials=${config.sops.secrets."smb-credentials-mars".path},uid=1000,gid=100"
+          ];
+        };
+
+        "/mnt/mars/datasets" = {
+          device = "//${ip}/datasets";
           fsType = "cifs";
           options = [
             "${automount_opts},credentials=${config.sops.secrets."smb-credentials-mars".path},uid=1000,gid=100"

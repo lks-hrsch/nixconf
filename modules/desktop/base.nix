@@ -2,6 +2,8 @@ _: {
   flake.modules.nixos.desktop =
     { pkgs, ... }:
     {
+      services.gnome.gnome-keyring.enable = true;
+
       i18n.inputMethod = {
         enable = true;
         type = "fcitx5";

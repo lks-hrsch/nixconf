@@ -70,7 +70,7 @@
 
         "diffEditor.ignoreTrimWhitespace" = false;
 
-        "git.autofetch" = "all";
+        # "git.autofetch" = "all";
 
         "nix.formatterPath" = "nixfmt";
         "nix.enableLanguageServer" = true;

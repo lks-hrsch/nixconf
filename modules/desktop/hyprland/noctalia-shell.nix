@@ -440,9 +440,17 @@
         };
       };
 
-      # Auto-start Noctalia Shell via Hyprland
-      wayland.windowManager.hyprland.settings.exec-once = [
-        "uwsm app -- noctalia-shell"
-      ];
+      # Noctalia Shell additions to Hyprland
+      wayland.windowManager.hyprland.settings = {
+        # Auto-start Noctalia Shell
+        exec-once = [
+          "uwsm app -- noctalia-shell"
+        ];
+        layerrule = [
+          "blur on, match:namespace noctalia-background-.*$"
+          "blur_popups on, match:namespace noctalia-background-.*$"
+          "ignore_alpha 0.5, match:namespace noctalia-background-.*$"
+        ];
+      };
     };
 }

@@ -15,7 +15,8 @@ _: {
         settings = {
           "plugin" = [
             "opencode-with-claude"
-            "opencode-dcp"
+            "@tarquinen/opencode-dcp@latest"
+            "superpowers@git+https://github.com/obra/superpowers.git" # https://github.com/obra/superpowers/blob/main/docs/README.opencode.md
           ];
           "provider" = {
             "anthropic" = {
@@ -26,7 +27,7 @@ _: {
                 "apiKey" = "{file:${secretPath "anthropic/api-key"}}";
               };
             };
-            "develappers" = {
+            "vllm-develappers" = {
               "npm" = "@ai-sdk/openai-compatible";
               "name" = "develappers - vllm (local)";
               "options" = {
@@ -38,7 +39,31 @@ _: {
                   "name" = "qwen3-coder-next:latest";
                   "limit" = {
                     "context" = 128000;
-                    "output" = 8192;
+                    "output" = 16384;
+                  };
+                };
+              };
+            };
+            "vllm-workstation-nixos" = {
+              "npm" = "@ai-sdk/openai-compatible";
+              "name" = "lkshrsch - vllm (workstation-nixos)";
+              "options" = {
+                "baseURL" = "{file:${secretPath "workstation-nixos/base-url"}}";
+                "apiKey" = "{file:${secretPath "workstation-nixos/api-key"}}";
+              };
+              "models" = {
+                "google/gemma-4-E2B-it" = {
+                  "name" = "google/gemma-4-E2B-it";
+                  "limit" = {
+                    "context" = 128000;
+                    "output" = 16384;
+                  };
+                };
+                "google/gemma-4-E4B-it" = {
+                  "name" = "google/gemma-4-E4B-it";
+                  "limit" = {
+                    "context" = 128000;
+                    "output" = 16384;
                   };
                 };
               };
