@@ -55,7 +55,7 @@ outer: {
 
         kernelParams = [
           "acpi_enforce_resources=lax"
-          "amd_pstate=guided"
+          "amd_pstate=active"
           "nvidia_drm.modeset=1"
           "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
           "zfs.zfs_arc_max=4294967296" # 4 GiB https://nixos.wiki/wiki/ZFS
@@ -72,7 +72,7 @@ outer: {
 
       powerManagement = {
         enable = true;
-        cpuFreqGovernor = "schedutil";
+        cpuFreqGovernor = "powersave";
       };
 
       fileSystems = {
