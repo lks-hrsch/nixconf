@@ -51,8 +51,10 @@ _: {
                 "opencode/provider/anthropic/api-key" = { };
                 "opencode/provider/develappers/base-url" = { };
                 "opencode/provider/develappers/api-key" = { };
-                "opencode/provider/workstation-nixos/base-url" = { };
-                "opencode/provider/workstation-nixos/api-key" = { };
+                 "opencode/provider/workstation-nixos/base-url" = { };
+                 "opencode/provider/workstation-nixos/api-key" = { };
+
+                 "mcp/tavily/api-key" = { };
               };
             };
 

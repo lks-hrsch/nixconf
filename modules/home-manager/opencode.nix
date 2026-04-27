@@ -17,6 +17,7 @@ _: {
             "opencode-with-claude"
             "@tarquinen/opencode-dcp@latest"
             "superpowers@git+https://github.com/obra/superpowers.git" # https://github.com/obra/superpowers/blob/main/docs/README.opencode.md
+            # "oh-my-openagent" # https://github.com/code-yeongyu/oh-my-openagent/blob/3f30dac3f14b25911f8ed1a3c199410f8125d1b2/docs/guide/installation.md
           ];
           "provider" = {
             "anthropic" = {

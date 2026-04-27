@@ -3,7 +3,7 @@
   flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
-      vscodeVersion = "1.116.0";
+      vscodeVersion = "1.117.0";
       vscodePackage =
         if pkgs.stdenv.hostPlatform.isDarwin then
           pkgs.unstable.vscode.overrideAttrs (old: rec {
@@ -11,7 +11,7 @@
             src = pkgs.fetchurl {
               name = "VSCode_${version}_darwin-arm64.zip";
               url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
-              sha256 = "sha256-VZufcJ/g1LPtlQruUwI8Pe5c8LNiAIUHY5+gNnyaPTQ=";
+              sha256 = "sha256-NijwhPO2NK2E6obEzVimAiqeiejfXVlzuiyDwaiTmuU=";
             };
           })
         else
@@ -50,6 +50,7 @@
 
         # AI Tools
         anthropic.claude-code
+        sst-dev.opencode
 
         # nix extensions
         jnoortheen.nix-ide
