@@ -36,10 +36,10 @@ _: {
                 "apiKey" = "{file:${secretPath "develappers/api-key"}}";
               };
               "models" = {
-                "qwen3-coder-next:latest" = {
-                  "name" = "qwen3-coder-next:latest";
+                "develappers-coding" = {
+                  "name" = "develappers-coding";
                   "limit" = {
-                    "context" = 128000;
+                    "context" = 256000;
                     "output" = 16384;
                   };
                 };
