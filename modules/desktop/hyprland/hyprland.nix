@@ -24,9 +24,8 @@
           "$mod" = "SUPER";
 
           exec-once = [
+            "uwsm app -- ibus start --type wayland"
             "uwsm app -- 1password --silent"
-            "uwsm app -- fcitx5 -d --replace"
-            "uwsm app -- fcitx5-remote -r"
           ];
 
           monitor = [
@@ -35,7 +34,6 @@
           ];
 
           windowrule = [
-            "pseudo on, match:class fcitx, match:title fcitx"
             "no_focus on, match:class ^$, match:title ^$, match:xwayland true, match:float true, match:fullscreen false, match:pin false" # Prevents focus on empty XWayland windows
             "suppress_event maximize, match:class .*" # You'll probably like this.
           ];

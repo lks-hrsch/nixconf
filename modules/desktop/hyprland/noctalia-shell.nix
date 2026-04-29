@@ -282,6 +282,7 @@
                     "1Password"
                     "Fcitx"
                     "spotify-client"
+                    "ibus-ui-gtk3"
                   ];
                   id = "Tray";
                 }

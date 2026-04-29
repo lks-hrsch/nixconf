@@ -10,10 +10,9 @@ _: {
           # export NIXOS_OZONE_WL="1"
           # export AQ_DRM_DEVICES="/dev/dri/card0:/dev/dri/card1"
           export GRIMBLAST_HIDE_CURSOR=0
-
-          # Input-method
-          export XMODIFIERS="@im=fcitx"
-          export QT_IM_MODULE="fcitx"
+          export GTK_IM_MODULE="ibus"
+          export QT_IM_MODULE="ibus"
+          export XMODIFIERS="@im=ibus"
 
           ##### NVIDIA / VA-API / Firefox ##########################################
           export LIBVA_DRIVER_NAME="nvidia"
