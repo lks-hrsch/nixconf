@@ -3,7 +3,7 @@
   flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
-      vscodeVersion = "1.117.0";
+      vscodeVersion = "1.118.0";
       vscodePackage =
         if pkgs.stdenv.hostPlatform.isDarwin then
           pkgs.unstable.vscode.overrideAttrs (old: rec {
@@ -11,7 +11,7 @@
             src = pkgs.fetchurl {
               name = "VSCode_${version}_darwin-arm64.zip";
               url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
-              sha256 = "sha256-NijwhPO2NK2E6obEzVimAiqeiejfXVlzuiyDwaiTmuU=";
+              sha256 = "sha256-KoH4ZUiX+uaGtNv04qw+Ne/v/mzFmQZLnD9k0zz9S8U=";
             };
           })
         else
