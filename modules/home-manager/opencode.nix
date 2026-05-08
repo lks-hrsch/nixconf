@@ -45,6 +45,23 @@ _: {
                 };
               };
             };
+            "vllm-develappers-proxy" = {
+              "npm" = "@ai-sdk/openai-compatible";
+              "name" = "develappers - vllm (proxy)";
+              "options" = {
+                "baseURL" = "{file:${secretPath "develappers-proxy/base-url"}}";
+                "apiKey" = "{file:${secretPath "develappers-proxy/api-key"}}";
+              };
+              "models" = {
+                "develappers-coding" = {
+                  "name" = "develappers-coding";
+                  "limit" = {
+                    "context" = 256000;
+                    "output" = 16384;
+                  };
+                };
+              };
+            };
             "vllm-workstation-nixos" = {
               "npm" = "@ai-sdk/openai-compatible";
               "name" = "lkshrsch - vllm (workstation-nixos)";
@@ -65,6 +82,13 @@ _: {
                   "limit" = {
                     "context" = 128000;
                     "output" = 16384;
+                  };
+                };
+                "RedHatAI/gemma-4-26B-A4B-it-NVFP4" = {
+                  "name" = "RedHatAI/gemma-4-26B-A4B-it-NVFP4";
+                  "limit" = {
+                    "context" = 65536;
+                    "output" = 8192;
                   };
                 };
               };

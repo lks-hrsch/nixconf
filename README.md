@@ -29,6 +29,12 @@ sudo nix flake update
 sudo nixos-rebuild switch --upgrade --flake ".#workstation-nixos"
 ```
 
+build a nixos on nixos:
+
+``` bash
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --target-host root@10.10.1.1
+```
+
 on darwin:
 
 - <https://github.com/DeterminateSystems/nix-installer>

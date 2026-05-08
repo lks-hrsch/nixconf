@@ -20,7 +20,7 @@
             src = pkgs.fetchurl {
               name = "VSCode_${version}_linux-x64.tar.gz";
               url = "https://update.code.visualstudio.com/${version}/linux-x64/stable";
-              sha256 = "sha256-Iv+cdAZIvQGGW0gYLwq6Lv8UpqDBAx8EgceALiu2pl4=";
+              sha256 = "sha256-b2XfDuDrPJkfLLMBiiqXMKf8soRUOzCRM+PvMvanYXw=";
             };
           });
       marketplace = pkgs.vscode-marketplace-release;
