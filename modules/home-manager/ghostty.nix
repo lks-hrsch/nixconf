@@ -5,7 +5,7 @@ _: {
       programs.ghostty = {
         enable = true;
         enableZshIntegration = true;
-        package = pkgs.unstable.ghostty;
+        package = if pkgs.stdenv.isDarwin then pkgs.unstable.ghostty-bin else pkgs.unstable.ghostty;
       };
     };
 }
