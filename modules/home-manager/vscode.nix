@@ -3,7 +3,7 @@
   flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
-      vscodeVersion = "1.118.0";
+      vscodeVersion = "1.119.0";
       vscodePackage =
         if pkgs.stdenv.hostPlatform.isDarwin then
           pkgs.unstable.vscode.overrideAttrs (old: rec {
@@ -20,7 +20,7 @@
             src = pkgs.fetchurl {
               name = "VSCode_${version}_linux-x64.tar.gz";
               url = "https://update.code.visualstudio.com/${version}/linux-x64/stable";
-              sha256 = "sha256-b2XfDuDrPJkfLLMBiiqXMKf8soRUOzCRM+PvMvanYXw=";
+              sha256 = "sha256-HcZIRGB0y8U5huxXN9jNrhMD0Jjmn+QNUU60EHGduXo=";
             };
           });
       marketplace = pkgs.vscode-marketplace-release;
@@ -98,6 +98,7 @@
         "github.copilot.chat.gpt54ConcisePrompt.enabled" = true;
         "github.copilot.chat.gpt54LargePrompt.enabled" = true;
         "github.copilot.chat.switchAgent.enabled" = true;
+        "github.copilot.chat.agent.backgroundTodoAgent.enabled" = true;
 
         "chat.mcp.gallery.enabled" = true;
         "chat.mcp.discovery.enabled" = {
