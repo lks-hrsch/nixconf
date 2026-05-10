@@ -16,7 +16,7 @@
           appLauncher = {
             enableClipboardHistory = true;
             showCategories = false;
-            terminalCommand = "uwsm app -- alacritty -e";
+            terminalCommand = "uwsm app -- ghostty -e";
             density = "compact";
           };
 

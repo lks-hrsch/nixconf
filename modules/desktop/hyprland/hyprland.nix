@@ -18,7 +18,7 @@
         package = null; # use the NixOS package
         portalPackage = null; # use the NixOS package
         settings = {
-          "$terminal" = "uwsm app -- alacritty";
+          "$terminal" = "uwsm app -- ghostty";
           "$fileManager" = "uwsm app -- nautilus";
           "$ipc" = "noctalia-shell ipc call";
           "$mod" = "SUPER";

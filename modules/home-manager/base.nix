@@ -13,8 +13,8 @@
     { ... }:
     {
       imports = with config.flake.modules.homeManager; [
-        alacritty
         claude-code
+        ghostty
         firefox
         git
         gpg
