@@ -3,7 +3,7 @@
   flake.modules.nixos.alloy =
     { config, lib, pkgs, ... }:
     let
-      cfg = config.my.alloy;
+      cfg = config.alloy;
 
       alloyConfig = ''
         // ---------- Sources ----------
@@ -99,7 +99,7 @@
       '';
     in
     {
-      options.my.alloy = {
+      options.alloy = {
         enable = lib.mkEnableOption "Grafana Alloy log collector";
 
         hostLabel = lib.mkOption {
@@ -141,13 +141,11 @@
 
         environment.etc."alloy/config.alloy".text = alloyConfig;
 
-        systemd.services.alloy.serviceConfig.EnvironmentFile =
-          cfg.basicAuthEnvFile;
-
-        systemd.services.alloy.serviceConfig.SupplementaryGroups =
-          lib.mkIf cfg.collectPodman [ "podman" ];
-
-        systemd.services.alloy.restartTriggers = [ alloyConfig ];
+        systemd.services.alloy = {
+          serviceConfig.EnvironmentFile = cfg.basicAuthEnvFile;
+          serviceConfig.SupplementaryGroups = lib.mkIf cfg.collectPodman [ "podman" ];
+          restartTriggers = [ alloyConfig ];
+        };
       };
     };
 }
