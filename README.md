@@ -33,6 +33,8 @@ build a nixos on nixos:
 
 ``` bash
 nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --target-host root@10.10.1.1
+
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --target-host root@192.168.1.13
 ```
 
 on darwin:

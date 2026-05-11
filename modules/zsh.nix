@@ -13,7 +13,8 @@ _: {
 
             # global system packages
             environment.systemPackages = with pkgs; [
-              btop
+              unstable.btop
+              unstable.ghostty.terminfo # infocmp -x xterm-ghostty | ssh YOUR-SERVER -- tic -x -
               pciutils
               usbutils
             ];
@@ -83,7 +84,10 @@ _: {
               };
 
               fastfetch.enable = true;
-              btop.enable = true;
+              btop = {
+                enable = true;
+                package = pkgs.unstable.btop;
+              };
             };
           };
       };

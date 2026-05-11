@@ -11,6 +11,7 @@
         base
         podman
         netbird
+        alloy
 
         # Include the default incus configuration.
         "${modulesPath}/virtualisation/lxc-container.nix"

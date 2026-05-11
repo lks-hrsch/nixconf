@@ -15,6 +15,7 @@
     {
       imports = with config.flake.modules.nixos; [
         base
+        alloy
         podman
         netbird
         (modulesPath + "/installer/scan/not-detected.nix")
