@@ -34,6 +34,7 @@ _: {
         "anki"
         "claude"
         "ollama-app"
+        "open-webui"
         "postman"
         "rustdesk"
         "spotify"
