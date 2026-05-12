@@ -30,7 +30,7 @@ _: {
 
         # Home-Manager level SOPS configuration
         homeManager.sops =
-          { config, lib, ... }:
+          { config, lib, pkgs, ... }:
           {
             sops = {
               age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
@@ -61,7 +61,7 @@ _: {
               };
             };
 
-            launchd.agents.sops-nix = {
+            launchd.agents.sops-nix = lib.mkIf pkgs.stdenv.isDarwin {
               config = {
                 EnvironmentVariables = {
                   PATH = lib.mkForce "/usr/bin:/bin:/usr/sbin:/sbin";

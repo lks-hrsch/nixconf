@@ -2,10 +2,25 @@ _: {
   flake.modules.homeManager.opencode =
     { pkgs, config, ... }:
     let
-      # Paths to decrypted secret files. sops-nix creates these at activation
-      # time in $XDG_RUNTIME_DIR/secrets/... (mode 0400, owner-only).
-      # Only the PATH is interpolated into the Nix store — never the value.
       secretPath = name: config.sops.secrets."opencode/provider/${name}".path;
+
+      makeModel = name: context: output: {
+        "name" = name;
+        "limit" = {
+          "context" = context;
+          "output" = output;
+        };
+      };
+
+      makeVllmProvider = label: secretPrefix: models: {
+        "npm" = "@ai-sdk/openai-compatible";
+        "name" = label;
+        "options" = {
+          "baseURL" = "{file:${secretPath "${secretPrefix}/base-url"}}";
+          "apiKey" = "{file:${secretPath "${secretPrefix}/api-key"}}";
+        };
+        "models" = models;
+      };
     in
     {
       programs.opencode = {
@@ -28,70 +43,16 @@ _: {
                 "apiKey" = "{file:${secretPath "anthropic/api-key"}}";
               };
             };
-            "vllm-develappers" = {
-              "npm" = "@ai-sdk/openai-compatible";
-              "name" = "develappers - vllm (local)";
-              "options" = {
-                "baseURL" = "{file:${secretPath "develappers/base-url"}}";
-                "apiKey" = "{file:${secretPath "develappers/api-key"}}";
-              };
-              "models" = {
-                "develappers-coding" = {
-                  "name" = "develappers-coding";
-                  "limit" = {
-                    "context" = 256000;
-                    "output" = 16384;
-                  };
-                };
-              };
+            "vllm-develappers" = makeVllmProvider "develappers - vllm (local)" "develappers" {
+              "develappers-coding" = makeModel "develappers-coding" 256000 16384;
             };
-            "vllm-develappers-proxy" = {
-              "npm" = "@ai-sdk/openai-compatible";
-              "name" = "develappers - vllm (proxy)";
-              "options" = {
-                "baseURL" = "{file:${secretPath "develappers-proxy/base-url"}}";
-                "apiKey" = "{file:${secretPath "develappers-proxy/api-key"}}";
-              };
-              "models" = {
-                "develappers-coding" = {
-                  "name" = "develappers-coding";
-                  "limit" = {
-                    "context" = 256000;
-                    "output" = 16384;
-                  };
-                };
-              };
+            "vllm-develappers-proxy" = makeVllmProvider "develappers - vllm (proxy)" "develappers-proxy" {
+              "develappers-coding" = makeModel "develappers-coding" 256000 16384;
             };
-            "vllm-workstation-nixos" = {
-              "npm" = "@ai-sdk/openai-compatible";
-              "name" = "lkshrsch - vllm (workstation-nixos)";
-              "options" = {
-                "baseURL" = "{file:${secretPath "workstation-nixos/base-url"}}";
-                "apiKey" = "{file:${secretPath "workstation-nixos/api-key"}}";
-              };
-              "models" = {
-                "google/gemma-4-E2B-it" = {
-                  "name" = "google/gemma-4-E2B-it";
-                  "limit" = {
-                    "context" = 128000;
-                    "output" = 16384;
-                  };
-                };
-                "google/gemma-4-E4B-it" = {
-                  "name" = "google/gemma-4-E4B-it";
-                  "limit" = {
-                    "context" = 128000;
-                    "output" = 16384;
-                  };
-                };
-                "RedHatAI/gemma-4-26B-A4B-it-NVFP4" = {
-                  "name" = "RedHatAI/gemma-4-26B-A4B-it-NVFP4";
-                  "limit" = {
-                    "context" = 65536;
-                    "output" = 8192;
-                  };
-                };
-              };
+            "vllm-workstation-nixos" = makeVllmProvider "lkshrsch - vllm (workstation-nixos)" "workstation-nixos" {
+              "google/gemma-4-E2B-it" = makeModel "google/gemma-4-E2B-it" 128000 16384;
+              "google/gemma-4-E4B-it" = makeModel "google/gemma-4-E4B-it" 128000 16384;
+              "RedHatAI/gemma-4-26B-A4B-it-NVFP4" = makeModel "RedHatAI/gemma-4-26B-A4B-it-NVFP4" 65536 8192;
             };
           };
         };
