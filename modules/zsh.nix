@@ -4,6 +4,10 @@ _: {
       let
         baseZshConfig =
           { pkgs, ... }:
+          let
+            ghosttyTerminfo =
+              if pkgs.stdenv.isDarwin then pkgs.unstable.ghostty-bin.terminfo else pkgs.unstable.ghostty.terminfo;
+          in
           {
             environment.shells = with pkgs; [ zsh ];
             programs = {
@@ -14,7 +18,7 @@ _: {
             # global system packages
             environment.systemPackages = with pkgs; [
               unstable.btop
-              unstable.ghostty.terminfo # infocmp -x xterm-ghostty | ssh YOUR-SERVER -- tic -x -
+              ghosttyTerminfo # infocmp -x xterm-ghostty | ssh YOUR-SERVER -- tic -x -
               pciutils
               usbutils
             ];
