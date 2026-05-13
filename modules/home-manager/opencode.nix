@@ -29,11 +29,13 @@ _: {
         package = pkgs.unstable.opencode;
         settings = {
           "plugin" = [
-            "opencode-with-claude"
-            "@tarquinen/opencode-dcp@latest"
-            "superpowers@git+https://github.com/obra/superpowers.git" # https://github.com/obra/superpowers/blob/main/docs/README.opencode.md
+            "opencode-with-claude@1.6.11"
+            "@tarquinen/opencode-dcp@3.1.12"
+            "superpowers@git+https://github.com/obra/superpowers.git#v5.1.0" # https://github.com/obra/superpowers/blob/main/docs/README.opencode.md
             # "oh-my-openagent" # https://github.com/code-yeongyu/oh-my-openagent/blob/3f30dac3f14b25911f8ed1a3c199410f8125d1b2/docs/guide/installation.md
           ];
+          "model" = "anthropic/claude-opus-4-7";
+          "small_model" = "github-copilot/gpt-5.4-mini";
           "provider" = {
             "anthropic" = {
               "options" = {
@@ -45,15 +47,19 @@ _: {
             };
             "vllm-develappers" = makeVllmProvider "develappers - vllm (local)" "develappers" {
               "develappers-coding" = makeModel "develappers-coding" 256000 16384;
+              "gemma-4-fast" = makeModel "gemma-4-fast" 256000 16384;
             };
             "vllm-develappers-proxy" = makeVllmProvider "develappers - vllm (proxy)" "develappers-proxy" {
               "develappers-coding" = makeModel "develappers-coding" 256000 16384;
+              "gemma-4-fast" = makeModel "gemma-4-fast" 256000 16384;
             };
-            "vllm-workstation-nixos" = makeVllmProvider "lkshrsch - vllm (workstation-nixos)" "workstation-nixos" {
-              "google/gemma-4-E2B-it" = makeModel "google/gemma-4-E2B-it" 128000 16384;
-              "google/gemma-4-E4B-it" = makeModel "google/gemma-4-E4B-it" 128000 16384;
-              "RedHatAI/gemma-4-26B-A4B-it-NVFP4" = makeModel "RedHatAI/gemma-4-26B-A4B-it-NVFP4" 65536 8192;
-            };
+            "vllm-workstation-nixos" =
+              makeVllmProvider "lkshrsch - vllm (workstation-nixos)" "workstation-nixos"
+                {
+                  "google/gemma-4-E2B-it" = makeModel "google/gemma-4-E2B-it" 128000 16384;
+                  "google/gemma-4-E4B-it" = makeModel "google/gemma-4-E4B-it" 128000 16384;
+                  "RedHatAI/gemma-4-26B-A4B-it-NVFP4" = makeModel "RedHatAI/gemma-4-26B-A4B-it-NVFP4" 65536 8192;
+                };
           };
         };
       };
