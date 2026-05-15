@@ -12,7 +12,7 @@
         ];
         useGlobalPkgs = true;
         useUserPackages = true;
-        backupFileExtension = ".backup";
+        backupFileExtension = "backup";
         users.${config.flake.users.owner.username}.imports = [
           (
             { lib, ... }:
