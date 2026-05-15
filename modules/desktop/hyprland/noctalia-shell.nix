@@ -321,6 +321,9 @@
                   id = "SystemMonitor";
                 }
                 {
+                  id = "plugin:netbird";
+                }
+                {
                   iconColor = "none";
                   textColor = "none";
                   id = "KeepAwake";
@@ -420,7 +423,10 @@
               enabled = true;
               sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
             };
-
+            netbird = {
+              enabled = true;
+              sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+            };
           };
           version = 2;
         };

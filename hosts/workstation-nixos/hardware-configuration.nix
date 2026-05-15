@@ -75,6 +75,8 @@ outer: {
         cpuFreqGovernor = "powersave";
       };
 
+      services.power-profiles-daemon.enable = true;
+
       fileSystems = {
         "/" = {
           device = "zroot/system/root";

@@ -53,6 +53,7 @@
       url = "github:numtide/nixos-facter-modules";
     };
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     mac-app-util = {
       url = "github:hraban/mac-app-util";
       inputs.cl-nix-lite.url = "github:r4v3n6101/cl-nix-lite/url-fix";
