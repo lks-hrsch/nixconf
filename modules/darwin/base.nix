@@ -66,6 +66,12 @@ in
               stateVersion = 6;
 
               defaults = {
+                CustomUserPreferences = {
+                  "com.apple.desktopservices" = {
+                    DSDontWriteNetworkStores = true;
+                  };
+                };
+                dock.expose-group-apps = true;
                 finder = {
                   AppleShowAllFiles = true;
                   AppleShowAllExtensions = true;
@@ -86,12 +92,9 @@ in
                   AppleShowScrollBars = "WhenScrolling";
                   AppleTemperatureUnit = "Celsius";
                 };
-                CustomUserPreferences = {
-                  "com.apple.desktopservices" = {
-                    DSDontWriteNetworkStores = true;
-                  };
-                };
+                spaces.spans-displays = false;
                 smb.NetBIOSName = lib.mkDefault config.networking.hostName;
+                universalaccess.reduceMotion = true;
               };
             };
           }

@@ -109,15 +109,12 @@ _: {
         };
 
         cursor = {
-          name = "Bibata-Modern-Classic";
-          package = pkgs.bibata-cursors;
+          name = "macOS";
+          package = pkgs.apple-cursor;
           size = 22;
         };
 
         targets = {
-          mako = {
-            enable = false; # The option definition `services.mako.extraConfig' in `/nix/store/hfig46d452pr4i0g5ks17571z38cs1il-source/modules/mako/hm.nix' no longer has any effect; please remove it. Use services.mako.settings instead.
-          };
           firefox = {
             profileNames = [ config.home.username ];
           };
@@ -126,9 +123,6 @@ _: {
               "default"
               config.home.username
             ];
-          };
-          waybar = {
-            addCss = false;
           };
           gnome.enable = pkgs.stdenv.isLinux; # Only enable GNOME theming on Linux
         };
