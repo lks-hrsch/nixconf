@@ -3,7 +3,7 @@
   flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
-      vscodeVersion = "1.119.0";
+      vscodeVersion = "1.120.0";
       vscodePackage =
         if pkgs.stdenv.hostPlatform.isDarwin then
           pkgs.unstable.vscode.overrideAttrs (old: rec {
@@ -20,7 +20,7 @@
             src = pkgs.fetchurl {
               name = "VSCode_${version}_linux-x64.tar.gz";
               url = "https://update.code.visualstudio.com/${version}/linux-x64/stable";
-              sha256 = "sha256-HcZIRGB0y8U5huxXN9jNrhMD0Jjmn+QNUU60EHGduXo=";
+              sha256 = "sha256-UQQm6yPTML8l2E/ojkmgjZZdayGVe4Lhlq98z3vdiCs=";
             };
           });
       marketplace = pkgs.vscode-marketplace-release;
@@ -84,8 +84,6 @@
           };
         };
 
-        "chat.disableAIFeatures" = false;
-
         "github.gitProtocol" = "ssh";
 
         "github.copilot.chat.rateLimitAutoSwitchToAuto" = true;
@@ -100,12 +98,14 @@
         "github.copilot.chat.switchAgent.enabled" = true;
         "github.copilot.chat.agent.backgroundTodoAgent.enabled" = true;
 
+        "chat.disableAIFeatures" = false;
         "chat.mcp.gallery.enabled" = true;
         "chat.mcp.discovery.enabled" = {
           "claude-desktop" = true;
           "cursor-global" = true;
           "cursor-workspace" = true;
         };
+        "chat.tools.compressOutput.enabled" = true;
 
         "claudeCode.hideOnboarding" = true;
         "claudeCode.useTerminal" = true;

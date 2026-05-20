@@ -182,7 +182,7 @@
                       hideUnoccupied = false;
                       iconScale = 0.75;
                       id = "Workspace";
-                      labelMode = "index";
+                      labelMode = "name";
                       occupiedColor = "secondary";
                       pillSize = 0.6;
                       showApplications = true;
@@ -259,7 +259,7 @@
                   groupedBorderOpacity = 1;
                   hideUnoccupied = false;
                   iconScale = 0.75;
-                  labelMode = "index";
+                  labelMode = "name";
                   occupiedColor = "secondary";
                   pillSize = 0.6;
                   showApplications = true;

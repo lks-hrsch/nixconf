@@ -2,6 +2,27 @@
 {
   flake.modules.homeManager.desktop-hyprland-hyprland =
     { pkgs, ... }:
+    let
+      # Switch to workspace N on DP-3, or L<N> on DP-2, depending on focused monitor
+      hypr-ws-switch = pkgs.writeShellScript "hypr-ws-switch" ''
+        ws=$1
+        mon=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .name')
+        if [ "$mon" = "DP-3" ]; then
+          hyprctl dispatch workspace "$ws"
+        else
+          hyprctl dispatch workspace "name:L$ws"
+        fi
+      '';
+      hypr-ws-move = pkgs.writeShellScript "hypr-ws-move" ''
+        ws=$1
+        mon=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .name')
+        if [ "$mon" = "DP-3" ]; then
+          hyprctl dispatch movetoworkspace "$ws"
+        else
+          hyprctl dispatch movetoworkspace "name:L$ws"
+        fi
+      '';
+    in
     {
 
       # install extra packages
@@ -80,21 +101,31 @@
           };
 
           dwindle = {
-            pseudotile = "yes"; # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
             preserve_split = "yes"; # you probably want this
           };
 
-          # define workspaces
+          # define workspaces — 1–9 on DP-3, L1–L9 (IDs 11–19) on DP-2
           workspace = [
+            # main (center) monitor
             "1, monitor:DP-3, default:true"
             "2, monitor:DP-3"
             "3, monitor:DP-3"
             "4, monitor:DP-3"
             "5, monitor:DP-3"
             "6, monitor:DP-3"
-            "7, monitor:DP-2, default:true"
-            "8, monitor:DP-2"
-            "9, monitor:DP-2"
+            "7, monitor:DP-3"
+            "8, monitor:DP-3"
+            "9, monitor:DP-3"
+            # left monitor
+            "name:L1, monitor:DP-2, default:true"
+            "name:L2, monitor:DP-2"
+            "name:L3, monitor:DP-2"
+            "name:L4, monitor:DP-2"
+            "name:L5, monitor:DP-2"
+            "name:L6, monitor:DP-2"
+            "name:L7, monitor:DP-2"
+            "name:L8, monitor:DP-2"
+            "name:L9, monitor:DP-2"
           ];
 
           bind = [
@@ -110,7 +141,7 @@
             "$mod CTRL, F, fullscreen,"
             "$mod SHIFT, F, togglefloating,"
             "$mod, P, pseudo," # dwindle
-            "$mod, J, togglesplit," # dwindle
+            "$mod, J, layoutmsg, togglesplit," # dwindle
 
             # clipboard history (via Noctalia launcher)
             "$mod ALT, C, exec, $ipc launcher clipboard"
@@ -125,8 +156,8 @@
             "CTRL, right, workspace, m+1"
           ]
           ++ (
-            # workspaces
-            # binds $mod + [shift +] {1..9} to [move to] workspace {1..9}
+            # CTRL+1-9 → workspace N on focused monitor (DP-3: 1-9, DP-2: L1-L9)
+            # CTRL+SHIFT+1-9 → move window to workspace N on focused monitor
             builtins.concatLists (
               builtins.genList (
                 i:
@@ -134,8 +165,8 @@
                   ws = i + 1;
                 in
                 [
-                  "CTRL, code:1${toString i}, workspace, ${toString ws}"
-                  "CTRL SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
+                  "CTRL, code:1${toString i}, exec, ${hypr-ws-switch} ${toString ws}"
+                  "CTRL SHIFT, code:1${toString i}, exec, ${hypr-ws-move} ${toString ws}"
                 ]
               ) 9
             )

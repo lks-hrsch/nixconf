@@ -33,6 +33,7 @@
         networkmanager = {
           enable = true;
           wifi.powersave = true;
+          plugins = [ pkgs.networkmanager-openvpn ];
         };
         firewall.allowedTCPPorts = [ 27040 ];
       };
@@ -113,6 +114,7 @@
         gnugrep
         dig
         nv-fan-control
+        unstable.eduvpn-client
       ];
 
       systemd.services.nvidia-fan-startup = {
