@@ -91,6 +91,7 @@ in
                   AppleShowAllFiles = true;
                   AppleShowScrollBars = "WhenScrolling";
                   AppleTemperatureUnit = "Celsius";
+                  _HIHideMenuBar = false;
                 };
                 spaces.spans-displays = false;
                 smb.NetBIOSName = lib.mkDefault config.networking.hostName;

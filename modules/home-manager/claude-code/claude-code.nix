@@ -86,6 +86,11 @@ _: {
         };
       };
 
+      programs.zsh.shellAliases = {
+        claude-office = "ANTHROPIC_BASE_URL=https://llm.develappers-intranet.de:11434 ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast claude";
+        claude-ollama = "ANTHROPIC_BASE_URL=http://localhost:11434 ANTHROPIC_MODEL=qwen3.6:27b ANTHROPIC_CUSTOM_MODEL_OPTION=gemma4:26b claude";
+      };
+
       home.file.".claude/statusline-command.sh" = {
         text = builtins.readFile ./statusline-command.sh;
         executable = true;
