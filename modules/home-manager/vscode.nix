@@ -3,7 +3,7 @@
   flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
-      vscodeVersion = "1.120.0";
+      vscodeVersion = "1.121.0";
       vscodePackage =
         if pkgs.stdenv.hostPlatform.isDarwin then
           pkgs.unstable.vscode.overrideAttrs (old: rec {
@@ -20,7 +20,7 @@
             src = pkgs.fetchurl {
               name = "VSCode_${version}_linux-x64.tar.gz";
               url = "https://update.code.visualstudio.com/${version}/linux-x64/stable";
-              sha256 = "sha256-UQQm6yPTML8l2E/ojkmgjZZdayGVe4Lhlq98z3vdiCs=";
+              sha256 = "sha256-jPJMxBRBRT4R6P4a6eWNMpcOI9ztOZg1xLCQQmPWaCA=";
             };
           });
       marketplace = pkgs.vscode-marketplace-release;
