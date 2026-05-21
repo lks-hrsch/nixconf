@@ -71,7 +71,11 @@ in
                     DSDontWriteNetworkStores = true;
                   };
                 };
-                dock.expose-group-apps = true;
+                dock = {
+                  expose-group-apps = true;
+                  launchanim = false;
+                  mru-spaces = false;
+                };
                 finder = {
                   AppleShowAllFiles = true;
                   AppleShowAllExtensions = true;
@@ -96,6 +100,9 @@ in
                 spaces.spans-displays = false;
                 smb.NetBIOSName = lib.mkDefault config.networking.hostName;
                 universalaccess.reduceMotion = true;
+                WindowManager = {
+                  EnableStandardClickToShowDesktop = false;
+                };
               };
             };
           }

@@ -11,7 +11,7 @@
             src = pkgs.fetchurl {
               name = "VSCode_${version}_darwin-arm64.zip";
               url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
-              sha256 = "sha256-8ixVOUe4EcNX/z0jnux1hXOhnG1JuhbssH2BARqU80o=";
+              sha256 = "sha256-3XKpLgJDH8CDf7BzIdFG8ApxxeYqh+ZiPzTL/oYMgrc=";
             };
           })
         else
