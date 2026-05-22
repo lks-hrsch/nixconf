@@ -5,6 +5,7 @@
 outer: {
   configurations.nixos."workstation-nixos".module =
     {
+      pkgs,
       config,
       lib,
       modulesPath,
@@ -55,6 +56,7 @@ outer: {
 
         kernelParams = [
           "acpi_enforce_resources=lax"
+          "acpi_osi=\"!Windows 2015\""
           "amd_pstate=active"
           "nvidia_drm.modeset=1"
           "nvidia.NVreg_PreserveVideoMemoryAllocations=1"

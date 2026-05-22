@@ -283,6 +283,8 @@
                     "Fcitx"
                     "spotify-client"
                     "ibus-ui-gtk3"
+                    "librepods"
+                    "Battery Status: Left: 80%, Right: 80%, Case: 0%"
                   ];
                   id = "Tray";
                 }
@@ -366,6 +368,13 @@
           # Dock configuration (disabled)
           dock = {
             enabled = false;
+          };
+
+          # network settings
+          network = {
+            bluetoothHideUnnamedDevices = true;
+            disableDiscoverability = true;
+            bluetoothAutoConnect = true;
           };
 
           # General settings
@@ -452,6 +461,7 @@
         # Auto-start Noctalia Shell
         exec-once = [
           "uwsm app -- noctalia-shell"
+          "uwsm app -- librepods"
         ];
         layerrule = [
           "blur on, match:namespace noctalia-background-.*$"

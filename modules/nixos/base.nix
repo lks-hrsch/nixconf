@@ -6,8 +6,10 @@
 }:
 {
   flake.modules.nixos.base =
-    { ... }:
+    { pkgs, lib, ... }:
     {
+      boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_6_18;
+
       imports = [
         config.flake.modules.nixos.internationalisation
         config.flake.modules.nixos.nixvim
