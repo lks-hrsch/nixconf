@@ -461,7 +461,6 @@
         # Auto-start Noctalia Shell
         exec-once = [
           "uwsm app -- noctalia-shell"
-          "uwsm app -- librepods"
         ];
         layerrule = [
           "blur on, match:namespace noctalia-background-.*$"

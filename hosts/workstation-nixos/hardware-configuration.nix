@@ -59,7 +59,9 @@ outer: {
           "acpi_osi=\"!Windows 2015\""
           "amd_pstate=active"
           "nvidia_drm.modeset=1"
-          "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+          # Override the default /tmp (tmpfs, RAM-backed) with /var/tmp (ZFS, disk-backed) so the
+          # VRAM dump on suspend doesn't compete with system RAM when the GPU has large allocations.
+          "nvidia.NVreg_TemporaryFilePath=/var/tmp"
           "zfs.zfs_arc_max=4294967296" # 4 GiB https://nixos.wiki/wiki/ZFS
           "zfs.zfs_prefetch_disable=1"
           "ip=192.168.1.40::192.168.1.1:255.255.255.0:workstation-nixos::none"

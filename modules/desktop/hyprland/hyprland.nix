@@ -47,6 +47,7 @@
           exec-once = [
             "uwsm app -- ibus start --type wayland"
             "uwsm app -- 1password --silent"
+            "uwsm app -- librepods --hide"
           ];
 
           monitor = [
