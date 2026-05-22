@@ -1,7 +1,12 @@
-{ config, lib, ... }:
+{ ... }:
 {
   flake.modules.nixos.alloy =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.alloy;
 
@@ -43,7 +48,8 @@
             action   = "drop"
           }
         }
-      '' + lib.optionalString cfg.collectPodman ''
+      ''
+      + lib.optionalString cfg.collectPodman ''
 
         // Podman containers via Docker-compatible socket. Provides richer
         // labels (container, image) than the journal.
@@ -83,7 +89,8 @@
             action   = "drop"
           }
         }
-      '' + ''
+      ''
+      + ''
 
         // ---------- Sink ----------
 
