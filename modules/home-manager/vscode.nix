@@ -120,6 +120,10 @@
         # for MCP
         uv
         nodejs_24
+
+        # for Python
+        unstable.pyrefly
+        unstable.ruff
       ];
 
       programs = {
@@ -155,6 +159,7 @@
                   ms-python.python
                   ms-python.vscode-pylance
                   ms-python.debugpy
+                  meta.pyrefly
                   charliermarsh.ruff
                   ms-toolsai.jupyter
                   ms-toolsai.jupyter-keymap

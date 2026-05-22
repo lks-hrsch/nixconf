@@ -36,6 +36,16 @@ _: {
           ];
           "model" = "anthropic/claude-opus-4-7";
           "small_model" = "github-copilot/gpt-5.4-mini";
+          "lsp" = {
+            "pyrefly" = {
+              "command" = [ "pyrefly" "lsp" ];
+              "extensions" = [ ".py" ".pyi" ];
+            };
+            "ruff" = {
+              "command" = [ "ruff" "server" ];
+              "extensions" = [ ".py" ".pyi" ];
+            };
+          };
           "provider" = {
             "anthropic" = {
               "options" = {

@@ -26,11 +26,12 @@ _: {
             url = "https://mcp.grep.app";
             description = "Code search across public GitHub repositories with caching & batch operations";
           };
+          # https://github.com/bitbonsai/mcpvault
           obsidian = {
             type = "stdio";
             command = "npx";
             args = [
-              "@mauricio.wolff/mcp-obsidian@latest"
+              "@bitbonsai/mcpvault@latest"
               "${config.home.homeDirectory}/Obsidian.nosync/private"
             ];
             description = "Secure access to local Obsidian vault for notes management";

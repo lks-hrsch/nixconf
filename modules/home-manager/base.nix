@@ -23,6 +23,7 @@
         mcp
         obsidian
         podman
+        skills
         zsh
         sops
         ssh
