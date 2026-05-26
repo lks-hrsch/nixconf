@@ -13,13 +13,13 @@
     { ... }:
     {
       imports = with config.flake.modules.homeManager; [
+        bruno
         claude-code
         ghostty
         firefox
         git
         gpg
         latex
-        manual
         mcp
         obsidian
         podman
