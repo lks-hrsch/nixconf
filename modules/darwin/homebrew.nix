@@ -19,12 +19,14 @@ _: {
 
       taps = [
         "tw93/tap" # for mole
+        "steipete/tap"
       ];
 
       # CLI tools (formulae)
       brews = [
         "helm"
         "mas" # https://github.com/mas-cli/mas
+        "steipete/tap/remindctl"
         "tw93/tap/mole" # https://github.com/tw93/Mole
       ];
 
