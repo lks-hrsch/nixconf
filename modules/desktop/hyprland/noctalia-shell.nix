@@ -1,13 +1,12 @@
 { inputs, config, ... }:
 let
-  location = config.repo.constants.location;
+  inherit (config.repo.constants) location;
 in
 {
   flake.modules.homeManager.desktop-hyprland-noctalia-shell =
     { pkgs, lib, osConfig, config, ... }:
     let
-      primary = osConfig.desktop.monitors.primary;
-      secondary = osConfig.desktop.monitors.secondary;
+      inherit (osConfig.desktop.monitors) primary secondary;
     in
     {
       imports = [
@@ -291,7 +290,6 @@ in
                     "spotify-client"
                     "ibus-ui-gtk3"
                     "librepods"
-                    "Battery Status: Left: 80%, Right: 80%, Case: 0%"
                   ];
                   id = "Tray";
                 }

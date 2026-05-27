@@ -26,49 +26,6 @@
           )
           config.flake.modules.homeManager.base
           config.flake.modules.homeManager.desktop
-          config.flake.modules.homeManager.desktop-apps-obsstudio
-          config.flake.modules.homeManager.desktop-apps-thunderbird
-          config.flake.modules.homeManager.desktop-hyprland-uwsm-env
-          config.flake.modules.homeManager.desktop-hyprland-cliphist
-          config.flake.modules.homeManager.desktop-hyprland-hyprland
-          config.flake.modules.homeManager.desktop-hyprland-noctalia-shell
-
-          (
-            { pkgs, ... }:
-            {
-              home.packages = with pkgs; [
-                nautilus
-                pavucontrol
-                pkg-config
-                rustdesk
-                osu-lazer
-                gimp3
-
-                # some dependencies
-                gtk3
-                qt5.qtbase
-
-                # dev tools
-                nasm # nasm compiler
-                gnumake # GNU make
-                cmake
-                ninja
-                clang
-                clang-tools
-
-                # cudatoolkit
-                linuxPackages.nvidia_x11
-
-                # dev virtualization
-                grub2
-                libisoburn
-                qemu
-
-                # extra tools
-                fio
-              ];
-            }
-          )
         ];
       };
     };

@@ -3,8 +3,7 @@
   flake.modules.homeManager.desktop-hyprland-hyprland =
     { pkgs, osConfig, ... }:
     let
-      primary = osConfig.desktop.monitors.primary;
-      secondary = osConfig.desktop.monitors.secondary;
+      inherit (osConfig.desktop.monitors) primary secondary;
 
       # Switch to workspace N on primary monitor, or L<N> on secondary
       hypr-ws-switch = pkgs.writeShellScript "hypr-ws-switch" ''

@@ -1,5 +1,5 @@
 _: {
-  flake.modules.homeManager.desktop-apps-obsstudio = _: {
+  flake.modules.homeManager.obsstudio = _: {
     programs.obs-studio = {
       enable = true;
     };

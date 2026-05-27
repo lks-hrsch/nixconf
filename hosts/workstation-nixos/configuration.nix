@@ -171,5 +171,38 @@
       # For more information, see `man configuration.nix` or:
       # https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion
       system.stateVersion = "24.11";
+
+      home-manager.users.${config.flake.users.owner.username}.imports = [
+        (
+          { pkgs, ... }:
+          {
+            home.packages = with pkgs; [
+              pkg-config
+              rustdesk
+              osu-lazer
+              gimp3
+
+              # dev tools
+              # nasm # nasm compiler
+              # gnumake # GNU make
+              # cmake
+              # ninja
+              # clang
+              # clang-tools
+
+              # cudatoolkit
+              linuxPackages.nvidia_x11
+
+              # dev virtualization
+              # grub2
+              # libisoburn
+              # qemu
+
+              # extra tools
+              fio
+            ];
+          }
+        )
+      ];
     };
 }

@@ -179,8 +179,8 @@
                     mktplcRef = {
                       publisher = "ms-playwright";
                       name = "playwright";
-                      version = "1.1.17";
-                      sha256 = "1w3gih8igk3hairqi90pd919rqf4vadk0mm49xs92k7kp3v15158";
+                      version = "1.1.19";
+                      sha256 = "1xppas4qla2bsppb89ks4mnrby2g3gra4irabnimkcmaz4m3wr9p";
                     };
                   })
                 ];

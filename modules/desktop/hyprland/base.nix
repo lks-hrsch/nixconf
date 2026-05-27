@@ -40,6 +40,14 @@
         dconf.enable = true;
         xwayland.enable = true;
       };
+
+      home-manager.users.${config.flake.users.owner.username}.imports =
+        with config.flake.modules.homeManager; [
+          desktop-hyprland-cliphist
+          desktop-hyprland-hyprland
+          desktop-hyprland-noctalia-shell
+          desktop-hyprland-uwsm-env
+        ];
     };
 
 }

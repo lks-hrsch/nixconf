@@ -1,4 +1,5 @@
-{ config, ... }: {
+{ config, ... }:
+{
   flake.modules.nixos.desktop =
     { pkgs, lib, ... }:
     {
@@ -42,6 +43,15 @@
             "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
           ];
         };
+
+        environment.systemPackages = with pkgs; [
+          nautilus # file manager
+          pavucontrol # sound
+
+          # some dependencies
+          gtk3
+          qt5.qtbase
+        ];
       };
     };
 
@@ -54,6 +64,8 @@
         firefox
         obsidian
         vscode
+        obsstudio
+        thunderbird
       ];
 
       xdg = {
