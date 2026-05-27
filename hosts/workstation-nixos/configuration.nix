@@ -27,6 +27,11 @@
 
       nixpkgs.config.cudaSupport = true;
 
+      desktop.monitors = {
+        primary = "DP-3";
+        secondary = "DP-2";
+      };
+
       networking = {
         hostName = "workstation-nixos";
         hostId = "99c58a86"; # head -c 8 /etc/machine-id

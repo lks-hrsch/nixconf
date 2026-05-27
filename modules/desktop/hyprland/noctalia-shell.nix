@@ -1,7 +1,14 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
+let
+  location = config.repo.constants.location;
+in
 {
   flake.modules.homeManager.desktop-hyprland-noctalia-shell =
-    { pkgs, lib, ... }:
+    { pkgs, lib, osConfig, config, ... }:
+    let
+      primary = osConfig.desktop.monitors.primary;
+      secondary = osConfig.desktop.monitors.secondary;
+    in
     {
       imports = [
         inputs.noctalia.homeModules.default
@@ -57,9 +64,9 @@
             };
           };
 
-          # Location configuration (Dresden, Germany)
+          # Location configuration
           location = {
-            name = "Dresden, Germany";
+            name = location;
             showWeekNumberInCalendar = true;
             autoLocate = false;
           };
@@ -149,25 +156,25 @@
           # Wallpaper configuration (replaces hyprpaper)
           wallpaper = {
             enabled = true;
-            directory = "/etc/nixos/wallpaper";
+            directory = toString ../../../wallpaper;
           };
 
           # Bar configuration
           bar = {
             barType = "floating";
             monitors = [
-              "DP-2"
-              "DP-3"
+              secondary
+              primary
             ];
             screenOverrides = [
               {
                 enabled = false;
-                name = "DP-3";
+                name = primary;
                 widgets = null;
               }
               {
                 enabled = true;
-                name = "DP-2";
+                name = secondary;
                 widgets = {
                   center = [
                     {
@@ -379,7 +386,7 @@
 
           # General settings
           general = {
-            avatarImage = "/home/lkshrsch/.face";
+            avatarImage = "${config.home.homeDirectory}/.face";
             animationDisabled = true;
             dimmerOpacity = 0;
             enableShadows = false;

@@ -1,33 +1,47 @@
 { config, ... }: {
   flake.modules.nixos.desktop =
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
     {
-      i18n.inputMethod = {
-        enable = true;
-        type = "ibus";
-        ibus.engines = [ pkgs.ibus-engines.mozc ];
+      options.desktop.monitors = {
+        primary = lib.mkOption {
+          type = lib.types.str;
+          description = "Primary monitor connector name (e.g. \"DP-3\").";
+        };
+        secondary = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = null;
+          description = "Optional secondary monitor connector name (e.g. \"DP-2\").";
+        };
       };
 
-      services.gnome.gnome-keyring.enable = true;
+      config = {
+        i18n.inputMethod = {
+          enable = true;
+          type = "ibus";
+          ibus.engines = [ pkgs.ibus-engines.mozc ];
+        };
 
-      nixpkgs.overlays = [
-        config.repo.overlays.firefox-addons
-        config.repo.overlays.nix-vscode-extensions
-      ];
+        services.gnome.gnome-keyring.enable = true;
 
-      nix.settings = {
-        substituters = [
-          "https://hyprland.cachix.org"
-          "https://noctalia.cachix.org"
-          "https://cache.nixos-cuda.org"
-          "https://cuda-maintainers.cachix.org"
+        nixpkgs.overlays = [
+          config.repo.overlays.firefox-addons
+          config.repo.overlays.nix-vscode-extensions
         ];
-        trusted-public-keys = [
-          "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-          "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
-          "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
-          "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
-        ];
+
+        nix.settings = {
+          substituters = [
+            "https://hyprland.cachix.org"
+            "https://noctalia.cachix.org"
+            "https://cache.nixos-cuda.org"
+            "https://cuda-maintainers.cachix.org"
+          ];
+          trusted-public-keys = [
+            "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+            "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+            "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
+            "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+          ];
+        };
       };
     };
 

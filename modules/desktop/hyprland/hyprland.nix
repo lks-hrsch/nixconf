@@ -1,13 +1,16 @@
 { inputs, ... }:
 {
   flake.modules.homeManager.desktop-hyprland-hyprland =
-    { pkgs, ... }:
+    { pkgs, osConfig, ... }:
     let
-      # Switch to workspace N on DP-3, or L<N> on DP-2, depending on focused monitor
+      primary = osConfig.desktop.monitors.primary;
+      secondary = osConfig.desktop.monitors.secondary;
+
+      # Switch to workspace N on primary monitor, or L<N> on secondary
       hypr-ws-switch = pkgs.writeShellScript "hypr-ws-switch" ''
         ws=$1
         mon=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .name')
-        if [ "$mon" = "DP-3" ]; then
+        if [ "$mon" = "${primary}" ]; then
           hyprctl dispatch workspace "$ws"
         else
           hyprctl dispatch workspace "name:L$ws"
@@ -16,7 +19,7 @@
       hypr-ws-move = pkgs.writeShellScript "hypr-ws-move" ''
         ws=$1
         mon=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .name')
-        if [ "$mon" = "DP-3" ]; then
+        if [ "$mon" = "${primary}" ]; then
           hyprctl dispatch movetoworkspace "$ws"
         else
           hyprctl dispatch movetoworkspace "name:L$ws"
@@ -51,8 +54,8 @@
           ];
 
           monitor = [
-            "DP-3,highrr,auto,1,vrr,2"
-            "DP-2,highres,auto-left,1,transform,1,vrr,2"
+            "${primary},highrr,auto,1,vrr,2"
+            "${secondary},highres,auto-left,1,transform,1,vrr,2"
           ];
 
           windowrule = [
@@ -105,28 +108,28 @@
             preserve_split = "yes"; # you probably want this
           };
 
-          # define workspaces — 1–9 on DP-3, L1–L9 (IDs 11–19) on DP-2
+          # define workspaces — 1–9 on primary, L1–L9 (IDs 11–19) on secondary
           workspace = [
             # main (center) monitor
-            "1, monitor:DP-3, default:true"
-            "2, monitor:DP-3"
-            "3, monitor:DP-3"
-            "4, monitor:DP-3"
-            "5, monitor:DP-3"
-            "6, monitor:DP-3"
-            "7, monitor:DP-3"
-            "8, monitor:DP-3"
-            "9, monitor:DP-3"
+            "1, monitor:${primary}, default:true"
+            "2, monitor:${primary}"
+            "3, monitor:${primary}"
+            "4, monitor:${primary}"
+            "5, monitor:${primary}"
+            "6, monitor:${primary}"
+            "7, monitor:${primary}"
+            "8, monitor:${primary}"
+            "9, monitor:${primary}"
             # left monitor
-            "name:L1, monitor:DP-2, default:true"
-            "name:L2, monitor:DP-2"
-            "name:L3, monitor:DP-2"
-            "name:L4, monitor:DP-2"
-            "name:L5, monitor:DP-2"
-            "name:L6, monitor:DP-2"
-            "name:L7, monitor:DP-2"
-            "name:L8, monitor:DP-2"
-            "name:L9, monitor:DP-2"
+            "name:L1, monitor:${secondary}, default:true"
+            "name:L2, monitor:${secondary}"
+            "name:L3, monitor:${secondary}"
+            "name:L4, monitor:${secondary}"
+            "name:L5, monitor:${secondary}"
+            "name:L6, monitor:${secondary}"
+            "name:L7, monitor:${secondary}"
+            "name:L8, monitor:${secondary}"
+            "name:L9, monitor:${secondary}"
           ];
 
           bind = [
@@ -157,7 +160,7 @@
             "CTRL, right, workspace, m+1"
           ]
           ++ (
-            # CTRL+1-9 → workspace N on focused monitor (DP-3: 1-9, DP-2: L1-L9)
+            # CTRL+1-9 → workspace N on focused monitor (primary: 1-9, secondary: L1-L9)
             # CTRL+SHIFT+1-9 → move window to workspace N on focused monitor
             builtins.concatLists (
               builtins.genList (
