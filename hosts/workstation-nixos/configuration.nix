@@ -33,6 +33,7 @@
         useNetworkd = true;
         networkmanager = {
           enable = true;
+          dns = "systemd-resolved";
           wifi.powersave = true;
           plugins = [ pkgs.networkmanager-openvpn ];
         };

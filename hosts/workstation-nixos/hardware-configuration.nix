@@ -2,7 +2,11 @@
 ## and may be overwritten by future invocations.  Please make changes
 ## to /etc/nixos/configuration.nix instead.
 
-outer: {
+{ config, ... }:
+let
+  sshKey = config.repo.constants.sshPublicKey;
+in
+{
   configurations.nixos."workstation-nixos".module =
     {
       pkgs,
@@ -15,6 +19,12 @@ outer: {
       imports = [
         (modulesPath + "/installer/scan/not-detected.nix")
       ];
+
+      facter.reportPath =
+        if builtins.pathExists ./facter.json then
+          ./facter.json
+        else
+          throw "Missing hosts/workstation-nixos/facter.json. Run: sudo nix run github:numtide/nixos-facter -- -o hosts/workstation-nixos/facter.json";
 
       boot = {
         initrd = {
@@ -39,7 +49,7 @@ outer: {
               enable = true;
               port = 2222; # connect with: ssh -p 2222 root@<initrd-ip>
               hostKeys = [ "/etc/ssh/ssh_host_ed25519_key" ];
-              authorizedKeys = [ outer.config.repo.constants.sshPublicKey ];
+              authorizedKeys = [ sshKey ];
               # shell = "/bin/cryptsetup-askpass";
             };
             udhcpc.enable = false;
