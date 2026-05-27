@@ -13,33 +13,35 @@ _: {
         "${modulesPath}/virtualisation/lxc-container.nix"
       ];
 
-      nix.settings.sandbox = false;
+      config = {
+        nix.settings.sandbox = false;
 
-      networking = {
-        dhcpcd.enable = false;
-        useDHCP = false;
-        useHostResolvConf = false;
-        firewall.enable = true;
-      };
-
-      systemd.network = {
-        enable = true;
-        networks."50-eth0" = {
-          matchConfig.Name = "eth0";
-          networkConfig = {
-            Address = config.marsLxc.ip;
-            Gateway = "192.168.1.1";
-            DNS = [
-              "192.168.1.1"
-              "5.45.99.133" # mercury.lukashirsch.de
-              "85.209.49.247" # earth.staudenstuebler.de
-            ];
-            IPv6AcceptRA = true;
-          };
-          linkConfig.RequiredForOnline = "routable";
+        networking = {
+          dhcpcd.enable = false;
+          useDHCP = false;
+          useHostResolvConf = false;
+          firewall.enable = true;
         };
-      };
 
-      system.stateVersion = "25.05";
+        systemd.network = {
+          enable = true;
+          networks."50-eth0" = {
+            matchConfig.Name = "eth0";
+            networkConfig = {
+              Address = config.marsLxc.ip;
+              Gateway = "192.168.1.1";
+              DNS = [
+                "192.168.1.1"
+                "5.45.99.133" # mercury.lukashirsch.de
+                "85.209.49.247" # earth.staudenstuebler.de
+              ];
+              IPv6AcceptRA = true;
+            };
+            linkConfig.RequiredForOnline = "routable";
+          };
+        };
+
+        system.stateVersion = "25.05";
+      };
     };
 }

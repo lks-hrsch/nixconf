@@ -1,4 +1,4 @@
-_: {
+{ config, ... }: {
   flake.modules.nixos.desktop =
     { pkgs, ... }:
     {
@@ -9,11 +9,39 @@ _: {
       };
 
       services.gnome.gnome-keyring.enable = true;
+
+      nixpkgs.overlays = [
+        config.repo.overlays.firefox-addons
+        config.repo.overlays.nix-vscode-extensions
+      ];
+
+      nix.settings = {
+        substituters = [
+          "https://hyprland.cachix.org"
+          "https://noctalia.cachix.org"
+          "https://cache.nixos-cuda.org"
+          "https://cuda-maintainers.cachix.org"
+        ];
+        trusted-public-keys = [
+          "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+          "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+          "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
+          "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+        ];
+      };
     };
 
   flake.modules.homeManager.desktop =
-    { lib, osConfig, ... }:
+    { lib, ... }:
     {
+      imports = with config.flake.modules.homeManager; [
+        bruno
+        ghostty
+        firefox
+        obsidian
+        vscode
+      ];
+
       xdg = {
         enable = true;
         userDirs = {

@@ -26,6 +26,7 @@
             }
           )
           config.flake.modules.homeManager.base
+          config.flake.modules.homeManager.desktop
         ];
       };
     };
