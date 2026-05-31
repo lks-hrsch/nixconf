@@ -87,9 +87,60 @@ git-crypt unlock
 SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt sops secrets/secrets.yaml
 ```
 
+## updating claude-code
+
+`overlays/claude-code-manifest.json` pins the version. To bump it, fetch the
+new manifest from the official CDN and commit it:
+
+``` bash
+# pin a specific version
+curl -fsSL \
+  "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.158/manifest.json" \
+  > overlays/claude-code-manifest.json
+
+# or track the upstream 'stable' pointer
+VER=$(curl -fsSL "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/stable")
+curl -fsSL "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${VER}/manifest.json" \
+  > overlays/claude-code-manifest.json
+```
+
+No hash juggling needed — all platform checksums are inside the manifest.
+Then rebuild as normal (`sudo nixos-rebuild switch ...` or `darwin-rebuild switch ...`).
+
+## updating opencode
+
+`overlays/opencode-manifest.json` pins the version. Binary releases are fetched
+from the anomalyco/opencode GitHub releases. Updating requires computing hashes
+for each platform tarball/zip:
+
+``` bash
+VER=1.15.XX   # new version
+BASE="https://github.com/anomalyco/opencode/releases/download/v${VER}"
+for ASSET in opencode-linux-x64.tar.gz opencode-linux-arm64.tar.gz opencode-darwin-arm64.zip; do
+  echo "${ASSET}:"
+  nix-prefetch-url "${BASE}/${ASSET}" 2>/dev/null | xargs -I{} nix hash convert --hash-algo sha256 --from nix32 {}
+done
+# paste sha256 values into overlays/opencode-manifest.json
+```
+
+## updating vscode
+
+`overlays/vscode-manifest.json` pins the version. Updating requires computing
+hashes for each platform archive:
+
+``` bash
+VER=1.122.X   # new version
+for PLAT in linux-x64 linux-arm64 darwin-arm64; do
+  echo "${PLAT}:"
+  nix-prefetch-url "https://update.code.visualstudio.com/${VER}/${PLAT}/stable" 2>/dev/null \
+    | xargs -I{} nix hash convert --hash-algo sha256 --from nix32 {}
+done
+# paste sha256 values into overlays/vscode-manifest.json
+```
+
 ## linting
 
-```
+``` bash
 ❯ nix run nixpkgs#statix -- check overlays
 ❯ nix run nixpkgs#statix -- fix overlays  
 ```

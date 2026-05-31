@@ -3,26 +3,6 @@
   flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
-      vscodeVersion = "1.121.0";
-      vscodePackage =
-        if pkgs.stdenv.hostPlatform.isDarwin then
-          pkgs.unstable.vscode.overrideAttrs (old: rec {
-            version = vscodeVersion;
-            src = pkgs.fetchurl {
-              name = "VSCode_${version}_darwin-arm64.zip";
-              url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
-              sha256 = "sha256-3XKpLgJDH8CDf7BzIdFG8ApxxeYqh+ZiPzTL/oYMgrc=";
-            };
-          })
-        else
-          pkgs.unstable.vscode.overrideAttrs (old: rec {
-            version = vscodeVersion;
-            src = pkgs.fetchurl {
-              name = "VSCode_${version}_linux-x64.tar.gz";
-              url = "https://update.code.visualstudio.com/${version}/linux-x64/stable";
-              sha256 = "sha256-jPJMxBRBRT4R6P4a6eWNMpcOI9ztOZg1xLCQQmPWaCA=";
-            };
-          });
       marketplace = pkgs.vscode-marketplace-release;
 
       # extensions for all profiles
@@ -133,7 +113,7 @@
 
         vscode = {
           enable = true;
-          package = vscodePackage;
+          package = pkgs.unstable.vscode;
 
           profiles = {
             default = {
