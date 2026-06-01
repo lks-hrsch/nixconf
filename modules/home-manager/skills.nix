@@ -10,6 +10,8 @@ _: {
     let
       cfg = config.programs.skills;
 
+      enabledSkills = lib.filterAttrs (_: s: s.enable) cfg.skills;
+
       mkSkillPath =
         skill:
         let
@@ -24,14 +26,16 @@ _: {
         in
         if skill.subdir == "." then fetched else "${fetched}/${skill.subdir}";
 
-      mkHomeFiles =
+      # Produces an attrset suitable for home.file or xdg.configFile, using
+      # baseDir as the relative prefix (e.g. ".claude/skills" or "opencode/skills").
+      mkSkillFiles =
         baseDir:
         lib.mapAttrs' (
           name: skill:
           lib.nameValuePair "${baseDir}/${name}" {
             source = mkSkillPath skill;
           }
-        ) cfg.skills;
+        ) enabledSkills;
     in
     {
       options.programs.skills = {
@@ -41,7 +45,7 @@ _: {
           default = { };
           description = ''
             Attrset of agent skills, each materialised as a symlink at
-            ~/.claude/skills/<name> and ~/.config/opencode/skills/<name>.
+            ~/.claude/skills/<name> and $XDG_CONFIG_HOME/opencode/skills/<name>.
 
             To add a skill:
               1. nix run nixpkgs#nix-prefetch-github -- <owner> <repo>
@@ -51,6 +55,9 @@ _: {
           type = lib.types.attrsOf (
             lib.types.submodule {
               options = {
+                enable = lib.mkEnableOption "this skill" // {
+                  default = true;
+                };
                 src = lib.mkOption {
                   description = "GitHub source pin.";
                   type = lib.types.submodule {
@@ -69,10 +76,6 @@ _: {
                   type = lib.types.str;
                   default = ".";
                   description = "Subdirectory within the repo containing SKILL.md. Omit if SKILL.md is at the root.";
-                };
-                description = lib.mkOption {
-                  type = lib.types.str;
-                  default = "";
                 };
               };
             }
@@ -94,7 +97,6 @@ _: {
                 hash = "sha256-Hd3ml5FmD9/EvhcWfX3AgF1vJQmBQRhRbIb+rW56N8A=";
               };
               subdir = "skills/obsidian";
-              description = "Obsidian vault skill (companion to @bitbonsai/mcpvault MCP server)";
             };
             skills.context7-mcp = {
               # https://github.com/upstash/context7 — companion skill to the
@@ -106,12 +108,14 @@ _: {
                 hash = "sha256-wWD8V3sxy6WGvWKdLxA1ranwFPvRpRRCrPWKJ3IDEuw=";
               };
               subdir = "skills/context7-mcp";
-              description = "Context7 MCP skill for up-to-date library documentation";
             };
           };
         }
         (lib.mkIf cfg.enable {
-          home.file = (mkHomeFiles ".claude/skills") // (mkHomeFiles ".config/opencode/skills");
+          # claude-code does not follow XDG; use home.file with a HOME-relative path.
+          home.file = mkSkillFiles ".claude/skills";
+          # opencode follows XDG_CONFIG_HOME; use xdg.configFile for correctness.
+          xdg.configFile = mkSkillFiles "opencode/skills";
         })
       ];
     };
