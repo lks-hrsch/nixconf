@@ -56,7 +56,7 @@
     };
 
   flake.modules.homeManager.desktop =
-    { lib, ... }:
+    { lib, pkgs, ... }:
     {
       imports = with config.flake.modules.homeManager; [
         bruno
@@ -70,7 +70,7 @@
 
       xdg = {
         enable = true;
-        userDirs = {
+        userDirs = lib.mkIf pkgs.stdenv.isLinux {
           enable = true;
           createDirectories = true;
           extraConfig = {

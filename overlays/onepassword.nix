@@ -1,5 +1,5 @@
-# Workaround: upstream nixpkgs-unstable shipped _1password-gui 8.12.21 with a stale
-# aarch64-darwin hash. Patch until nixpkgs merges the corrected derivation.
+# nixpkgs-unstable ships _1password-gui 8.12.21 with a wrong aarch64-darwin hash.
+# Patch until nixpkgs merges the corrected derivation.
 # TODO: remove once `nix flake update nixpkgs-unstable` brings in a working hash.
 final: prev:
 prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
