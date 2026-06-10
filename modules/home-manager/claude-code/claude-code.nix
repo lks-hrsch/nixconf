@@ -1,12 +1,37 @@
 _: {
   flake.modules.homeManager.claude-code =
-    { pkgs, config, ... }:
+    { pkgs, ... }:
     {
       programs.claude-code = {
         enable = true;
-        # enableMcpIntegration = true; # TODO - currently not in home manager 25.11 check it later
-        mcpServers = config.programs.mcp.servers;
+        enableMcpIntegration = true;
         package = pkgs.unstable.claude-code;
+        # Plugins loaded directly via --plugin-dir from pinned sources (no marketplace
+        # registration). Bump a rev+hash like the skills pins in skills.nix to update.
+        plugins =
+          let
+            # anthropics/claude-plugins-official — rev is the current ~/.claude .gcs-sha
+            official = pkgs.fetchFromGitHub {
+              owner = "anthropics";
+              repo = "claude-plugins-official";
+              rev = "3d5017bc1d40ef08c5733243516afeb993a6f5e5";
+              hash = "sha256-fhE6Zm83EUbdLBjY4VSCtoHyLVJ+Aexz7DN7n0Y0FLA=";
+            };
+          in
+          [
+            "${official}/plugins/code-review"
+            "${official}/plugins/claude-md-management"
+            "${official}/plugins/pyright-lsp"
+            "${official}/plugins/rust-analyzer-lsp"
+            "${official}/plugins/typescript-lsp"
+            # superpowers is an external plugin referenced by the official marketplace
+            (pkgs.fetchFromGitHub {
+              owner = "obra";
+              repo = "superpowers";
+              rev = "6fd4507659784c351abbd2bc264c7162cfd386dc"; # v5.1.0
+              hash = "sha256-P/FD8HTQO+QzvMe3A/B2v2vjs8T6ZmIYH3MPp79dSzo=";
+            })
+          ];
         settings = {
           skillListingBudgetFraction = 0.05;
           model = "opusplan";
@@ -71,14 +96,6 @@ _: {
           statusLine = {
             type = "command";
             command = "bash ~/.claude/statusline-command.sh";
-          };
-          enabledPlugins = {
-            "rust-analyzer-lsp@claude-plugins-official" = true;
-            "typescript-lsp@claude-plugins-official" = true;
-            "superpowers@claude-plugins-official" = true;
-            "code-review@claude-plugins-official" = true;
-            "claude-md-management@claude-plugins-official" = true;
-            "pyright-lsp@claude-plugins-official" = true;
           };
           promptSuggestionEnabled = false;
           autoMemoryEnabled = true;

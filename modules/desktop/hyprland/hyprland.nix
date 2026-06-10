@@ -49,7 +49,7 @@
         settings = {
           "$terminal" = "uwsm app -- ghostty";
           "$fileManager" = "uwsm app -- nautilus";
-          "$ipc" = "noctalia-shell ipc call";
+          "$ipc" = "noctalia msg";
           "$mod" = "SUPER";
 
           exec-once = [
@@ -141,19 +141,19 @@
             "$mod, T, exec, $terminal"
             "$mod, E, exec, $fileManager"
             "$mod, F, exec, uwsm app -- firefox"
-            "$mod, SPACE, exec, $ipc launcher toggle"
-            "$mod, S, exec, $ipc controlCenter toggle"
-            "$mod, comma, exec, $ipc settings toggle"
+            "$mod, SPACE, exec, $ipc panel-toggle launcher"
+            "$mod, S, exec, $ipc panel-toggle control-center"
+            "$mod, comma, exec, $ipc settings-toggle"
 
             "$mod, Q, killactive"
-            "$mod CTRL, Q, exec, $ipc lockScreen lock"
+            "$mod CTRL, Q, exec, $ipc session lock"
             "$mod CTRL, F, fullscreen,"
             "$mod SHIFT, F, togglefloating,"
             "$mod, P, pseudo," # dwindle
             "$mod, J, layoutmsg, togglesplit," # dwindle
 
-            # clipboard history (via Noctalia launcher)
-            "$mod ALT, C, exec, $ipc launcher clipboard"
+            # clipboard history (via Noctalia panel)
+            "$mod ALT, C, exec, $ipc panel-toggle clipboard"
 
             # grimblast
             "$mod SHIFT, 3, exec, grimblast --notify copysave active"

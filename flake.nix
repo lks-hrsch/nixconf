@@ -30,7 +30,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     hyprland = {
-      url = "github:hyprwm/Hyprland/v0.55.2";
+      url = "github:hyprwm/Hyprland/v0.55.3";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     hyprland-contrib = {
@@ -38,7 +38,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
+      url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     sops-nix = {

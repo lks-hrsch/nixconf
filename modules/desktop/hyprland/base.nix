@@ -45,7 +45,7 @@
         with config.flake.modules.homeManager; [
           desktop-hyprland-cliphist
           desktop-hyprland-hyprland
-          desktop-hyprland-noctalia-shell
+          desktop-hyprland-noctalia
           desktop-hyprland-uwsm-env
         ];
     };

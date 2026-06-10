@@ -6,6 +6,7 @@ _: {
       };
       supportedFilesystems = [ "zfs" ];
       zfs = {
+        # TODO
         # Adopt the new safe default early. forceImportRoot=true risks importing
         # a pool that was previously exported on another system; false is the new
         # default from 26.11 on.
