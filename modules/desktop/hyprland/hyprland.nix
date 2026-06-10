@@ -1,29 +1,26 @@
 { inputs, ... }:
 {
   flake.modules.homeManager.desktop-hyprland-hyprland =
-    { pkgs, osConfig, ... }:
+    {
+      pkgs,
+      lib,
+      osConfig,
+      ...
+    }:
     let
       inherit (osConfig.desktop.monitors) primary secondary;
+      inherit (lib.generators) mkLuaInline;
 
-      # Switch to workspace N on primary monitor, or L<N> on secondary
-      hypr-ws-switch = pkgs.writeShellScript "hypr-ws-switch" ''
-        ws=$1
-        mon=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .name')
-        if [ "$mon" = "${primary}" ]; then
-          hyprctl dispatch workspace "$ws"
-        else
-          hyprctl dispatch workspace "name:L$ws"
-        fi
-      '';
-      hypr-ws-move = pkgs.writeShellScript "hypr-ws-move" ''
-        ws=$1
-        mon=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .name')
-        if [ "$mon" = "${primary}" ]; then
-          hyprctl dispatch movetoworkspace "$ws"
-        else
-          hyprctl dispatch movetoworkspace "name:L$ws"
-        fi
-      '';
+      # Command shorthands (were hyprlang $variables)
+      terminal = "uwsm app -- ghostty";
+      fileManager = "uwsm app -- nautilus";
+      ipc = "noctalia msg";
+      mod = "SUPER";
+
+      # Lua bind helpers — each renders as hl.bind(keys, <lua>, opts?)
+      bind = keys: lua: { _args = [ keys (mkLuaInline lua) ]; };
+      bind' = keys: lua: opts: { _args = [ keys (mkLuaInline lua) opts ]; };
+      exec = keys: cmd: bind keys ''hl.dsp.exec_cmd("${cmd}")'';
     in
     {
 
@@ -40,129 +37,205 @@
         # set the flake package
         package = null; # use the NixOS package
         portalPackage = null; # use the NixOS package
-        # TODO: switch to lua config
-        # Keep generating hyprland.conf (hyprlang backend). HM 26.05 defaults to
-        # "lua" at home.stateVersion >= "26.05"; our stateVersion is 25.05 so this
-        # is defensive — prevents a silent config-format flip if stateVersion is
-        # ever bumped. Lua migration is a separate future task.
-        configType = "hyprlang";
+        # Generate ~/.config/hypr/hyprland.lua — hyprlang is deprecated since
+        # Hyprland 0.55. Each settings.<name> attr renders as hl.<name>(...);
+        # list values render one call per element (and lists merge across
+        # modules, e.g. noctalia.nix contributes `on` and `layer_rule`).
+        configType = "lua";
         settings = {
-          "$terminal" = "uwsm app -- ghostty";
-          "$fileManager" = "uwsm app -- nautilus";
-          "$ipc" = "noctalia msg";
-          "$mod" = "SUPER";
+          # Lua locals (rendered first): switch/move to workspace N on the
+          # primary monitor, or L<N> on the secondary
+          ws_switch._var = mkLuaInline ''
+            function(n)
+              local mon = hl.get_active_monitor()
+              local ws = (mon and mon.name == "${primary}") and n or ("name:L" .. n)
+              hl.dispatch(hl.dsp.focus({ workspace = ws }))
+            end'';
+          ws_move._var = mkLuaInline ''
+            function(n)
+              local mon = hl.get_active_monitor()
+              local ws = (mon and mon.name == "${primary}") and n or ("name:L" .. n)
+              hl.dispatch(hl.dsp.window.move({ workspace = ws, follow = true }))
+            end'';
 
-          exec-once = [
-            "uwsm app -- ibus start --type wayland"
-            "uwsm app -- 1password --silent"
-            "uwsm app -- librepods --hide"
-          ];
+          # hl.config — plain config tables (stylix merges its colors here too)
+          config = {
+            input = {
+              kb_layout = "gb";
+              kb_options = "grp:alt_shift_toggle";
+
+              accel_profile = "flat";
+
+              touchpad = {
+                natural_scroll = true;
+                scroll_factor = 0.8;
+                tap_to_click = false;
+                clickfinger_behavior = true;
+              };
+            };
+
+            cursor = {
+              no_hardware_cursors = true;
+            };
+
+            general = {
+              gaps_in = 2;
+              gaps_out = {
+                top = 2;
+                right = 4;
+                bottom = 4;
+                left = 4;
+              };
+            };
+
+            decoration = {
+              rounding = 10;
+
+              blur = {
+                enabled = true;
+              };
+            };
+
+            dwindle = {
+              preserve_split = true; # you probably want this
+            };
+          };
 
           monitor = [
-            "${primary},highrr,auto,1,vrr,2"
-            "${secondary},highres,auto-left,1,transform,1,vrr,2"
+            {
+              output = primary;
+              mode = "highrr";
+              position = "auto";
+              scale = 1;
+              vrr = 2;
+            }
+            {
+              output = secondary;
+              mode = "highres";
+              position = "auto-left";
+              scale = 1;
+              transform = 1;
+              vrr = 2;
+            }
           ];
 
-          windowrule = [
-            "no_focus on, match:class ^$, match:title ^$, match:xwayland true, match:float true, match:fullscreen false, match:pin false" # Prevents focus on empty XWayland windows
-            "suppress_event maximize, match:class .*" # You'll probably like this.
+          window_rule = [
+            # Prevents focus on empty XWayland windows
+            {
+              match = {
+                class = "^$";
+                title = "^$";
+                xwayland = true;
+                float = true;
+                fullscreen = false;
+                pin = false;
+              };
+              no_focus = true;
+            }
+            # You'll probably like this.
+            {
+              match.class = ".*";
+              suppress_event = "maximize";
+            }
           ];
-
-          input = {
-            kb_layout = "gb";
-            kb_options = "grp:alt_shift_toggle";
-
-            accel_profile = "flat";
-
-            touchpad = {
-              natural_scroll = true;
-              scroll_factor = 0.8;
-              tap-to-click = false;
-              clickfinger_behavior = true;
-            };
-          };
-
-          device = {
-            name = "apple-inc.-magic-trackpad";
-          };
 
           gesture = [
-            "3, horizontal, workspace"
-            "4, horizontal, workspace"
-            "5, horizontal, workspace"
+            {
+              fingers = 3;
+              direction = "horizontal";
+              action = "workspace";
+            }
+            {
+              fingers = 4;
+              direction = "horizontal";
+              action = "workspace";
+            }
+            {
+              fingers = 5;
+              direction = "horizontal";
+              action = "workspace";
+            }
           ];
 
-          cursor = {
-            no_hardware_cursors = true;
-          };
+          # define workspaces — 1–9 on primary, L1–L9 on secondary
+          workspace_rule =
+            builtins.genList (i: {
+              workspace = toString (i + 1);
+              monitor = primary;
+              default = i == 0;
+            }) 9
+            ++ builtins.genList (i: {
+              workspace = "name:L${toString (i + 1)}";
+              monitor = secondary;
+              default = i == 0;
+            }) 9;
 
-          general = {
-            gaps_in = 2;
-            gaps_out = "2, 4, 4, 4";
-          };
-
-          decoration = {
-            rounding = 10;
-
-            blur = {
-              enabled = true;
-            };
-          };
-
-          dwindle = {
-            preserve_split = "yes"; # you probably want this
-          };
-
-          # define workspaces — 1–9 on primary, L1–L9 (IDs 11–19) on secondary
-          workspace = [
-            # main (center) monitor
-            "1, monitor:${primary}, default:true"
-            "2, monitor:${primary}"
-            "3, monitor:${primary}"
-            "4, monitor:${primary}"
-            "5, monitor:${primary}"
-            "6, monitor:${primary}"
-            "7, monitor:${primary}"
-            "8, monitor:${primary}"
-            "9, monitor:${primary}"
-            # left monitor
-            "name:L1, monitor:${secondary}, default:true"
-            "name:L2, monitor:${secondary}"
-            "name:L3, monitor:${secondary}"
-            "name:L4, monitor:${secondary}"
-            "name:L5, monitor:${secondary}"
-            "name:L6, monitor:${secondary}"
-            "name:L7, monitor:${secondary}"
-            "name:L8, monitor:${secondary}"
-            "name:L9, monitor:${secondary}"
+          # autostart (was exec-once) — list form so noctalia.nix's hook
+          # merges as its own hl.on call
+          on = [
+            {
+              _args = [
+                "hyprland.start"
+                (mkLuaInline ''
+                  function()
+                    hl.exec_cmd("uwsm app -- ibus start --type wayland")
+                    hl.exec_cmd("uwsm app -- 1password --silent")
+                    hl.exec_cmd("uwsm app -- librepods --hide")
+                  end'')
+              ];
+            }
           ];
 
           bind = [
-            "$mod, T, exec, $terminal"
-            "$mod, E, exec, $fileManager"
-            "$mod, F, exec, uwsm app -- firefox"
-            "$mod, SPACE, exec, $ipc panel-toggle launcher"
-            "$mod, S, exec, $ipc panel-toggle control-center"
-            "$mod, comma, exec, $ipc settings-toggle"
+            (exec "${mod} + T" terminal)
+            (exec "${mod} + E" fileManager)
+            (exec "${mod} + F" "uwsm app -- firefox")
+            (exec "${mod} + SPACE" "${ipc} panel-toggle launcher")
+            (exec "${mod} + S" "${ipc} panel-toggle control-center")
+            (exec "${mod} + comma" "${ipc} settings-toggle")
 
-            "$mod, Q, killactive"
-            "$mod CTRL, Q, exec, $ipc session lock"
-            "$mod CTRL, F, fullscreen,"
-            "$mod SHIFT, F, togglefloating,"
-            "$mod, P, pseudo," # dwindle
-            "$mod, J, layoutmsg, togglesplit," # dwindle
+            (bind "${mod} + Q" "hl.dsp.window.close()")
+            (exec "${mod} + CTRL + Q" "${ipc} session lock")
+            (bind "${mod} + CTRL + F" ''hl.dsp.window.fullscreen({ action = "toggle" })'')
+            (bind "${mod} + SHIFT + F" ''hl.dsp.window.float({ action = "toggle" })'')
+            (bind "${mod} + P" ''hl.dsp.window.pseudo({ action = "toggle" })'') # dwindle
+            (bind "${mod} + J" ''hl.dsp.layout("togglesplit")'') # dwindle
 
             # clipboard history (via Noctalia panel)
-            "$mod ALT, C, exec, $ipc panel-toggle clipboard"
+            (exec "${mod} + ALT + C" "${ipc} panel-toggle clipboard")
 
             # grimblast
-            "$mod SHIFT, 3, exec, grimblast --notify copysave active"
-            "$mod SHIFT, 4, exec, grimblast --notify copysave area"
-            "$mod SHIFT, 5, exec, grimblast --notify copysave output"
+            (exec "${mod} + SHIFT + 3" "grimblast --notify copysave active")
+            (exec "${mod} + SHIFT + 4" "grimblast --notify copysave area")
+            (exec "${mod} + SHIFT + 5" "grimblast --notify copysave output")
 
             # workspaces
-            "CTRL, left, workspace, m-1"
-            "CTRL, right, workspace, m+1"
+            (bind "CTRL + left" ''hl.dsp.focus({ workspace = "m-1" })'')
+            (bind "CTRL + right" ''hl.dsp.focus({ workspace = "m+1" })'')
+
+            # mouse binds (were bindm — drag/resize dispatchers imply mouse)
+            (bind "${mod} + mouse:272" "hl.dsp.window.drag()")
+            (bind "${mod} + mouse:273" "hl.dsp.window.resize()")
+
+            # media keys — repeating for volume/brightness (was bindel),
+            # locked so they also work on the lock screen
+            (bind' "XF86AudioRaiseVolume" ''hl.dsp.exec_cmd("${ipc} volume-up")'' {
+              repeating = true;
+              locked = true;
+            })
+            (bind' "XF86AudioLowerVolume" ''hl.dsp.exec_cmd("${ipc} volume-down")'' {
+              repeating = true;
+              locked = true;
+            })
+            (bind' "XF86MonBrightnessUp" ''hl.dsp.exec_cmd("${ipc} brightness-up")'' {
+              repeating = true;
+              locked = true;
+            })
+            (bind' "XF86MonBrightnessDown" ''hl.dsp.exec_cmd("${ipc} brightness-down")'' {
+              repeating = true;
+              locked = true;
+            })
+            (bind' "XF86AudioMute" ''hl.dsp.exec_cmd("${ipc} volume-mute")'' { locked = true; })
           ]
           ++ (
             # CTRL+1-9 → workspace N on focused monitor (primary: 1-9, secondary: L1-L9)
@@ -171,33 +244,15 @@
               builtins.genList (
                 i:
                 let
-                  ws = i + 1;
+                  ws = toString (i + 1);
                 in
                 [
-                  "CTRL, code:1${toString i}, exec, ${hypr-ws-switch} ${toString ws}"
-                  "CTRL SHIFT, code:1${toString i}, exec, ${hypr-ws-move} ${toString ws}"
+                  (bind "CTRL + code:1${toString i}" "function() ws_switch(${ws}) end")
+                  (bind "CTRL + SHIFT + code:1${toString i}" "function() ws_move(${ws}) end")
                 ]
               ) 9
             )
           );
-
-          bindm = [
-            "$mod, mouse:272, movewindow"
-            "$mod, mouse:273, resizewindow"
-          ];
-
-          # Media keys (continuous for volume/brightness)
-          bindel = [
-            ", XF86AudioRaiseVolume, exec, $ipc volume increase"
-            ", XF86AudioLowerVolume, exec, $ipc volume decrease"
-            ", XF86MonBrightnessUp, exec, $ipc brightness increase"
-            ", XF86MonBrightnessDown, exec, $ipc brightness decrease"
-          ];
-
-          # Media keys (one-shot for mute)
-          bindl = [
-            ", XF86AudioMute, exec, $ipc volume muteOutput"
-          ];
         };
       };
     };

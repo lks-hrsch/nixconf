@@ -228,18 +228,41 @@ in
         };
       };
 
-      # Noctalia additions to Hyprland
+      # Noctalia additions to Hyprland (lua config — see hyprland.nix)
       wayland.windowManager.hyprland.settings = {
         # Auto-start Noctalia via UWSM (keeps it in the compositor's app scope)
-        exec-once = [
-          "uwsm app -- noctalia"
+        on = [
+          {
+            _args = [
+              "hyprland.start"
+              (lib.generators.mkLuaInline ''
+                function()
+                  hl.exec_cmd("uwsm app -- noctalia")
+                end'')
+            ];
+          }
         ];
-        # Blur rules — v5 layer namespaces per official docs:
+        # Blur rule — v5 layer namespaces per official docs:
         # https://docs.noctalia.dev/v5/compositor-settings/hyprland/
-        layerrule = [
-          "blur on, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$"
-          "blur_popups on, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$"
-          "ignore_alpha 0.5, match:namespace ^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$"
+        # ignore_alpha below the docs' 0.5: glass-mode panels render their
+        # background at 0.55 alpha, leaving blur marginal at the 0.5 cutoff.
+        layer_rule = [
+          {
+            name = "noctalia";
+            match.namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$";
+            blur = true;
+            blur_popups = true;
+            ignore_alpha = 0.2;
+          }
+        ];
+        # The settings panel is an xdg window (not a layer surface) with an
+        # opaque Surface background — force opacity so compositor blur applies
+        window_rule = [
+          {
+            name = "noctalia-settings";
+            match.class = "^dev\\.noctalia\\.Noctalia\\.Settings$";
+            opacity = "0.9";
+          }
         ];
       };
     };
