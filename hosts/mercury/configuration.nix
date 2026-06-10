@@ -22,7 +22,7 @@
         (modulesPath + "/profiles/qemu-guest.nix")
       ];
 
-      facter.reportPath =
+      hardware.facter.reportPath =
         if builtins.pathExists ./facter.json then
           ./facter.json
         else

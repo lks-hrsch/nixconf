@@ -40,6 +40,12 @@
         # set the flake package
         package = null; # use the NixOS package
         portalPackage = null; # use the NixOS package
+        # TODO: switch to lua config
+        # Keep generating hyprland.conf (hyprlang backend). HM 26.05 defaults to
+        # "lua" at home.stateVersion >= "26.05"; our stateVersion is 25.05 so this
+        # is defensive — prevents a silent config-format flip if stateVersion is
+        # ever bumped. Lua migration is a separate future task.
+        configType = "hyprlang";
         settings = {
           "$terminal" = "uwsm app -- ghostty";
           "$fileManager" = "uwsm app -- nautilus";

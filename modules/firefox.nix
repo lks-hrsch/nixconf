@@ -25,6 +25,10 @@
       programs.firefox = {
         enable = true;
         package = firefox-package;
+        # Keep the legacy profile directory (.mozilla/firefox). HM 26.05 warns
+        # that the default changes to $XDG_CONFIG_HOME/mozilla/firefox at
+        # stateVersion >= "26.05". Explicit pin prevents a silent profile move.
+        configPath = ".mozilla/firefox";
 
         profiles.${config.flake.users.owner.username} = {
           search = {

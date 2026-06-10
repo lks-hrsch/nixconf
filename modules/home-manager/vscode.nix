@@ -94,7 +94,7 @@
     {
       home.packages = with pkgs; [
         nil
-        nixfmt-rfc-style
+        nixfmt
         nixpkgs-fmt
 
         # for MCP

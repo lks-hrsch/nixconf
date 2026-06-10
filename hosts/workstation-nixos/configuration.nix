@@ -104,22 +104,6 @@
           daemon.enable = true;
         };
       };
-
-      boot.kernelPatches = [
-        {
-          # Backport of upstream e3ac0d9f1a20 (merged 2026-04-24).
-          # btmtk: validate WMT FUNC_CTRL bounds-check (634a4408c061) rejects
-          # the too-short event MT7922 sends, producing "Failed to send wmt
-          # func ctrl (-22)".  Fix treats short packet as WMT_ON_UNDONE
-          # (success).  Remove once LTS 6.18.x picks up the backport.
-          name = "btmtk-accept-too-short-wmt-func-ctrl-events";
-          patch = pkgs.fetchpatch {
-            url = "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=e3ac0d9f1a205f33a43fba3b79ef74d2f604c78b";
-            hash = "sha256-NLrP59cKV0wjUVTyWXhHchSS2uLwF4fAowltZ4T25rg=";
-          };
-        }
-      ];
-
       # https://discourse.nixos.org/t/how-to-automatically-mount-external-hard-drive/15563
       # https://www.reddit.com/r/NixOS/comments/185f0x4/how_to_mount_a_usb_drive/
       # https://mynixos.com/nixpkgs/option/services.upower.enable

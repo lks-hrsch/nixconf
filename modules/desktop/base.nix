@@ -72,8 +72,12 @@
         userDirs = lib.mkIf pkgs.stdenv.isLinux {
           enable = true;
           createDirectories = true;
+          # Keep exporting XDG session variables (legacy HM default; 26.05 default
+          # flips to false at stateVersion >= "26.05").
+          setSessionVariables = true;
           extraConfig = {
-            XDG_SCREENSHOTS_DIR = "$HOME/Pictures/Screenshots";
+            # Key format changed in HM 26.05: bare name instead of XDG_<NAME>_DIR.
+            SCREENSHOTS = "$HOME/Pictures/Screenshots";
           };
         };
       };

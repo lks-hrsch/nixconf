@@ -18,6 +18,7 @@ _: {
           export LIBVA_DRIVER_NAME="nvidia"
           export GBM_BACKEND="nvidia-drm"
           export NVD_BACKEND="direct"
+          export __GLX_VENDOR_LIBRARY_NAME="nvidia"
 
           export MOZ_ENABLE_WAYLAND="1"
           export MOZ_USE_XINPUT2="1"

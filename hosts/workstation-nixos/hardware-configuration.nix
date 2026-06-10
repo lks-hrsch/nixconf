@@ -20,7 +20,7 @@ in
         (modulesPath + "/installer/scan/not-detected.nix")
       ];
 
-      facter.reportPath =
+      hardware.facter.reportPath =
         if builtins.pathExists ./facter.json then
           ./facter.json
         else
@@ -42,7 +42,9 @@ in
             "igc" # lspci -v | grep -iA8 'network\|ethernet'
           ];
 
-          # Remote unlock for encrypted ZFS: enable networking and SSH in initrd
+          # Remote unlock for encrypted ZFS: enable networking and SSH in initrd.
+          # boot.initrd.network.ssh and boot.initrd.secrets remain valid under
+          # systemd-initrd; the ip= kernelParam supplies the static address.
           network = {
             enable = true;
             ssh = {
@@ -50,7 +52,6 @@ in
               port = 2222; # connect with: ssh -p 2222 root@<initrd-ip>
               hostKeys = [ "/etc/ssh/ssh_host_ed25519_key" ];
               authorizedKeys = [ sshKey ];
-              # shell = "/bin/cryptsetup-askpass";
             };
             udhcpc.enable = false;
           };
@@ -58,6 +59,23 @@ in
           secrets = {
             "/etc/ssh/ssh_host_ed25519_key" = "/etc/ssh/ssh_host_ed25519_key";
           };
+
+          # TODO(systemd-initrd remote unlock): under systemd-initrd root's home
+          # is /var/empty and ZFS key prompts go through systemd ask-password.
+          # Until this is tested, remote unlock via SSH:2222 may require the
+          # physical console. Uncomment the unit below once verified.
+          #
+          # systemd.services.zfs-unlock-profile = {
+          #   description = "Attach SSH login to the ZFS passphrase prompt";
+          #   wantedBy = [ "initrd.target" ];
+          #   before = [ "initrd-root-fs.target" ];
+          #   unitConfig.DefaultDependencies = false;
+          #   serviceConfig.Type = "oneshot";
+          #   script = ''
+          #     mkdir -p /var/empty
+          #     echo "systemd-tty-ask-password-agent --watch" > /var/empty/.profile
+          #   '';
+          # };
         };
 
         kernelModules = [

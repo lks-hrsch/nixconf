@@ -21,7 +21,6 @@
     inputs.nixpkgs.lib.nixosSystem {
       modules = [
         inputs.disko.nixosModules.default
-        inputs.nixos-facter-modules.nixosModules.facter
         module
       ];
     }

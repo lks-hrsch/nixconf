@@ -35,7 +35,7 @@ _: {
         darwin.zsh = baseZshConfig;
 
         homeManager.zsh =
-          { lib, pkgs, ... }:
+          { lib, pkgs, config, ... }:
           {
             home.packages = with pkgs; [
               jq
@@ -58,6 +58,9 @@ _: {
                 shellAliases = lib.optionalAttrs pkgs.stdenv.isLinux {
                   netbird = "netbird-wt0";
                 };
+                # Lock in the legacy default (home directory). HM 26.05 warns that
+                # the default will shift to the XDG config dir when xdg.enable=true.
+                dotDir = config.home.homeDirectory;
               };
 
               starship = {

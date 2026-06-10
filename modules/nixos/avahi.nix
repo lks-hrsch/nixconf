@@ -20,10 +20,10 @@ _: {
         # When avahi owns mDNS, prevent systemd-resolved from running a competing
         # mDNS responder (which causes intermittent .local resolution failures).
         resolved = lib.mkIf config.services.avahi.enable {
-          extraConfig = ''
-            MulticastDNS=no
-            LLMNR=no
-          '';
+          settings.Resolve = {
+            MulticastDNS = "no";
+            LLMNR = "no";
+          };
         };
       };
     };
