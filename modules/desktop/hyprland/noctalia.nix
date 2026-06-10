@@ -59,8 +59,10 @@ in
             animation.enabled = false;
 
             panel = {
+              session_placement = "centered";
               shadow = false;
               transparency_mode = "glass";
+              wallpaper_placement = "centered";
             };
 
             screen_corners.enabled = true;
