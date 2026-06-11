@@ -4,7 +4,6 @@ final: prev: {
     inherit (prev.stdenv.hostPlatform) system;
     inherit (prev) config;
     overlays = [
-      (import ./onepassword.nix)
       (import ./claude-code.nix)
       (import ./opencode.nix)
       (import ./vscode.nix)

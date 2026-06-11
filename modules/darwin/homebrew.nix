@@ -15,6 +15,8 @@ _: {
         autoUpdate = true;
         upgrade = true;
         cleanup = "zap";
+        # Homebrew 5.1.15+ requires --force when --cleanup is used
+        extraFlags = [ "--force" ];
       };
 
       taps = [

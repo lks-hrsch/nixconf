@@ -39,8 +39,8 @@ _: {
             enable = true;
             enableDefaultConfig = false;
             includes = [ "${config.sops.secrets."ssh-extra-config".path}" ];
-            matchBlocks."*" = {
-              identityAgent = onePasswordAgent;
+            settings."*" = {
+              IdentityAgent = onePasswordAgent;
             };
           };
         };
