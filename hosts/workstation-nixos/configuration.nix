@@ -91,6 +91,19 @@
           # of just the bare essentials.
           powerManagement.enable = true;
 
+          # nixpkgs 26.05 defaults this to true for the open driver >= 595, which
+          # drops the nvidia-suspend/resume/hibernate systemd units in favor of the
+          # new kernel suspend-notifier path - that path hung S3 suspend on first
+          # use (2026-06-10, journal ends at "PM: suspend entry (deep)").
+          # NOTE: not proven that the notifier path alone caused the hang - the GPU
+          # was already wedged by the Hyprland v0.55.3 monitor-disconnect SEGV 30s
+          # earlier. External reports of standalone notifier hangs on 595 exist
+          # though (open-gpu-kernel-modules#1157), so we keep the proven path.
+          # TODO(2026-Q3): retry the notifier default (remove this line) once a
+          # 595.x driver with the suspend-notifier fix lands in nixpkgs and the
+          # known-bad combo (PVMA=1 + notifiers=1 + no units) is resolved upstream.
+          powerManagement.kernelSuspendNotifier = false;
+
           # Use the NVidia open source kernel module (not to be confused with the
           # independent third-party "nouveau" open source driver).
           # Support is limited to the Turing and later architectures. Full list of
@@ -125,6 +138,16 @@
         nv-fan-control
         unstable.eduvpn-client
       ];
+
+      # systemd >= 256 freezes user sessions before sleep, which can deadlock
+      # against nvidia-suspend saving VRAM (see nixpkgs#371058); boot -1 on
+      # 2026-06-10 froze user.slice right before the suspend hang.
+      # NOTE: belt-and-braces, added together with kernelSuspendNotifier=false -
+      # the two were not tested independently.
+      # TODO(2026-Q3): once suspend has been stable for a while, try removing
+      # this and verify suspend still works (isolates which fix was load-bearing);
+      # drop entirely when nixpkgs#371058 is resolved.
+      systemd.services."systemd-suspend".environment.SYSTEMD_SLEEP_FREEZE_USER_SESSIONS = "false";
 
       systemd.services.nvidia-fan-startup = {
         description = "Set NVIDIA Fan Speed at Startup";

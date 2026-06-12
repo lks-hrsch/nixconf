@@ -30,7 +30,13 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     hyprland = {
-      url = "github:hyprwm/Hyprland/v0.55.3";
+      # >= v0.55.4 required: fixes SEGV when the last monitor disconnects
+      # (DPMS-off on DP drops the link), hyprwm/Hyprland#15048. That backport is
+      # a symptom fix (null guard); the root-cause unsafe-state/fallback refactor
+      # is hyprwm/Hyprland#14547 (main only).
+      # TODO(next hyprland release): bump to the release containing #14547 and
+      # re-run the DPMS reproducer: hyprctl dispatch dpms off; sleep 90; dpms on.
+      url = "github:hyprwm/Hyprland/v0.55.4";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     hyprland-contrib = {

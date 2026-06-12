@@ -25,23 +25,26 @@ in
 
         # Stylix-driven palette (Catppuccin Mocha OLED base16 scheme from
         # modules/home-manager/stylix.nix), selected via theme.source = "custom".
+        # Accents echo the cherry-blossom wallpaper (blossom / sky / train);
+        # structural roles follow https://nix-community.github.io/stylix/styling.html
+        # (base02/03 = selection/unfocused-border ramp, base08 = error).
         customPalettes.stylix = {
           dark = {
-            mPrimary = colors.base0E; # mauve
+            mPrimary = colors.base0F; # flamingo — cherry-blossom accent (soft pastel by design)
             mOnPrimary = colors.base00;
-            mSecondary = colors.base0D; # blue
+            mSecondary = colors.base07; # lavender — dusk sky; styleguide "light bg" slot, used as accent here
             mOnSecondary = colors.base00;
-            mTertiary = colors.base0C; # teal
+            mTertiary = colors.base0D; # blue — the train
             mOnTertiary = colors.base00;
             mError = colors.base08; # red
             mOnError = colors.base00;
             mSurface = colors.base00; # OLED black
             mOnSurface = colors.base05; # text
-            mSurfaceVariant = colors.base02; # surface0 — capsule fill contrast
+            mSurfaceVariant = colors.base00;
             mOnSurfaceVariant = colors.base05;
-            mOutline = colors.base03; # surface1
+            mOutline = colors.base03; # surface1 — unfocused borders per styleguide
             mShadow = colors.base00;
-            mHover = colors.base02;
+            mHover = colors.base02; # surface0 — one ramp step above mSurfaceVariant so hover is visible
             mOnHover = colors.base05;
           };
         };
@@ -75,6 +78,14 @@ in
           wallpaper = {
             enabled = true;
             directory = toString ../../../wallpaper;
+            # Stylix-driven: default + per-monitor follow stylix.image
+            # (modules/home-manager/stylix.nix). `wallpaper.last` is runtime
+            # state owned by noctalia — deliberately not set here.
+            default.path = toString config.stylix.image;
+            monitors = {
+              ${primary}.path = toString config.stylix.image;
+              ${secondary}.path = toString config.stylix.image;
+            };
           };
 
           # ── Theme ────────────────────────────────────────────────────────────
@@ -145,6 +156,8 @@ in
             position = "top";
             background_opacity = 0.0;
             capsule = true;
+            capsule_border = "primary";
+            capsule_fill = "surface";
             capsule_padding = 14.0;
             thickness = 24;
             radius = 32;
@@ -220,9 +233,79 @@ in
 
           desktop_widgets.enabled = false;
 
-          # ── Lockscreen widgets (disabled) ───────────────────────────────────────────────
+          # ── Lockscreen widgets ───────────────────────────────────────────────
 
-          lockscreen_widgets.enabled = false;
+          lockscreen_widgets = {
+            enabled = true;
+            schema_version = 2;
+            widget_order = [
+              "lockscreen-login-box@${primary}"
+              "lockscreen-login-box@${secondary}"
+              "lockscreen-widget-0000000000000001"
+              "lockscreen-widget-0000000000000002"
+              "lockscreen-widget-0000000000000003"
+            ];
+
+            grid = {
+              cell_size = 16;
+              major_interval = 4;
+              visible = true;
+            };
+
+            widget = {
+              # Login boxes — positions are monitor-geometry-specific
+              "lockscreen-login-box@${secondary}" = {
+                box_height = 0.0;
+                box_width = 0.0;
+                cx = 540.0;
+                cy = 1797.0;
+                output = secondary;
+                rotation = 0.0;
+                type = "login_box";
+              };
+              "lockscreen-login-box@${primary}" = {
+                box_height = 0.0;
+                box_width = 0.0;
+                cx = 1280.0;
+                cy = 1317.0;
+                output = primary;
+                rotation = 0.0;
+                type = "login_box";
+              };
+              "lockscreen-widget-0000000000000001" = {
+                box_height = 176.0;
+                box_width = 512.0;
+                cx = 1280.0;
+                cy = 1168.0;
+                output = primary;
+                rotation = 0.0;
+                type = "media_player";
+                settings = {
+                  hide_when_no_media = true;
+                  layout = "horizontal";
+                };
+              };
+              "lockscreen-widget-0000000000000002" = {
+                box_height = 176.0;
+                box_width = 512.0;
+                cx = 1840.0;
+                cy = 256.0;
+                output = primary;
+                rotation = 0.0;
+                type = "weather";
+              };
+              "lockscreen-widget-0000000000000003" = {
+                box_height = 176.0;
+                box_width = 512.0;
+                cx = 1296.0;
+                cy = 256.0;
+                output = primary;
+                rotation = 0.0;
+                type = "clock";
+                settings.clock_style = "digital";
+              };
+            };
+          };
 
           # ── Dock (disabled) ──────────────────────────────────────────────────
 
