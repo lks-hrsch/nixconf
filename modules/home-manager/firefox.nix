@@ -1,35 +1,17 @@
 { config, ... }:
 {
-  flake.modules.darwin.firefox = _: {
-    # On macOS, programs.firefox.package doesn't automatically create app symlinks
-
-    homebrew = {
-      casks = [
-        "firefox"
-      ];
-    };
-  };
   flake.modules.homeManager.firefox =
     {
       pkgs,
       ...
     }:
-    let
-      firefox-package =
-        if pkgs.stdenv.isDarwin then
-          pkgs.lib.makeOverridable (args: pkgs.runCommand "firefox-0.0.0" { } "mkdir $out") { }
-        else
-          pkgs.unstable.firefox-bin;
-    in
     {
       programs.firefox = {
         enable = true;
-        package = firefox-package;
-        # TODO
-        # Keep the legacy profile directory (.mozilla/firefox). HM 26.05 warns
-        # that the default changes to $XDG_CONFIG_HOME/mozilla/firefox at
-        # stateVersion >= "26.05". Explicit pin prevents a silent profile move.
-        configPath = ".mozilla/firefox";
+        package = pkgs.unstable.firefox-bin;
+        # macOS Firefox reads from ~/Library/Application Support/Firefox, not ~/.mozilla/firefox
+        configPath =
+          if pkgs.stdenv.isDarwin then "Library/Application Support/Firefox" else ".mozilla/firefox";
 
         profiles.${config.flake.users.owner.username} = {
           search = {

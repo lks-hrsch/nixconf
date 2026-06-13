@@ -14,7 +14,6 @@ in
     {
       imports = [
         config.flake.modules.darwin.onepassword
-        config.flake.modules.darwin.firefox
         config.flake.modules.darwin.homebrew
         config.flake.modules.darwin.nixvim
         config.flake.modules.darwin.time
