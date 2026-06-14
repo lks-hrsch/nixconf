@@ -5,7 +5,6 @@
     {
       imports = with config.flake.modules.darwin; [
         base
-        podman
         netbird
       ];
 
