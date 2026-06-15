@@ -1,8 +1,8 @@
 {
-  "version": "1.124.0",
+  "version": "1.124.2",
   "platforms": {
-    "x86_64-linux":   { "plat": "linux-x64",   "sha256": "sha256-eUiOpSJCcdDeSk3NRv4fxN3RSrG4axGB6U5zh5DEZXc=" },
-    "aarch64-linux":  { "plat": "linux-arm64",  "sha256": "sha256-KJ/LMfAHI6AehxRLla9lBxjFFD00TmHMDA5jyl08GL4=" },
-    "aarch64-darwin": { "plat": "darwin-arm64", "sha256": "sha256-9AC7xsB7Wj4WTN7Z0i3H/W/DP54ttPc0wGPNrBFGXrk=" }
+    "x86_64-linux":   { "plat": "linux-x64",   "sha256": "sha256-L0o9+vxfAkmtOHJvmf0G8WIbp3bXjAuuIAtTtFvbwjQ=" },
+    "aarch64-linux":  { "plat": "linux-arm64",  "sha256": "sha256-3CBrenqZs35gMWmVtI//4w0JGSKP8cbu3cJH14P4aEU=" },
+    "aarch64-darwin": { "plat": "darwin-arm64", "sha256": "sha256-0JVfgcYxgdaeWfeGFrfG3qxpWHilQte/dLiW33yxm8o=" }
   }
 }
