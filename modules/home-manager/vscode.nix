@@ -34,6 +34,9 @@
 
         # nix extensions
         jnoortheen.nix-ide
+
+        # yaml
+        redhat.vscode-yaml
       ];
 
       # settings for all profiles
@@ -104,6 +107,9 @@
         # for Python
         unstable.pyrefly
         unstable.ruff
+
+        # for YAML
+        unstable.yaml-language-server
       ];
 
       programs = {
