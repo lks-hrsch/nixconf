@@ -25,9 +25,6 @@ _: {
           export MOZ_DISABLE_RDD_SANDBOX="1"
           export MOZ_DRM_DEVICE="/dev/dri/renderD128"
 
-          ##### Steam & Proton #####################################################
-          export STEAM_EXTRA_COMPAT_TOOLS_PATH="$HOME/.steam/root/compatibilitytools.d"
-
           ##### CMake / Ninja tool-chain ###########################################
           export CMAKE_C_COMPILER="$HOME/.nix-profile/bin/clang"
           export CMAKE_CXX_COMPILER="$HOME/.nix-profile/bin/clang++"
