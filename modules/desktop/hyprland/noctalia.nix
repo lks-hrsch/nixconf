@@ -19,6 +19,13 @@ in
         inputs.noctalia.homeModules.default
       ];
 
+      # Stable symlink so noctalia's wallpaper path survives rebuilds.
+      # toString config.stylix.image gives a /nix/store/<hash>-... path that
+      # changes on every rebuild; noctalia persists paths as runtime state
+      # (wallpaper.last), so after a rebuild those persisted paths go stale.
+      # A fixed symlink in the home dir breaks that cycle.
+      home.file.".local/share/wallpaper/current.png".source = config.stylix.image;
+
       # Configure Noctalia Shell v5
       programs.noctalia = {
         enable = true;
@@ -75,18 +82,21 @@ in
 
           # ── Wallpaper ────────────────────────────────────────────────────────
 
-          wallpaper = {
-            enabled = true;
-            directory = toString ../../../wallpaper;
-            # Stylix-driven: default + per-monitor follow stylix.image
-            # (modules/home-manager/stylix.nix). `wallpaper.last` is runtime
-            # state owned by noctalia — deliberately not set here.
-            default.path = toString config.stylix.image;
-            monitors = {
-              ${primary}.path = toString config.stylix.image;
-              ${secondary}.path = toString config.stylix.image;
+          wallpaper =
+            let
+              stablePath = "${config.home.homeDirectory}/.local/share/wallpaper/current.png";
+            in
+            {
+              enabled = true;
+              directory = "${config.home.homeDirectory}/.local/share/wallpaper";
+              # Stable path via home.file symlink above — survives rebuilds even
+              # when noctalia persists wallpaper.last with the old path.
+              default.path = stablePath;
+              monitors = {
+                ${primary}.path = stablePath;
+                ${secondary}.path = stablePath;
+              };
             };
-          };
 
           # ── Theme ────────────────────────────────────────────────────────────
 
