@@ -1,6 +1,11 @@
 _: {
   flake.modules.nixos.marsLxcBase =
-    { config, lib, modulesPath, ... }:
+    {
+      config,
+      lib,
+      modulesPath,
+      ...
+    }:
     {
       options.marsLxc = {
         ip = lib.mkOption {
