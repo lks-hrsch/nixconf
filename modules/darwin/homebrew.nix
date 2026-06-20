@@ -35,7 +35,6 @@ _: {
       # GUI applications (casks)
       casks = [
         "aldente"
-        "anki"
         "claude"
         "ollama-app"
         "open-webui"
