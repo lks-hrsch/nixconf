@@ -34,6 +34,7 @@ _: {
           ##### CUDA & linker flags ###############################################
           export CUDA_PATH="${pkgs.cudatoolkit}"
           export LDFLAGS="-L/lib -L${pkgs.linuxPackages.nvidia_x11}/lib"
+          export LD_LIBRARY_PATH="${pkgs.linuxPackages.nvidia_x11}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
         '';
       };
     };

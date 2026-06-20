@@ -30,5 +30,13 @@ in
     # that actually runs, so ignore the unsatisfiable musl dep.
     autoPatchelfIgnoreMissingDeps =
       (old.autoPatchelfIgnoreMissingDeps or [ ]) ++ [ "libc.musl-x86_64.so.1" ];
+    # 1.125 adds a Copilot computer-use binary (computer.node) that requires
+    # libXtst, libjpeg8, pipewire, and libei for screen capture / input emulation.
+    buildInputs = (old.buildInputs or [ ]) ++ [
+      prev.libxtst
+      prev.libjpeg8
+      prev.pipewire
+      prev.libei
+    ];
   });
 }

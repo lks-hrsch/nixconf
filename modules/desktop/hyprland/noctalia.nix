@@ -54,6 +54,26 @@ in
             mHover = colors.base02; # surface0 — one ramp step above mSurfaceVariant so hover is visible
             mOnHover = colors.base05;
           };
+          # Noctalia requires both dark and light sections to accept a custom palette.
+          # This is a dark-only theme so light mirrors dark; light mode is never active.
+          light = {
+            mPrimary = colors.base0F;
+            mOnPrimary = colors.base00;
+            mSecondary = colors.base07;
+            mOnSecondary = colors.base00;
+            mTertiary = colors.base0D;
+            mOnTertiary = colors.base00;
+            mError = colors.base08;
+            mOnError = colors.base00;
+            mSurface = colors.base00;
+            mOnSurface = colors.base05;
+            mSurfaceVariant = colors.base00;
+            mOnSurfaceVariant = colors.base05;
+            mOutline = colors.base03;
+            mShadow = colors.base00;
+            mHover = colors.base02;
+            mOnHover = colors.base05;
+          };
         };
 
         settings = {
@@ -146,6 +166,7 @@ in
 
           system.monitor = {
             enabled = true;
+            enable_dgpu_monitoring = true; # NVIDIA needs the nvidia-smi opt-in
             cpu_poll_seconds = 5;
             gpu_poll_seconds = 5;
             memory_poll_seconds = 5;
