@@ -6,6 +6,7 @@ in
   flake.modules.homeManager.desktop-hyprland-noctalia =
     {
       lib,
+      pkgs,
       osConfig,
       config,
       ...
@@ -29,6 +30,16 @@ in
       # Configure Noctalia Shell v5
       programs.noctalia = {
         enable = true;
+
+        # noctalia v5 reads GPU stats via dlopen("libnvidia-ml.so.1") (NVML).
+        # Its package only adds autoAddDriverRunpath when cudaSupport = true
+        # (nix/package.nix:56); noctalia's pinned nixpkgs defaults it to false, so
+        # the driver libs aren't on RUNPATH and NVML dlopen fails silently.
+        # Enabling it here pulls NO CUDA — it only puts /run/opengl-driver/lib
+        # on the binary's DT_RUNPATH so NVML resolves at runtime.
+        package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+          cudaSupport = true;
+        };
 
         # Stylix-driven palette (Catppuccin Mocha OLED base16 scheme from
         # modules/home-manager/stylix.nix), selected via theme.source = "custom".
@@ -158,6 +169,17 @@ in
             };
           };
 
+          # ── Weather ──────────────────────────────────────────────────────────
+          # enabled defaults to true in v5 (config_types.h:902); set explicitly
+          # since v5 is alpha and example.toml wrongly documents it as false.
+          # Coordinates come from [location] above. unit: "imperial" = °F; any
+          # other value = °C (struct default "metric"), so omit for Celsius.
+          weather = {
+            enabled = true;
+            refresh_minutes = 30;
+            effects = true; # animated rain/snow overlays in the weather panel
+          };
+
           # ── Notifications ────────────────────────────────────────────────────
 
           notification.background_opacity = 0.75;
@@ -204,9 +226,10 @@ in
             center = [ "active_window" ];
             end = [
               "CPU"
-              "temp"
               "ram"
+              "temp"
               "gpu"
+              "gpu-vram"
               "gpu-temperature"
               "network_rx"
               "network_tx"
@@ -235,25 +258,42 @@ in
           # ── Per-widget settings ──────────────────────────────────────────────
 
           widget = {
+            "control-center".glyph = "snowflake";
             CPU = {
               display = "text";
+              show_label = false;
               type = "sysmon";
             };
-            "control-center".glyph = "snowflake";
+            GPU.stat = "gpu_usage";
             gpu = {
               display = "text";
+              show_label = false;
               stat = "gpu_usage";
               type = "sysmon";
             };
             "gpu-temperature" = {
               display = "text";
+              glyph = "cpu-temperature";
+              show_label = false;
               stat = "gpu_temp";
+              type = "sysmon";
+            };
+            "gpu-vram" = {
+              display = "text";
+              show_label = false;
+              stat = "gpu_vram";
               type = "sysmon";
             };
             network_rx.display = "text";
             network_tx.display = "text";
-            ram.display = "text";
-            temp.display = "text";
+            ram = {
+              display = "text";
+              show_label = false;
+            };
+            temp = {
+              display = "text";
+              show_label = false;
+            };
             workspaces = {
               display = "name";
               minimal = true;

@@ -35,28 +35,47 @@
       networking = {
         hostName = "workstation-nixos";
         hostId = "99c58a86"; # head -c 8 /etc/machine-id
+        # Split network stack: systemd-networkd owns the wired LAN (enp10s0,); NetworkManager owns WiFi + VPNs (openvpn / netbird / wireguard).
         useNetworkd = true;
+        # Suppress the global `99-*` DHCP catch-all .networks.
+        useDHCP = false;
         networkmanager = {
           enable = true;
           dns = "systemd-resolved";
           wifi.powersave = true;
           plugins = [ pkgs.networkmanager-openvpn ];
+          # Keep NM's hands off the wired NIC — networkd owns it.
+          unmanaged = [ "interface-name:enp10s0" ];
         };
         firewall.allowedTCPPorts = [ 27040 ];
       };
 
-      systemd.network = {
-        enable = true;
-        networks = {
-          "10-lan" = {
-            matchConfig.Name = "enp10s0";
-            networkConfig = {
-              DHCP = "no";
-              Address = "192.168.1.40/24";
-              Gateway = "192.168.1.1";
-              DNS = [ "192.168.1.1" ];
-              Domains = "~mars.lukashirsch.de ~deimos.mars.lukashirsch.de";
-              IPv6AcceptRA = true;
+      # systemd-resolved is load-bearing: NM uses `dns = "systemd-resolved"`,
+      # and networkd hands the wired link's DNS + split-DNS domains to it.
+      services.resolved.enable = true;
+      systemd = {
+        network = {
+          enable = true;
+          wait-online.extraArgs = [ "--interface=enp10s0" ];
+          networks = {
+            # Hand WiFi entirely to NetworkManager. nixos-facter emits a
+            # `40-wlp11s0.network` (DHCP=yes); without this, networkd would run a
+            # second DHCP client on the WiFi link NM owns.
+            "05-wlp11s0-unmanaged" = {
+              matchConfig.Name = "wlp11s0";
+              linkConfig.Unmanaged = true;
+            };
+            "10-enp10s0-lan" = {
+              matchConfig.Name = "enp10s0";
+              networkConfig = {
+                DHCP = "no";
+                Address = "192.168.1.40/24";
+                Gateway = "192.168.1.1";
+                DNS = [ "192.168.1.1" ];
+                # `~` prefix = routing-only split-DNS domains forwarded to resolved.
+                Domains = "~mars.lukashirsch.de ~deimos.mars.lukashirsch.de";
+                IPv6AcceptRA = true;
+              };
             };
           };
         };
