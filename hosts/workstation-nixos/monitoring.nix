@@ -44,6 +44,10 @@ _: {
         enable = true;
         hostLabel = "workstation-nixos.lukashirsch.de";
         basicAuthEnvFile = config.sops.templates."alloy/loki-auth.env".path;
+        # This host runs no quadlet containers; disabling prevents Alloy from
+        # polling the podman socket every 30s, which socket-activates and
+        # immediately terminates podman.service ~120 times per hour.
+        collectPodman = false;
       };
     };
 }

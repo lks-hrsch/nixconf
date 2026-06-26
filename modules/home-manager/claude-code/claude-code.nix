@@ -35,6 +35,7 @@ _: {
         settings = {
           skillListingBudgetFraction = 0.05;
           model = "opusplan";
+          effortLevel = "xhigh";
           cleanupPeriodDays = 30;
           permissions = {
             allow = [
