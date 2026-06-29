@@ -32,7 +32,8 @@ in
       (old.autoPatchelfIgnoreMissingDeps or [ ]) ++ [ "libc.musl-x86_64.so.1" ];
     # 1.125 adds a Copilot computer-use binary (computer.node) that requires
     # libXtst, libjpeg8, pipewire, and libei for screen capture / input emulation.
-    buildInputs = (old.buildInputs or [ ]) ++ [
+    # These are Linux-only; guard so the overlay doesn't break darwin builds.
+    buildInputs = (old.buildInputs or [ ]) ++ prev.lib.optionals prev.stdenv.hostPlatform.isLinux [
       prev.libxtst
       prev.libjpeg8
       prev.pipewire
