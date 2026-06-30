@@ -41,7 +41,11 @@ _: {
 
         homebrew = {
           taps = [
-            "slp/krunkit"
+            # Trust the tap (Homebrew 6.0); note it doesn't cover krunkit's transitive same-tap deps — see HOMEBREW_NO_REQUIRE_TAP_TRUST in darwin/homebrew.nix.
+            {
+              name = "slp/krunkit";
+              trusted = true;
+            }
           ];
           brews = [
             "helm"

@@ -38,12 +38,24 @@ _: {
           "small_model" = "github-copilot/gpt-5.4-mini";
           "lsp" = {
             "pyrefly" = {
-              "command" = [ "pyrefly" "lsp" ];
-              "extensions" = [ ".py" ".pyi" ];
+              "command" = [
+                "pyrefly"
+                "lsp"
+              ];
+              "extensions" = [
+                ".py"
+                ".pyi"
+              ];
             };
             "ruff" = {
-              "command" = [ "ruff" "server" ];
-              "extensions" = [ ".py" ".pyi" ];
+              "command" = [
+                "ruff"
+                "server"
+              ];
+              "extensions" = [
+                ".py"
+                ".pyi"
+              ];
             };
           };
           "provider" = {

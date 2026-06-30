@@ -58,7 +58,6 @@ _: {
                 "opencode/provider/develappers-proxy/api-key" = { };
 
                 "mcp/tavily/api-key" = { };
-                "mcp/mcpo/api-key" = { };
               };
             };
 

@@ -17,6 +17,8 @@ _: {
         cleanup = "zap";
         # Homebrew 5.1.15+ requires --force when --cleanup is used
         extraFlags = [ "--force" ];
+        # Homebrew 6.0 tap-trust doesn't cover transitively-loaded deps from 3rd-party taps (krunkit -> virglrenderer); disable the check. Deprecated escape hatch — revisit when removed.
+        extraEnv.HOMEBREW_NO_REQUIRE_TAP_TRUST = "1";
       };
 
       taps = [
@@ -36,7 +38,6 @@ _: {
       casks = [
         "aldente"
         "claude"
-        "ollama-app"
         "open-webui"
         "postman"
         "rustdesk"
