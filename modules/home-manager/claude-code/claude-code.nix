@@ -14,8 +14,8 @@ _: {
             official = pkgs.fetchFromGitHub {
               owner = "anthropics";
               repo = "claude-plugins-official";
-              rev = "3d5017bc1d40ef08c5733243516afeb993a6f5e5";
-              hash = "sha256-fhE6Zm83EUbdLBjY4VSCtoHyLVJ+Aexz7DN7n0Y0FLA=";
+              rev = "cd3ca5bd4a4b62bf006b59b68848b59e95f95439";
+              hash = "sha256-goJj0/7DtdVp/iwcmD1Bj4jZsQLdc7GLTYk4bhqgoN8=";
             };
           in
           [
@@ -28,8 +28,8 @@ _: {
             (pkgs.fetchFromGitHub {
               owner = "obra";
               repo = "superpowers";
-              rev = "6fd4507659784c351abbd2bc264c7162cfd386dc"; # v5.1.0
-              hash = "sha256-P/FD8HTQO+QzvMe3A/B2v2vjs8T6ZmIYH3MPp79dSzo=";
+              rev = "896224c4b1879920ab573417e68fd51d2ccc9072"; # v6.0.3
+              hash = "sha256-+lT2a/qq0SF4k0PgnEDKiuidVlZX2p0vEso4d/5T1os=";
             })
           ];
         settings = {

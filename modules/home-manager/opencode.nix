@@ -29,9 +29,9 @@ _: {
         package = pkgs.unstable.opencode;
         settings = {
           "plugin" = [
-            "opencode-with-claude@1.6.11"
-            "@tarquinen/opencode-dcp@3.1.12"
-            "superpowers@git+https://github.com/obra/superpowers.git#v5.1.0" # https://github.com/obra/superpowers/blob/main/docs/README.opencode.md
+            "opencode-with-claude@1.6.14"
+            "@tarquinen/opencode-dcp@3.1.14"
+            "superpowers@git+https://github.com/obra/superpowers.git#v6.0.3" # https://github.com/obra/superpowers/blob/main/docs/README.opencode.md
             # "oh-my-openagent" # https://github.com/code-yeongyu/oh-my-openagent/blob/3f30dac3f14b25911f8ed1a3c199410f8125d1b2/docs/guide/installation.md
           ];
           "model" = "anthropic/claude-opus-4-7";

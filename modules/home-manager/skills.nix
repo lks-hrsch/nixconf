@@ -1,122 +1,84 @@
-# https://www.skills.sh/
+# Declarative agent skills shared across claude-code and opencode.
+#
+# Each skill pins a GitHub source; the fetched store path is handed to the native
+# home-manager options programs.{claude-code,opencode}.skills, which symlink it
+# into ~/.claude/skills/<name> and $XDG_CONFIG_HOME/opencode/skills/<name>.
+#
+# To add a skill:
+#   1. nix run nixpkgs#nix-prefetch-github -- <owner> <repo>
+#   2. Add an entry below with the returned rev + hash and the subdir holding SKILL.md.
+#   3. Rebuild.
 _: {
   flake.modules.homeManager.skills =
     {
       lib,
       pkgs,
-      config,
       ...
     }:
     let
-      cfg = config.programs.skills;
-
-      enabledSkills = lib.filterAttrs (_: s: s.enable) cfg.skills;
-
-      mkSkillPath =
-        skill:
-        let
-          fetched = pkgs.fetchFromGitHub {
-            inherit (skill.src)
-              owner
-              repo
-              rev
-              hash
-              ;
-          };
-        in
-        if skill.subdir == "." then fetched else "${fetched}/${skill.subdir}";
-
-      # Produces an attrset suitable for home.file or xdg.configFile, using
-      # baseDir as the relative prefix (e.g. ".claude/skills" or "opencode/skills").
-      mkSkillFiles =
-        baseDir:
-        lib.mapAttrs' (
-          name: skill:
-          lib.nameValuePair "${baseDir}/${name}" {
-            source = mkSkillPath skill;
-          }
-        ) enabledSkills;
-    in
-    {
-      options.programs.skills = {
-        enable = lib.mkEnableOption "Declarative agent skills shared across claude-code and opencode";
-
-        skills = lib.mkOption {
-          default = { };
-          description = ''
-            Attrset of agent skills, each materialised as a symlink at
-            ~/.claude/skills/<name> and $XDG_CONFIG_HOME/opencode/skills/<name>.
-
-            To add a skill:
-              1. nix run nixpkgs#nix-prefetch-github -- <owner> <repo>
-              2. Add an entry here with the returned rev + hash.
-              3. Rebuild.
-          '';
-          type = lib.types.attrsOf (
-            lib.types.submodule {
-              options = {
-                enable = lib.mkEnableOption "this skill" // {
-                  default = true;
-                };
-                src = lib.mkOption {
-                  description = "GitHub source pin.";
-                  type = lib.types.submodule {
-                    options = {
-                      owner = lib.mkOption { type = lib.types.str; };
-                      repo = lib.mkOption { type = lib.types.str; };
-                      rev = lib.mkOption { type = lib.types.str; };
-                      hash = lib.mkOption {
-                        type = lib.types.str;
-                        description = "SRI hash from nix-prefetch-github (sha256-...=).";
-                      };
-                    };
-                  };
-                };
-                subdir = lib.mkOption {
-                  type = lib.types.str;
-                  default = ".";
-                  description = "Subdirectory within the repo containing SKILL.md. Omit if SKILL.md is at the root.";
-                };
-              };
-            }
-          );
+      # name -> GitHub source pin + subdir containing SKILL.md
+      skills = {
+        obsidian = {
+          # companion skill to the @bitbonsai/mcpvault MCP server (mcp.nix)
+          owner = "bitbonsai";
+          repo = "mcpvault";
+          rev = "ed18307c205c4c8bedc242601304fc4c50f63918";
+          hash = "sha256-3jAb7lWZAK0eEfL4nfYeP+KMnmS3dCfn/JKU0hJ8bf8=";
+          subdir = "skills/obsidian";
+        };
+        context7-mcp = {
+          # companion skill to the context7 MCP server (mcp.nix)
+          owner = "upstash";
+          repo = "context7";
+          rev = "b1fb8b523263143db858d09698f9c67e3be79e33";
+          hash = "sha256-7bqUsYnpceA9GG/t/p24Y8c47YPHwYiYlJQ2Xqs/FzQ=";
+          subdir = "skills/context7-mcp";
+        };
+        find-skills = {
+          owner = "vercel-labs";
+          repo = "skills";
+          rev = "2adcfe5a4cce0ce5f4d5547a997b2a161ec5d127";
+          hash = "sha256-176EeM1VhNSBH1cYUUy3oLST21PbV0v+tCNglfM9+6Y=";
+          subdir = "skills/find-skills";
+        };
+        grill-me = {
+          owner = "mattpocock";
+          repo = "skills";
+          rev = "801dca688564c529fa84f247f64472520d9ebe28";
+          hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+          subdir = "skills/productivity/grill-me";
+        };
+        grill-with-docs = {
+          owner = "mattpocock";
+          repo = "skills";
+          rev = "801dca688564c529fa84f247f64472520d9ebe28";
+          hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+          subdir = "skills/engineering/grill-with-docs";
+        };
+        tdd = {
+          owner = "mattpocock";
+          repo = "skills";
+          rev = "801dca688564c529fa84f247f64472520d9ebe28";
+          hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+          subdir = "skills/engineering/tdd";
+        };
+        improve-codebase-architecture = {
+          owner = "mattpocock";
+          repo = "skills";
+          rev = "801dca688564c529fa84f247f64472520d9ebe28";
+          hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+          subdir = "skills/engineering/improve-codebase-architecture";
         };
       };
 
-      config = lib.mkMerge [
-        {
-          programs.skills = {
-            enable = lib.mkDefault true;
-            skills.obsidian = {
-              # https://github.com/bitbonsai/mcpvault — companion skill to the
-              # @bitbonsai/mcpvault MCP server declared in mcp.nix
-              src = {
-                owner = "bitbonsai";
-                repo = "mcpvault";
-                rev = "dec984fee1f5daeac5d6a23ae1d9a62d6318fcb1";
-                hash = "sha256-Hd3ml5FmD9/EvhcWfX3AgF1vJQmBQRhRbIb+rW56N8A=";
-              };
-              subdir = "skills/obsidian";
-            };
-            skills.context7-mcp = {
-              # https://github.com/upstash/context7 — companion skill to the
-              # context7 MCP server declared in mcp.nix
-              src = {
-                owner = "upstash";
-                repo = "context7";
-                rev = "7cacc9460a77efe61273433e56298d03694d7ba7";
-                hash = "sha256-wWD8V3sxy6WGvWKdLxA1ranwFPvRpRRCrPWKJ3IDEuw=";
-              };
-              subdir = "skills/context7-mcp";
-            };
-          };
-        }
-        (lib.mkIf cfg.enable {
-          # claude-code does not follow XDG; use home.file with a HOME-relative path.
-          home.file = mkSkillFiles ".claude/skills";
-          # opencode follows XDG_CONFIG_HOME; use xdg.configFile for correctness.
-          xdg.configFile = mkSkillFiles "opencode/skills";
-        })
-      ];
+      # name -> store path of the skill's directory (containing SKILL.md). Identical
+      # pins share one fetchFromGitHub derivation, so a repo is fetched only once.
+      skillPaths = lib.mapAttrs (
+        _: s: "${pkgs.fetchFromGitHub { inherit (s) owner repo rev hash; }}/${s.subdir}"
+      ) skills;
+    in
+    {
+      programs.claude-code.skills = skillPaths;
+      programs.opencode.skills = skillPaths;
     };
 }
