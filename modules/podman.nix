@@ -68,18 +68,13 @@ _: {
           ...
         }:
         {
-          home.packages =
-            with pkgs;
-            [
-              kubectl
-              minikube
+          home.packages = with pkgs; [
+            kubectl
+            minikube
 
-              argocd
-              kubeseal
-            ]
-            ++ lib.optionals pkgs.stdenv.isLinux [
-              podman-desktop
-            ];
+            argocd
+            kubeseal
+          ];
 
           programs.k9s.enable = true;
         };
