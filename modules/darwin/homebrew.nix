@@ -38,6 +38,9 @@ _: {
       casks = [
         "aldente"
         "claude"
+        # Signed app in /Applications required for 1Password desktop-app
+        # integration; profile is managed by home-manager (firefox.nix).
+        "firefox"
         "open-webui"
         "postman"
         "rustdesk"
