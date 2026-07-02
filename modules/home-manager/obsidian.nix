@@ -1,4 +1,8 @@
-_: {
+{ config, ... }:
+let
+  inherit (config.repo.constants) obsidianVaultPath;
+in
+{
   flake.modules.homeManager.obsidian =
     {
       config,
@@ -13,7 +17,7 @@ _: {
 
       home.file.obsidian-stylix-css = {
         enable = true;
-        target = "Obsidian.nosync/private/.obsidian/snippets/obsidian-stylix-css.css";
+        target = "${obsidianVaultPath}/.obsidian/snippets/obsidian-stylix-css.css";
         text = ''
           :root .theme-dark {
               --background-primary:         ${base00};

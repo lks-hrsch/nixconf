@@ -24,8 +24,8 @@
       ];
 
       nixpkgs = {
-        hostPlatform = "x86_64-linux";
-        config.allowUnfree = true;
+        hostPlatform = lib.mkDefault "x86_64-linux";
+        config.allowUnfree = lib.mkDefault true;
         overlays = [
           config.repo.overlays.unstable
         ];

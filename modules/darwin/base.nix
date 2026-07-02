@@ -33,8 +33,8 @@ in
           { config, lib, ... }:
           {
             nixpkgs = {
-              hostPlatform = "aarch64-darwin";
-              config.allowUnfree = true;
+              hostPlatform = lib.mkDefault "aarch64-darwin";
+              config.allowUnfree = lib.mkDefault true;
               overlays = [
                 overlays.unstable
                 overlays.firefox-addons
