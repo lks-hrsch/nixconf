@@ -60,10 +60,10 @@
     };
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
-    mac-app-util = {
-      url = "github:hraban/mac-app-util";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # Deliberately NOT following our nixpkgs: mac-app-util is a Common Lisp
+    # tool whose sbcl/fare-quasiquote dependency stack fails to build on
+    # nixpkgs 26.05 aarch64-darwin — it needs the older nixpkgs it pins.
+    mac-app-util.url = "github:hraban/mac-app-util";
     meridian = {
       url = "github:rynfar/meridian";
       inputs.nixpkgs.follows = "nixpkgs";

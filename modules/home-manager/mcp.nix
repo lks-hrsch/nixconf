@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  inherit (config.repo.constants) obsidianVaultPath;
+  inherit (config.repo.constants) obsidianBasePath;
 in
 {
   flake.modules.homeManager.mcp =
@@ -36,7 +36,9 @@ in
             command = "npx";
             args = [
               "@bitbonsai/mcpvault@latest"
-              "${config.home.homeDirectory}/${obsidianVaultPath}"
+              # Private vault only — the work-develappers vault is not
+              # exposed via MCP.
+              "${config.home.homeDirectory}/${obsidianBasePath}/private"
             ];
             description = "Secure access to local Obsidian vault for notes management";
           };
