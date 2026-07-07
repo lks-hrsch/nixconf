@@ -59,6 +59,7 @@
     { lib, pkgs, ... }:
     {
       imports = with config.flake.modules.homeManager; [
+        bruno
         ghostty
         firefox
         obsidian
