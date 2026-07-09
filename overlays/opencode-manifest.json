@@ -1,8 +1,8 @@
 {
-  "version": "1.17.14",
+  "version": "1.17.16",
   "platforms": {
-    "x86_64-linux":   { "filename": "opencode-linux-x64.tar.gz",  "sha256": "sha256-OKhw0JUac/ZA6ufbFyk2S8TjqEBffz4d7UmU981T7S4=" },
-    "aarch64-linux":  { "filename": "opencode-linux-arm64.tar.gz", "sha256": "sha256-QLdDF4189JOoyO1DZIsaMaruqgpT68OZRFI+yAZpTV8=" },
-    "aarch64-darwin": { "filename": "opencode-darwin-arm64.zip",   "sha256": "sha256-7AGMCsi80Gad2/m/a78JABzt5/xGA4HbJ8JzJYivsJg=" }
+    "x86_64-linux":   { "filename": "opencode-linux-x64.tar.gz",  "sha256": "sha256-gCs/SZWyKhBdFV/3AvgxAcTB0lhLFdBmGD6bAmafbX8=" },
+    "aarch64-linux":  { "filename": "opencode-linux-arm64.tar.gz", "sha256": "sha256-5+2D2NaLJ76wNIOpdXBWdXitS0VEjOVgaL3Q5V20BHk=" },
+    "aarch64-darwin": { "filename": "opencode-darwin-arm64.zip",   "sha256": "sha256-3imU8KovSldtaES/Ko/dU+wqecWXbOxEDstj+T4foEY=" }
   }
 }
