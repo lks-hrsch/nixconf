@@ -20,6 +20,7 @@ mercury is the public edge VPS for this fleet.
 | --- | --- | --- | --- |
 | 80 | TCP | Traefik | HTTP -> HTTPS redirect and ACME handling |
 | 443 | TCP | Traefik | TLS ingress for apps, OIDC, NetBird HTTP/gRPC |
+| 1883 | TCP | Mosquitto (ldr-connect) | Plaintext MQTT dev broker (ACL-gated; TLS+creds planned) |
 | 3478 | UDP | NetBird | STUN/TURN |
 | 51821 | UDP | wg0 | Backbone VPN entrypoint |
 
@@ -46,6 +47,7 @@ Notes:
 | Authelia | Auth portal + OIDC provider | Routed via Traefik |
 | NetBird server/dashboard | Overlay VPN control plane | Routed via Traefik + 3478/udp |
 | Vaultwarden | Password manager | Public via Traefik on 443 |
+| Mosquitto (ldr-connect) | MQTT broker for ldr-connect | Public 1883/tcp, bypasses Traefik |
 
 ## Current Routing Notes
 
@@ -56,6 +58,10 @@ Notes:
 - Vaultwarden is intended to be publicly reachable via Traefik over HTTPS (not VPN-only).
 - Vaultwarden is currently not behind Authelia forward-auth (intentional for now).
 - Traefik dashboard route exists and is restricted with an IP allowlist middleware.
+- ldr-connect broker answers on broker.ldr-connect.lukashirsch.de and
+  broker.ldr-connect.mercury.lukashirsch.de — both are manual DNS-only A
+  records at Cloudflare pointing at 5.45.99.133 (MQTT can't ride the
+  Cloudflare proxy or Traefik, so the names are pure DNS).
 
 ## Architecture
 
