@@ -1,6 +1,6 @@
 _: {
   flake.modules.homeManager.claude-code =
-    { pkgs, ... }:
+    { pkgs, config, ... }:
     let
       # anthropics/claude-plugins-official — rev is the current ~/.claude .gcs-sha
       official = pkgs.fetchFromGitHub {
@@ -24,6 +24,15 @@ _: {
     in
     {
       imports = [ ../../../overlays/uv-module.nix ];
+
+      # Decrypted at HM activation; read at runtime by the `claude-collana` /
+      # `claude-develappers` aliases (below) so no value enters the Nix store.
+      sops.secrets = {
+        "claude-code/provider/collana/base-url" = { };
+        "claude-code/provider/collana/auth-token" = { };
+        "claude-code/provider/develappers/base-url" = { };
+        "claude-code/provider/develappers/auth-token" = { };
+      };
 
       # dependencies
       home.packages = with pkgs; [
@@ -140,9 +149,14 @@ _: {
       };
 
       # TODO: Wait for Litellm Issue #23841 and PR #23844, #28595 merge (input_text block translation fix) — see https://github.com/BerriAI/litellm/issues/23841
-      programs.zsh.shellAliases = {
-        claude-office = "ANTHROPIC_BASE_URL=https://llm.develappers-intranet.de:11434 ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=develappers-coding ANTHROPIC_DEFAULT_SONNET_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding claude";
-      };
+      programs.zsh.shellAliases =
+        let
+          secretPath = name: config.sops.secrets."claude-code/provider/${name}".path;
+        in
+        {
+          claude-develappers = "ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=develappers-coding ANTHROPIC_DEFAULT_SONNET_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding claude";
+          claude-collana = "ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=general ANTHROPIC_CUSTOM_MODEL_OPTION=coding ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general claude";
+        };
 
       home.file.".claude/statusline-command.sh" = {
         text = builtins.readFile ./statusline-command.sh;
