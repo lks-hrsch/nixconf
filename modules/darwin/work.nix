@@ -14,7 +14,6 @@
         "fork"
         "google-chrome"
         "keepassxc"
-        "microsoft-edge"
         "openvpn-connect"
         "zoom"
       ];

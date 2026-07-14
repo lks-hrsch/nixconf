@@ -1,37 +1,67 @@
 _: {
   flake.modules.homeManager.claude-code =
     { pkgs, ... }:
+    let
+      # anthropics/claude-plugins-official — rev is the current ~/.claude .gcs-sha
+      official = pkgs.fetchFromGitHub {
+        owner = "anthropics";
+        repo = "claude-plugins-official";
+        rev = "cd3ca5bd4a4b62bf006b59b68848b59e95f95439";
+        hash = "sha256-goJj0/7DtdVp/iwcmD1Bj4jZsQLdc7GLTYk4bhqgoN8=";
+      };
+      superpowers = pkgs.fetchFromGitHub {
+        owner = "obra";
+        repo = "superpowers";
+        rev = "896224c4b1879920ab573417e68fd51d2ccc9072"; # v6.0.3
+        hash = "sha256-+lT2a/qq0SF4k0PgnEDKiuidVlZX2p0vEso4d/5T1os=";
+      };
+      claude-mem = pkgs.fetchFromGitHub {
+        owner = "thedotmack";
+        repo = "claude-mem";
+        rev = "f5633c1f84181673896c038cbe285131c6d669a3"; # v13.11.0
+        hash = "sha256-CWvBXPHU195o9B0KBEWuMbefc5YUPFZtu0nMbxGq1p8=";
+      };
+    in
     {
+      imports = [ ../../../overlays/uv-module.nix ];
+
+      # dependencies
+      home.packages = with pkgs; [
+        nodejs_24
+        bun
+      ];
+
+      # graphify skill CLI — https://github.com/Graphify-Labs/graphify
+      # (PyPI package is `graphifyy`; installed command is `graphify`)
+      programs.uv = {
+        enable = true;
+        tool = {
+          packages = [ "graphifyy" ];
+          prune = true;
+        };
+      };
+
       programs.claude-code = {
         enable = true;
         enableMcpIntegration = true;
         package = pkgs.unstable.claude-code;
-        # Plugins loaded directly via --plugin-dir from pinned sources (no marketplace
-        # registration). Bump a rev+hash like the skills pins in skills.nix to update.
-        plugins =
-          let
-            # anthropics/claude-plugins-official — rev is the current ~/.claude .gcs-sha
-            official = pkgs.fetchFromGitHub {
-              owner = "anthropics";
-              repo = "claude-plugins-official";
-              rev = "cd3ca5bd4a4b62bf006b59b68848b59e95f95439";
-              hash = "sha256-goJj0/7DtdVp/iwcmD1Bj4jZsQLdc7GLTYk4bhqgoN8=";
-            };
-          in
-          [
-            "${official}/plugins/code-review"
-            "${official}/plugins/claude-md-management"
-            "${official}/plugins/pyright-lsp"
-            "${official}/plugins/rust-analyzer-lsp"
-            "${official}/plugins/typescript-lsp"
-            # superpowers is an external plugin referenced by the official marketplace
-            (pkgs.fetchFromGitHub {
-              owner = "obra";
-              repo = "superpowers";
-              rev = "896224c4b1879920ab573417e68fd51d2ccc9072"; # v6.0.3
-              hash = "sha256-+lT2a/qq0SF4k0PgnEDKiuidVlZX2p0vEso4d/5T1os=";
-            })
-          ];
+        marketplaces = {
+          superpowers = superpowers;
+          claude-mem = claude-mem;
+        };
+        plugins = [
+          "${official}/plugins/code-review"
+          "${official}/plugins/code-simplifier"
+          "${official}/plugins/claude-md-management"
+          "${official}/plugins/pyright-lsp"
+          "${official}/plugins/rust-analyzer-lsp"
+          "${official}/plugins/swift-lsp"
+          "${official}/plugins/typescript-lsp"
+          # superpowers is an external plugin referenced by the official marketplace
+          superpowers
+          # claude-mem
+          "${claude-mem}/plugin"
+        ];
         settings = {
           skillListingBudgetFraction = 0.05;
           model = "opusplan";
@@ -91,6 +121,8 @@ _: {
               "mcp__obsidian__read_multiple_notes"
               "mcp__obsidian__search_notes"
               "mcp__obsidian__list_directory"
+              "mcp__plugin_claude-code-home-manager_grep-app__searchGitHub"
+              "mcp__plugin_claude-code-home-manager_nixos__nix"
             ];
             defaultMode = "default";
           };
@@ -102,6 +134,8 @@ _: {
           autoMemoryEnabled = true;
           autoDreamEnabled = true;
           remoteControlAtStartup = false;
+          feedbackSurveyRate = 0;
+          tui = "fullscreen";
         };
       };
 

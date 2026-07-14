@@ -43,7 +43,7 @@ _: {
           taps = [
             # Trust the tap (Homebrew 6.0); note it doesn't cover krunkit's transitive same-tap deps — see HOMEBREW_NO_REQUIRE_TAP_TRUST in darwin/homebrew.nix.
             {
-              name = "slp/krun";
+              name = "libkrun/krun";
               trusted = true;
             }
           ];
@@ -53,7 +53,7 @@ _: {
             "docker-compose"
             "podman"
             "podman-compose"
-            "slp/krun/krunkit"
+            "libkrun/krun/krunkit"
           ];
           casks = [
             "podman-desktop"
