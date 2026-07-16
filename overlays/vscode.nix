@@ -14,16 +14,40 @@ in
       url = "https://update.code.visualstudio.com/${dlVer}/${entry.plat}/stable";
       inherit (entry) sha256;
     };
-    # VSCode 1.122+ moved the bundled ripgrep from `@vscode/ripgrep/bin/rg`
-    # to `@vscode/ripgrep-universal/bin/<plat>/rg`. The nixpkgs builder still
-    # hardcodes the old path in postPatch, so its `rm` fails. Patch the
-    # already-rendered postPatch string to point at the new location.
-    # `entry.plat` (linux-x64 / linux-arm64 / darwin-arm64) matches the
-    # ripgrep-universal subdir name for every system we ship.
-    postPatch = builtins.replaceStrings
-      [ "@vscode/ripgrep/bin/rg" ]
-      [ "@vscode/ripgrep-universal/bin/${entry.plat}/rg" ]
-      old.postPatch;
+    # VSCode's ripgrep-universal binary (bundled since 1.122+) has shipped
+    # under BOTH `node_modules/` and `node_modules.asar.unpacked/` across
+    # different releases — nixpkgs' own generic.nix (currently pinned to
+    # vscode 1.127.0) assumes a single cutoff (asar.unpacked only pre-1.94.0
+    # on darwin) that no longer holds: VSCode 1.129.0's darwin-arm64 build
+    # ships ripgrep-universal under node_modules.asar.unpacked despite being
+    # well past 1.94.0, so nixpkgs' hardcoded `chmod +x .../node_modules/...`
+    # target 404s. Downstream consumers (e.g. cline/cline's extension.ts) hit
+    # the same inconsistency and probe both locations instead of trusting a
+    # version cutoff — do the same here. Covers both the pre-1.122
+    # (`@vscode/ripgrep/bin/rg`) and current (`.../ripgrep-universal/bin/
+    # <plat>/rg`) relative paths so this keeps working if nixpkgs' own vscode
+    # pin ever moves back across that boundary.
+    postPatch =
+      let
+        appDir = if prev.stdenv.hostPlatform.isDarwin then "Contents/Resources/app" else "resources/app";
+        probe = rgRelPath: ''
+          for base in "${appDir}/node_modules" "${appDir}/node_modules.asar.unpacked"; do
+            if [ -f "$base/${rgRelPath}" ]; then
+              chmod +x "$base/${rgRelPath}"
+            fi
+          done
+        '';
+      in
+      builtins.replaceStrings
+        [
+          "chmod +x ${appDir}/node_modules/@vscode/ripgrep/bin/rg"
+          "chmod +x ${appDir}/node_modules/@vscode/ripgrep-universal/bin/${entry.plat}/rg"
+        ]
+        [
+          (probe "@vscode/ripgrep/bin/rg")
+          (probe "@vscode/ripgrep-universal/bin/${entry.plat}/rg")
+        ]
+        old.postPatch;
     # 1.122 ships the Copilot extension with both glibc and musl native
     # binaries. The musl `copilot` wants libc.musl-*.so.1, which is absent on
     # glibc NixOS — autoPatchelf hard-fails on it. The glibc variant is the one
