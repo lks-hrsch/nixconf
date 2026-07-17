@@ -19,6 +19,12 @@ _: {
             inconsolata
             mwe
             enumitem
+            noto
+            notomath # math support for noto fonts
+            newtx
+            txfonts # txsyc symbol fonts used by newtxmath
+            kastrup # binhex.tex (\input by newtxmath)
+            xstring # used by newtxmath
           ]
         ))
         ghostscript
