@@ -25,10 +25,12 @@ _: {
             txfonts # txsyc symbol fonts used by newtxmath
             kastrup # binhex.tex (\input by newtxmath)
             xstring # used by newtxmath
+            pdfpc
           ]
         ))
         ghostscript
         biber
+        pdfpc
       ];
     };
 }
