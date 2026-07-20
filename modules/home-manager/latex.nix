@@ -26,6 +26,10 @@ _: {
             kastrup # binhex.tex (\input by newtxmath)
             xstring # used by newtxmath
             pdfpc
+            hyperxmp
+            luacode
+            ifmtarg
+            zref
           ]
         ))
         ghostscript
