@@ -21,6 +21,13 @@ _: {
         rev = "f5633c1f84181673896c038cbe285131c6d669a3"; # v13.11.0
         hash = "sha256-CWvBXPHU195o9B0KBEWuMbefc5YUPFZtu0nMbxGq1p8=";
       };
+      # openai/codex-plugin-cc — "codex" plugin in the "openai-codex" marketplace
+      codex-plugin-cc = pkgs.fetchFromGitHub {
+        owner = "openai";
+        repo = "codex-plugin-cc";
+        rev = "db52e28f4d9ded852ab3942cea316258ae4ef346"; # v1.0.6
+        hash = "sha256-S/R4kHTcIHBcG0TRX063C7ILXZZm0oMqunchPGg6ToU=";
+      };
     in
     {
       imports = [ ../../../overlays/uv-module.nix ];
@@ -57,6 +64,7 @@ _: {
         marketplaces = {
           superpowers = superpowers;
           claude-mem = claude-mem;
+          openai-codex = codex-plugin-cc;
         };
         plugins = [
           "${official}/plugins/code-review"
@@ -70,6 +78,8 @@ _: {
           superpowers
           # claude-mem
           "${claude-mem}/plugin"
+          # openai codex plugin — /codex:* review & delegate commands
+          "${codex-plugin-cc}/plugins/codex"
         ];
         settings = {
           skillListingBudgetFraction = 0.05;
