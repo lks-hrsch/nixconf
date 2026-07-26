@@ -45,6 +45,8 @@ _: {
       home.packages = with pkgs; [
         nodejs_24
         bun
+        # for the security-guidance and claude-security plugin hooks
+        (unstable.python3.withPackages (ps: [ ps.claude-agent-sdk ]))
       ];
 
       # graphify skill CLI — https://github.com/Graphify-Labs/graphify
@@ -92,7 +94,6 @@ _: {
             allow = [
               # file metadata (no content)
               "Bash(ls:*)"
-              "Bash(find:*)"
               "Bash(stat:*)"
               "Bash(file:*)"
               "Bash(wc:*)"
@@ -106,7 +107,6 @@ _: {
               "Bash(date:*)"
               "Bash(echo:*)"
               "Bash(printf:*)"
-              "Bash(env:*)"
               # text transforms (stdin/pipeline, not file reading)
               "Bash(sort:*)"
               "Bash(uniq:*)"
@@ -126,24 +126,22 @@ _: {
               # nix read-only
               "Bash(nix flake show:*)"
               "Bash(nix path-info:*)"
-              "Bash(nix eval:*)"
               # web
               "WebFetch(domain:github.com)"
               "WebFetch(domain:raw.githubusercontent.com)"
-              "WebFetch(domain:mynixos.com)"
               "WebFetch(domain:nix.dev)"
+              "WebFetch(domain:mynixos.com)"
               "WebFetch(domain:wiki.nixos.org)"
               # mcp
-              "mcp__context7__resolve-library-id"
-              "mcp__context7__query-docs"
-              "mcp__nixos__nix"
-              "mcp__nixos__nix_versions"
-              "mcp__obsidian__read_note"
-              "mcp__obsidian__read_multiple_notes"
-              "mcp__obsidian__search_notes"
-              "mcp__obsidian__list_directory"
-              "mcp__plugin_claude-code-home-manager_grep-app__searchGitHub"
+              "mcp__plugin_claude-code-home-manager_context7__resolve-library-id"
+              "mcp__plugin_claude-code-home-manager_context7__query-docs"
               "mcp__plugin_claude-code-home-manager_nixos__nix"
+              "mcp__plugin_claude-code-home-manager_nixos__nix_versions"
+              "mcp__plugin_claude-code-home-manager_grep-app__searchGitHub"
+              "mcp__plugin_claude-code-home-manager_obsidian__read_note"
+              "mcp__plugin_claude-code-home-manager_obsidian__read_multiple_notes"
+              "mcp__plugin_claude-code-home-manager_obsidian__search_notes"
+              "mcp__plugin_claude-code-home-manager_obsidian__list_directory"
             ];
             defaultMode = "default";
           };
