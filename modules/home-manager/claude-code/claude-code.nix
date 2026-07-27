@@ -51,13 +51,7 @@ _: {
 
       # graphify skill CLI — https://github.com/Graphify-Labs/graphify
       # (PyPI package is `graphifyy`; installed command is `graphify`)
-      programs.uv = {
-        enable = true;
-        tool = {
-          packages = [ "graphifyy" ];
-          prune = true;
-        };
-      };
+      programs.uv.tool.packages = [ "graphifyy" ];
 
       programs.claude-code = {
         enable = true;

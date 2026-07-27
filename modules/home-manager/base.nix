@@ -25,6 +25,7 @@
         sops
         ssh
         stylix
+        uv
         zsh
       ];
 
