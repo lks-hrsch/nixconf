@@ -28,6 +28,13 @@ _: {
         rev = "db52e28f4d9ded852ab3942cea316258ae4ef346"; # v1.0.6
         hash = "sha256-S/R4kHTcIHBcG0TRX063C7ILXZZm0oMqunchPGg6ToU=";
       };
+      # DietrichGebert/ponytail — repo root is both the marketplace and the plugin
+      ponytail = pkgs.fetchFromGitHub {
+        owner = "DietrichGebert";
+        repo = "ponytail";
+        rev = "16f29800fd2681bdf24f3eb4ccffe38be3baec6b"; # main as of 2026-07-15 (v4.8.4 + 53)
+        hash = "sha256-Y7d4s7uqjH6IbEXhqAiQ+yaxr6iiGcv2X64LuMtG1T8=";
+      };
     in
     {
       imports = [ ../../../overlays/uv-module.nix ];
@@ -61,23 +68,26 @@ _: {
           superpowers = superpowers;
           claude-mem = claude-mem;
           openai-codex = codex-plugin-cc;
+          ponytail = ponytail;
         };
         plugins = [
           "${official}/plugins/code-review"
           "${official}/plugins/code-simplifier"
           "${official}/plugins/claude-md-management"
+          "${official}/plugins/claude-security"
+          "${official}/plugins/security-guidance"
           "${official}/plugins/pyright-lsp"
           "${official}/plugins/rust-analyzer-lsp"
           "${official}/plugins/swift-lsp"
           "${official}/plugins/typescript-lsp"
-          "${official}/plugins/claude-security"
-          "${official}/plugins/security-guidance"
           # superpowers is an external plugin referenced by the official marketplace
           superpowers
           # claude-mem
           "${claude-mem}/plugin"
           # openai codex plugin — /codex:* review & delegate commands
           "${codex-plugin-cc}/plugins/codex"
+          # ponytail — lazy-senior-dev ruleset; /ponytail{,-review,-audit,-debt,-gain,-help}
+          ponytail
         ];
         settings = {
           skillListingBudgetFraction = 0.05;

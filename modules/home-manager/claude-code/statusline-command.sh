@@ -88,9 +88,24 @@ cost_part="${YELLOW}$(printf '$%.2f' "$cost")${RESET}"
 # ── Code velocity ──
 velocity="${GREEN}+${lines_add}${RESET} ${RED}-${lines_del}${RESET}"
 
+# ── Ponytail mode badge (plugin writes this flag at SessionStart) ──
+pony=""
+pony_flag="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/.ponytail-active"
+if [ -f "$pony_flag" ]; then
+  pony_mode=$(head -n1 "$pony_flag" | tr -d '[:space:]')
+  pony_color=108
+  [ "$pony_mode" = "ultra" ] && pony_color=173
+  if [ -z "$pony_mode" ] || [ "$pony_mode" = "full" ]; then
+    pony="\033[38;5;${pony_color}m[PONYTAIL]\033[0m"
+  else
+    pony="\033[38;5;${pony_color}m[PONYTAIL:$(printf '%s' "$pony_mode" | tr '[:lower:]' '[:upper:]')]\033[0m"
+  fi
+fi
+
 # ── Single line ──
 out=""
-[ -n "$repo" ] && out="${BOLD}${YELLOW}${repo}${RESET}"
+[ -n "$pony" ] && out="$pony"
+[ -n "$repo" ] && out="${out:+$out }${BOLD}${YELLOW}${repo}${RESET}"
 [ -n "$branch" ] && out="${out:+$out }${BOLD}${CYAN}🌿 (${branch})${RESET}"
 out="${out:+$out ${DIM}|${RESET} }${ctx_part}"
 out="${out} ${DIM}|${RESET} ${cost_part}"
