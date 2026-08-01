@@ -32,6 +32,7 @@ _: {
               luacode
               ifmtarg
               zref
+              helvetic # urw-base35 Helvetica — needed by acl.sty's [review] line numbers
             ]
           ))
           ghostscript

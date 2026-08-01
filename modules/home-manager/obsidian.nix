@@ -79,15 +79,26 @@ in
       #    rebuild; each nix host renders its own copy from this module.
       # .stignore itself never syncs — mirror lines manually on other devices
       # if they should also skip these paths.
-      home.file."${obsidianBasePath}/.stignore".text = ''
-        **.nosync
-        **.DS_Store
-        **.Trash
-        **.trash
-      ''
-      + lib.concatMapStrings (v: ''
-        /${v}/.obsidian/appearance.json
-        /${v}/.obsidian/snippets
-      '') vaultNames;
+      #
+      # Written via activation script (not home.file) so it lands as a real
+      # file: home.file symlinks into /nix/store, and Syncthing refuses to
+      # load an ignore file that's a symlink escaping the folder root,
+      # failing every scan with "too many levels of symbolic links".
+      home.activation.obsidianStignore = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        install -m644 ${
+          pkgs.writeText "obsidian-stignore" (
+            ''
+              **.nosync
+              **.DS_Store
+              **.Trash
+              **.trash
+            ''
+            + lib.concatMapStrings (v: ''
+              /${v}/.obsidian/appearance.json
+              /${v}/.obsidian/snippets
+            '') vaultNames
+          )
+        } "$HOME/${obsidianBasePath}/.stignore"
+      '';
     };
 }
