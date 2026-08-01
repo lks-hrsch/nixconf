@@ -30,6 +30,7 @@ _: {
       brews = [
         "helm"
         "mas" # https://github.com/mas-cli/mas
+        "pdfpc" # nixpkgs build crashes on render on aarch64-darwin, see modules/home-manager/latex.nix
         "steipete/tap/remindctl"
         "tw93/tap/mole" # https://github.com/tw93/Mole
       ];
