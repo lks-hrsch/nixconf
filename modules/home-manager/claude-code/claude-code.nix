@@ -1,7 +1,16 @@
 _: {
   flake.modules.homeManager.claude-code =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      lib,
+      ...
+    }:
     let
+      statusline = {
+        text = builtins.readFile ./statusline-command.sh;
+        executable = true;
+      };
       # anthropics/claude-plugins-official — pinned to latest main as of 2026-07-24
       official = pkgs.fetchFromGitHub {
         owner = "anthropics";
@@ -34,6 +43,13 @@ _: {
         repo = "ponytail";
         rev = "16f29800fd2681bdf24f3eb4ccffe38be3baec6b"; # main as of 2026-07-15 (v4.8.4 + 53)
         hash = "sha256-Y7d4s7uqjH6IbEXhqAiQ+yaxr6iiGcv2X64LuMtG1T8=";
+      };
+      # JuliusBrussee/caveman — repo root is both the marketplace and the plugin
+      caveman = pkgs.fetchFromGitHub {
+        owner = "JuliusBrussee";
+        repo = "caveman";
+        rev = "0d95a81d35a9f2d123a5e9430d1cfc43d55f1bb0"; # v1.9.1
+        hash = "sha256-VqRHx3/4SSCnEh3cUJ/he5saIfwNhS0hOzoH/wwtU2o=";
       };
     in
     {
@@ -69,6 +85,7 @@ _: {
           claude-mem = claude-mem;
           openai-codex = codex-plugin-cc;
           ponytail = ponytail;
+          caveman = caveman;
         };
         plugins = [
           "${official}/plugins/code-review"
@@ -88,6 +105,8 @@ _: {
           "${codex-plugin-cc}/plugins/codex"
           # ponytail — lazy-senior-dev ruleset; /ponytail{,-review,-audit,-debt,-gain,-help}
           ponytail
+          # caveman — ultra-compressed prose mode; /caveman, active by default
+          caveman
         ];
         settings = {
           skillListingBudgetFraction = 0.05;
@@ -168,13 +187,32 @@ _: {
           secretPath = name: config.sops.secrets."claude-code/provider/${name}".path;
         in
         {
-          claude-develappers = "ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_SONNET_MODEL=develappers-coding ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding claude";
-          claude-collana = "ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general claude";
+          claude-work = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" claude";
+          claude-collana-private = "DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_EFFORT_LEVEL=unset CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
+          claude-collana = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_EFFORT_LEVEL=unset CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
+          claude-develappers = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_EFFORT_LEVEL=unset CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_SONNET_MODEL=develappers-coding ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding CLAUDE_MEM_MODEL=develappers-coding claude --model develappers-coding";
         };
 
-      home.file.".claude/statusline-command.sh" = {
-        text = builtins.readFile ./statusline-command.sh;
-        executable = true;
-      };
+      # claude-mem settings — declarative replacement for auto-generated
+      # ~/.claude-mem/settings.json.  Tier models use real model names so the
+      # worker never sends "general" to the API (gateway/collana aliases set
+      # CLAUDE_MEM_MODEL=general at runtime; that alias is resolved by LiteLLM).
+      home.file = {
+        ".claude/statusline-command.sh" = statusline;
+
+        # ~/.claude-work is the CLAUDE_CONFIG_DIR used by the claude-work /
+        # claude-collana / claude-develappers aliases above — mirror the base setup
+        # so those sessions get the same settings, statusline and skills.
+        ".claude-work/statusline-command.sh" = statusline;
+        ".claude-work/settings.json".source =
+          config.home.file."${config.programs.claude-code.configDir}/settings.json".source;
+      }
+      // lib.mapAttrs' (
+        name: src:
+        lib.nameValuePair ".claude-work/skills/${name}" {
+          source = src;
+          recursive = true;
+        }
+      ) config.programs.claude-code.skills;
     };
 }
