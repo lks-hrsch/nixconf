@@ -11,12 +11,12 @@ _: {
         text = builtins.readFile ./statusline-command.sh;
         executable = true;
       };
-      # anthropics/claude-plugins-official — pinned to latest main as of 2026-07-24
+      # anthropics/claude-plugins-official — pinned to latest main as of 2026-08-04
       official = pkgs.fetchFromGitHub {
         owner = "anthropics";
         repo = "claude-plugins-official";
-        rev = "b4810bd800e10c8595d79835e61e5945c1cd81ba";
-        hash = "sha256-t5fhBhsOiIEkK7kvTqnsbGj06YpSOJho4JykkXGIIxY=";
+        rev = "b7e93a4e7c950ba5b22a2bdb9a61e2631f75a51e";
+        hash = "sha256-u6suHaAGCr3BufCUYhcgmwx/UWovCY7RPUCfKCg/0SU=";
       };
       superpowers = pkgs.fetchFromGitHub {
         owner = "obra";
@@ -27,8 +27,8 @@ _: {
       claude-mem = pkgs.fetchFromGitHub {
         owner = "thedotmack";
         repo = "claude-mem";
-        rev = "21434061901629e2b78d75328f39536a8a3caec8"; # v13.12.4
-        hash = "sha256-4Q95emcF4fUFc7eMwU18v44Uoz/ZAenCcXbwZC8z0kM=";
+        rev = "f9e330199c411cb49b1874915b9a1736d33b2703"; # v13.13.1
+        hash = "sha256-j4/FW6ubZTtMw2Q2jZJKkSE95pUBpomstHI03IcPHsc=";
       };
       # openai/codex-plugin-cc — "codex" plugin in the "openai-codex" marketplace
       codex-plugin-cc = pkgs.fetchFromGitHub {
@@ -48,15 +48,14 @@ _: {
       caveman = pkgs.fetchFromGitHub {
         owner = "JuliusBrussee";
         repo = "caveman";
-        rev = "0d95a81d35a9f2d123a5e9430d1cfc43d55f1bb0"; # v1.9.1
-        hash = "sha256-VqRHx3/4SSCnEh3cUJ/he5saIfwNhS0hOzoH/wwtU2o=";
+        rev = "fcf7663366c217dc8f334a11028de52ed950ceab"; # v1.10.0
+        hash = "sha256-3lPEPb+hzomLLz4xfU7wQS++10gXP0UbXHXq/yluAGM=";
       };
     in
     {
       imports = [ ../../../overlays/uv-module.nix ];
 
-      # Decrypted at HM activation; read at runtime by the `claude-collana` /
-      # `claude-develappers` aliases (below) so no value enters the Nix store.
+      # Decrypted at activation, read at runtime by the aliases below — keeps secrets out of the Nix store.
       sops.secrets = {
         "claude-code/provider/collana/base-url" = { };
         "claude-code/provider/collana/auth-token" = { };
@@ -64,7 +63,6 @@ _: {
         "claude-code/provider/develappers/auth-token" = { };
       };
 
-      # dependencies
       home.packages = with pkgs; [
         nodejs_24
         bun
@@ -72,8 +70,7 @@ _: {
         (unstable.python3.withPackages (ps: [ ps.claude-agent-sdk ]))
       ];
 
-      # graphify skill CLI — https://github.com/Graphify-Labs/graphify
-      # (PyPI package is `graphifyy`; installed command is `graphify`)
+      # graphify skill CLI: PyPI package `graphifyy`, command `graphify`
       programs.uv.tool.packages = [ "graphifyy" ];
 
       programs.claude-code = {
@@ -188,21 +185,17 @@ _: {
         in
         {
           claude-work = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" claude";
-          claude-collana-private = "DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_EFFORT_LEVEL=unset CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
-          claude-collana = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_EFFORT_LEVEL=unset CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
-          claude-develappers = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_EFFORT_LEVEL=unset CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_SONNET_MODEL=develappers-coding ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding CLAUDE_MEM_MODEL=develappers-coding claude --model develappers-coding";
+          claude-collana-private = "DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
+          claude-collana = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
+          claude-develappers = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_SONNET_MODEL=develappers-coding ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding CLAUDE_MEM_MODEL=develappers-coding claude --model develappers-coding";
         };
 
-      # claude-mem settings — declarative replacement for auto-generated
-      # ~/.claude-mem/settings.json.  Tier models use real model names so the
-      # worker never sends "general" to the API (gateway/collana aliases set
-      # CLAUDE_MEM_MODEL=general at runtime; that alias is resolved by LiteLLM).
+      # CLAUDE_MEM_MODEL=general is set by the gateway aliases and resolved via LiteLLM at runtime.
       home.file = {
         ".claude/statusline-command.sh" = statusline;
 
-        # ~/.claude-work is the CLAUDE_CONFIG_DIR used by the claude-work /
-        # claude-collana / claude-develappers aliases above — mirror the base setup
-        # so those sessions get the same settings, statusline and skills.
+        # ~/.claude-work: CLAUDE_CONFIG_DIR for claude-work/-collana/-develappers — mirrors the
+        # base setup so those sessions get the same settings, statusline and skills.
         ".claude-work/statusline-command.sh" = statusline;
         ".claude-work/settings.json".source =
           config.home.file."${config.programs.claude-code.configDir}/settings.json".source;
