@@ -178,7 +178,6 @@ _: {
         };
       };
 
-      # TODO: Wait for Litellm Issue #23841 and PR #23844, #28595 merge (input_text block translation fix) — see https://github.com/BerriAI/litellm/issues/23841
       programs.zsh.shellAliases =
         let
           secretPath = name: config.sops.secrets."claude-code/provider/${name}".path;
@@ -197,8 +196,16 @@ _: {
         # ~/.claude-work: CLAUDE_CONFIG_DIR for claude-work/-collana/-develappers — mirrors the
         # base setup so those sessions get the same settings, statusline and skills.
         ".claude-work/statusline-command.sh" = statusline;
+        # Same file minus `model`: "opusplan" hardcodes real Anthropic model IDs, bypassing
+        # ANTHROPIC_MODEL — the gateway aliases only know "coding"/"general", so plan-mode
+        # toggles would 404 instantly if opusplan stayed in.
         ".claude-work/settings.json".source =
-          config.home.file."${config.programs.claude-code.configDir}/settings.json".source;
+          pkgs.runCommand "claude-work-settings.json" { nativeBuildInputs = [ pkgs.jq ]; }
+            ''
+              jq 'del(.model)' ${
+                config.home.file."${config.programs.claude-code.configDir}/settings.json".source
+              } > $out
+            '';
       }
       // lib.mapAttrs' (
         name: src:

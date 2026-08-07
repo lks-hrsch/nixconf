@@ -50,12 +50,12 @@ _: {
                 # no secret is ever baked into the Nix store.
                 "opencode/provider/anthropic/base-url" = { };
                 "opencode/provider/anthropic/api-key" = { };
+                "opencode/provider/collana/base-url" = { };
+                "opencode/provider/collana/api-key" = { };
                 "opencode/provider/develappers/base-url" = { };
                 "opencode/provider/develappers/api-key" = { };
                 "opencode/provider/workstation-nixos/base-url" = { };
                 "opencode/provider/workstation-nixos/api-key" = { };
-                "opencode/provider/develappers-proxy/base-url" = { };
-                "opencode/provider/develappers-proxy/api-key" = { };
 
                 "mcp/tavily/api-key" = { };
               };
