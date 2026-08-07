@@ -1,56 +1,55 @@
 _: {
-  # llama.cpp server (Gemma 4 E2B QAT Q4_0) as an always-on launchd agent,
-  # with MTP speculative decoding (n_max=1) for throughput and --jinja for
-  # OpenAI-compatible tool calling (function calling).
-  #
-  # Tuned for this 16 GB M1: Metal offload, 131k ctx, 2 parallel slots,
-  # serving an OpenAI-compatible API on 0.0.0.0:8080 (LAN-accessible).
-  #
-  # KV cache stays f16: Gemma 4 E2B uses sliding-window attention on most
-  # layers; 131k context at f16 is ~2 GB. MTP forces f16 internally anyway.
-  #
-  # Host-specific for now (lives here rather than in modules/), matching the
-  # per-host stack layout used under hosts/mars/deimos/.
+  # llama.cpp server: Gemma 4 E2B QAT (UD-Q4_K_XL) with MTP speculative
+  # decoding, OpenAI-compatible API on 0.0.0.0:8080 (LAN). Tuned for this
+  # 16 GB M1: Metal offload, 131k ctx (f16 KV ~2 GB), 2 slots.
   configurations.darwin."lkshrsch-mb-pro-m1".module =
     { pkgs, ... }:
     let
-      # nixpkgs llama-cpp (b9503) predates gemma4-assistant arch support, which
-      # landed in mainline at b9549 (PR #23398, "llama: add Gemma4 MTP"). The
-      # stock build accepts --spec-type draft-mtp but can't *load* the draft
-      # head ("unknown model architecture: 'gemma4-assistant'"), so we build
-      # from the latest release. Metal is enabled by default on aarch64-darwin.
-      # Drop this override once nixpkgs ships llama-cpp >= b9549.
+      # Pinned to the latest upstream release (newer than nixpkgs) for Gemma 4
+      # MTP support and speculative-decoding fixes. To bump: update
+      # version/rev/hash/npmDepsHash.
       llama = pkgs.unstable.llama-cpp.overrideAttrs (_old: {
-        version = "9626"; # nixpkgs stores version without "b"; tag = "b${version}"
+        version = "10299"; # nixpkgs stores version without "b"; tag = "b${version}"
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          rev = "4988f6e866057afd130c1515ecef0c9bab9a15f8"; # release b9626
-          hash = "sha256-ZTur0tkcMxsVtkxCGlO8LxC1Dxuf6AM3CSOkTV5PTTs=";
+          rev = "e40bf886420d9449cee9aab8a417081cde4620d1"; # release b10299
+          hash = "sha256-j3wAW7HAzM6uOC96HgG+sXP8tR2I2zXiz+AQkTzIe7Y=";
         };
         # The bundled web UI's package-lock.json differs from the nixpkgs pin.
-        npmDepsHash = "sha256-TU4Gv+dd48WDpswhfVtm79IVIOwoCXz1fZ/DI/z40Wg=";
+        npmDepsHash = "sha256-FHvd2bMvBc9EXrJEzu8EN78oUVSLcOKYCc0232V+L4A=";
       });
       hf = "https://huggingface.co";
 
-      # Base model: Gemma 4 E2B QAT Q4_0 GGUF (ungated).
+      # unsloth UD-Q4_K_XL: QAT-faithful, unlike Google's own qat-q4_0 GGUF
+      # which loses the QAT calibration in conversion.
       baseModel = pkgs.fetchurl {
-        url = "${hf}/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/main/gemma-4-E2B_q4_0-it.gguf";
-        hash = "sha256-Nka0wUfNI1pE2R3xVG07fY4ptUfb5OH4CFZBmqRV5v0=";
+        url = "${hf}/unsloth/gemma-4-E2B-it-qat-GGUF/resolve/main/gemma-4-E2B-it-qat-UD-Q4_K_XL.gguf";
+        hash = "sha256-5TEAchjfq5kEhqXednamky1uqN6iM9H2mNfCHPihaIk=";
       };
 
-      # Drafter: E2B MTP head GGUF (gemma4-assistant arch).
-      # Q4_0 (~40 MB) from lym00 — follows Google's "unquantized-assistant"
-      # naming convention used for the E4B head; AtomicChat's Q4_K_M was built
-      # with a custom fork and fails with unknown arch on standard llama.cpp.
+      # unsloth's official E2B MTP head. Q4_0 and n_max=1 benchmarked fastest
+      # on this M1 (37.2 tok/s; F16/BF16 heads and n_max 2/4 all slower);
+      # drafter precision never affects output quality.
       drafterModel = pkgs.fetchurl {
-        url = "${hf}/lym00/gemma-4-E2B-it-qat-q4_0-unquantized-assistant-gguf-test/resolve/main/gemma-4-E2B-it-qat-assistant-q4_0.gguf";
-        hash = "sha256-ganZg7WpTQRkMVECvE0vhpuzHT32y4DOuhQAZfQH58g=";
+        url = "${hf}/unsloth/gemma-4-E2B-it-qat-GGUF/resolve/main/MTP/mtp-gemma-4-E2B-it-Q4_0.gguf";
+        hash = "sha256-WG8kYLkJAIZAmB7DQGCqhk4DwUT7q/sxc8QzUIfkquA=";
       };
     in
     {
-      launchd.agents.llama-cpp = {
+      # The app firewall allowlists by binary path (no declarative option),
+      # so version bumps silently drop LAN access; re-add on each activation.
+      system.activationScripts.postActivation.text = ''
+        sfw=/usr/libexec/ApplicationFirewall/socketfilterfw
+        "$sfw" --add "${llama}/bin/llama-server" >/dev/null
+        "$sfw" --unblockapp "${llama}/bin/llama-server" >/dev/null
+      '';
+
+      # Daemon, not agent — see meridian.nix for the rationale.
+      launchd.daemons.llama-cpp = {
         serviceConfig = {
+          UserName = "lkshrsch";
+          GroupName = "staff";
           ProgramArguments = [
             "${llama}/bin/llama-server"
             "-m"
@@ -69,6 +68,13 @@ _: {
             "131072"
             "--parallel"
             "2"
+            # Gemma 4 recommended sampling; per-request params override.
+            "--temp"
+            "1.0"
+            "--top-p"
+            "0.95"
+            "--top-k"
+            "64"
             "--jinja"
             "--host"
             "0.0.0.0"

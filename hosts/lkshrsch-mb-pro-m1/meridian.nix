@@ -1,49 +1,32 @@
 { inputs, ... }:
 {
-  # Meridian: re-exposes this user's Claude Max subscription as a local
-  # Anthropic-/OpenAI-compatible HTTP API, LAN-accessible on 0.0.0.0:3456.
+  # Meridian: exposes this user's Claude Max subscription as a local
+  # Anthropic-/OpenAI-compatible API on 0.0.0.0:3456 (LAN).
   #
   # MERIDIAN_API_KEY is REQUIRED for LAN exposure — without it anyone on the
-  # network can burn the subscription. The key is sourced from sops at
-  # runtime (wrapper script reads the decrypted file) so it never enters the
-  # Nix store or the launchd plist.
-  #
-  # Authentication reference: x-api-key header or "Authorization: Bearer <key>".
-  # Routes /  and /health remain open; all others (including /v1/*) require
-  # the key.
-  #
-  # Credentials: launchd LaunchAgents cannot read the macOS login Keychain
-  # where `claude login` stores its OAuth token. The fix is a long-lived
-  # headless token from `claude setup-token` (1-year, subscription-tied,
-  # Pro/Max/Team/Enterprise), stored in sops and injected at runtime as
-  # CLAUDE_CODE_OAUTH_TOKEN. Meridian passes this through to the Agent SDK.
-  #
-  # CLAUDE_CONFIG_DIR is pinned to an isolated directory with no
-  # .credentials.json so the SDK can't fall back to on-disk creds and mask
-  # token failures (meridian#446). The dir is created by the wrapper script
-  # before exec so it exists the first time.
+  # network can burn the subscription. launchd services can't read the login
+  # Keychain, so auth uses a long-lived `claude setup-token` OAuth token
+  # instead of `claude login`. Both secrets come from sops at runtime and
+  # never enter the Nix store or plist.
   configurations.darwin."lkshrsch-mb-pro-m1".module =
     { config, pkgs, ... }:
     let
-      # Meridian package from its own flake; aarch64-darwin is in its
-      # nix-systems/default set. Prefer the named attr; fall back to
-      # .default if the attr name ever changes upstream.
-      meridian =
+      # From meridian's flake; fall back to .default if the attr is renamed.
+      meridianBase =
         inputs.meridian.packages.${pkgs.stdenv.hostPlatform.system}.meridian
           or inputs.meridian.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      # Meridian >= 1.53 takes claude-code from nixpkgs and is meta.broken
+      # when it's too old; inject the overlay build (overlays/claude-code.nix).
+      meridian = meridianBase.override { claude-code = pkgs.unstable.claude-code; };
 
-      # Paths where sops-nix decrypts the secrets at system activation.
       keyPath = config.sops.secrets."meridian/api-key".path;
       tokenPath = config.sops.secrets."meridian/oauth-token".path;
 
-      # Wrapper: reads both secrets at runtime, exports them, pins an
-      # isolated config dir, then exec's meridian. Secrets never enter the
-      # Nix store or the launchd plist.
       start = pkgs.writeShellScript "meridian-start" ''
         export MERIDIAN_API_KEY="$(cat "${keyPath}")"
         export CLAUDE_CODE_OAUTH_TOKEN="$(cat "${tokenPath}")"
-        # Isolated config dir — no .credentials.json — prevents SDK from
-        # silently falling back to on-disk creds (meridian#446).
+        # Isolated config dir with no .credentials.json — the SDK must not
+        # fall back to on-disk creds and mask token failures (meridian#446).
         export CLAUDE_CONFIG_DIR="/Users/lkshrsch/.config/meridian/sdk-config"
         mkdir -p "$CLAUDE_CONFIG_DIR"
         exec ${meridian}/bin/meridian
@@ -57,8 +40,7 @@
         mode = "0400";
       };
 
-      # Long-lived subscription OAuth token (claude setup-token).
-      # Rotates annually; store the new token in sops and rebuild.
+      # claude setup-token; rotates annually — update sops and rebuild.
       sops.secrets."meridian/oauth-token" = {
         sopsFile = ../../secrets/secrets.yaml;
         key = "meridian/oauth-token";
@@ -66,9 +48,25 @@
         mode = "0400";
       };
 
-      launchd.agents.meridian = {
+      # Same firewall gotcha as llama-cpp.nix. The listening binary is node,
+      # extracted from the wrapper since meridian doesn't expose its nodejs.
+      system.activationScripts.postActivation.text = ''
+        sfw=/usr/libexec/ApplicationFirewall/socketfilterfw
+        node=$(grep -o '/nix/store/[^" ]*/bin/node' "${meridian}/bin/meridian" | head -1)
+        if [ -n "$node" ]; then
+          "$sfw" --add "$node" >/dev/null
+          "$sfw" --unblockapp "$node" >/dev/null
+        fi
+      '';
+
+      # Daemon, not agent: nix-darwin loads agents as root into the system
+      # domain anyway; a UserName daemon runs there as lkshrsch and starts
+      # at boot without a login (headless clamshell server).
+      launchd.daemons.meridian = {
         serviceConfig = {
           ProgramArguments = [ "${start}" ];
+          UserName = "lkshrsch";
+          GroupName = "staff";
           EnvironmentVariables = {
             MERIDIAN_HOST = "0.0.0.0";
             MERIDIAN_PORT = "3456";
