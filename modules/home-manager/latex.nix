@@ -33,6 +33,7 @@ _: {
               ifmtarg
               zref
               helvetic # urw-base35 Helvetica — needed by acl.sty's [review] line numbers
+              placeins # Control float placement
             ]
           ))
           ghostscript
