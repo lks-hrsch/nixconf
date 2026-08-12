@@ -8,8 +8,14 @@
     }:
     let
       hyprlandPkg = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system};
+      # ponytail: FetchContent fallback needs network mid-build if find_package
+      # misses glaze <8 — see overlays/glaze7.nix. Drop once Hyprland's
+      # CMakeLists accepts glaze 8.x upstream.
+      hyprland = hyprlandPkg.hyprland.override { glaze-hyprland = pkgs.glaze7; };
     in
     {
+      nixpkgs.overlays = [ config.repo.overlays.glaze7 ];
+
       environment.systemPackages = with pkgs; [
         uwsm
       ];
@@ -20,9 +26,7 @@
         enable = true;
         settings = rec {
           initial_session = {
-            command = "${lib.getExe pkgs.uwsm} start -eD Hyprland ${
-              inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland
-            }/share/wayland-sessions/hyprland.desktop";
+            command = "${lib.getExe pkgs.uwsm} start -eD Hyprland ${hyprland}/share/wayland-sessions/hyprland.desktop";
             user = config.flake.users.owner.username;
           };
           default_session = initial_session;
@@ -33,7 +37,7 @@
         hyprland = {
           enable = true;
           withUWSM = true;
-          package = hyprlandPkg.hyprland;
+          package = hyprland;
           portalPackage = hyprlandPkg.xdg-desktop-portal-hyprland;
         };
 
