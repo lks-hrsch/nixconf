@@ -33,7 +33,7 @@ Notes:
 
 | Network | Purpose | Members |
 | --- | --- | --- |
-| mercury-reverse-proxy | Ingress/routing plane | Traefik, Authelia, LLDAP UI, NetBird, Vaultwarden, Mosquitto (ldr-connect) |
+| mercury-reverse-proxy | Ingress/routing plane | Traefik, Authelia, LLDAP UI, NetBird, Vaultwarden, SearXNG, Mosquitto (ldr-connect) |
 | mercury-id | Identity-only traffic | LLDAP, Authelia |
 | mercury-netbird | NetBird internal traffic | NetBird server, NetBird dashboard |
 
@@ -47,6 +47,7 @@ Notes:
 | Authelia | Auth portal + OIDC provider | Routed via Traefik |
 | NetBird server/dashboard | Overlay VPN control plane | Routed via Traefik + 3478/udp |
 | Vaultwarden | Password manager | Public via Traefik on 443 |
+| SearXNG | Metasearch engine | Public via Traefik on 443 (Authelia forward-auth) |
 | Mosquitto (ldr-connect) | MQTT broker for ldr-connect | MQTTS via Traefik TCP/SNI on 8883 |
 
 ## Current Routing Notes
@@ -57,6 +58,8 @@ Notes:
   - vaultwarden.mercury.lukashirsch.de
 - Vaultwarden is intended to be publicly reachable via Traefik over HTTPS (not VPN-only).
 - Vaultwarden is currently not behind Authelia forward-auth (intentional for now).
+- SearXNG is behind Authelia forward-auth (the `authelia@file` Traefik middleware,
+  defined in `traefik.nix`'s dynamic config) since it has no native OIDC support.
 - Traefik dashboard route exists and is restricted with an IP allowlist middleware.
 - ldr-connect broker: MQTTS on 8883 via Traefik TCP router (HostSNI on
   broker.ldr-connect.lukashirsch.de and
@@ -73,6 +76,7 @@ Internet
       -> auth.lukashirsch.de (Authelia)
       -> netbird.lukashirsch.de (NetBird)
       -> vaultwarden.*.lukashirsch.de (Vaultwarden, public)
+      -> searxng.mercury.lukashirsch.de (SearXNG, Authelia forward-auth)
       -> lldap.lukashirsch.de (LLDAP UI)
 
 Identity plane
