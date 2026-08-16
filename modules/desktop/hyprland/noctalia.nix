@@ -30,16 +30,7 @@ in
       # Configure Noctalia Shell v5
       programs.noctalia = {
         enable = true;
-
-        # noctalia v5 reads GPU stats via dlopen("libnvidia-ml.so.1") (NVML).
-        # Its package only adds autoAddDriverRunpath when cudaSupport = true
-        # (nix/package.nix:56); noctalia's pinned nixpkgs defaults it to false, so
-        # the driver libs aren't on RUNPATH and NVML dlopen fails silently.
-        # Enabling it here pulls NO CUDA — it only puts /run/opengl-driver/lib
-        # on the binary's DT_RUNPATH so NVML resolves at runtime.
-        package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
-          cudaSupport = true;
-        };
+        package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
         # Stylix-driven palette (Catppuccin Mocha OLED base16 scheme from
         # modules/home-manager/stylix.nix), selected via theme.source = "custom".
@@ -100,10 +91,12 @@ in
             animation.enabled = false;
 
             panel = {
-              session_placement = "centered";
+              session_placement = "floating";
+              session_position = "center";
               shadow = false;
               transparency_mode = "glass";
-              wallpaper_placement = "centered";
+              wallpaper_placement = "floating";
+              wallpaper_position = "center";
             };
 
             screen_corners.enabled = true;
@@ -188,7 +181,6 @@ in
 
           system.monitor = {
             enabled = true;
-            enable_dgpu_monitoring = true; # NVIDIA needs the nvidia-smi opt-in
             cpu_poll_seconds = 5;
             gpu_poll_seconds = 5;
             memory_poll_seconds = 5;
@@ -235,18 +227,18 @@ in
               "network_tx"
               "tray"
               "caffeine"
-              "weather"
               "date"
               "clock"
             ];
 
             monitor = {
-              # Secondary (portrait) monitor — workspaces only
+              # Secondary (portrait) monitor — workspaces, plus weather/privacy
+              # ported from a live GUI edit (2026-08-16)
               ${secondary} = {
                 enabled = true;
-                start = [ ];
+                start = [ "weather" ];
                 center = [ "workspaces" ];
-                end = [ ];
+                end = [ "privacy" ];
               };
               # Primary monitor — full bar from the main widget lists
               ${primary} = {
@@ -257,46 +249,51 @@ in
 
           # ── Per-widget settings ──────────────────────────────────────────────
 
+          # v5 renamed sysmon presentation keys: display="text" -> visualization="none",
+          # show_label=false -> show_value=true. GPU (uppercase, no type=) was a stale
+          # duplicate of gpu below and resolved to an invalid widget type - dropped.
           widget = {
             "control-center".glyph = "snowflake";
             CPU = {
-              display = "text";
-              show_label = false;
+              show_value = true;
               type = "sysmon";
+              visualization = "none";
             };
-            GPU.stat = "gpu_usage";
             gpu = {
-              display = "text";
-              show_label = false;
+              show_value = true;
               stat = "gpu_usage";
               type = "sysmon";
+              visualization = "none";
             };
             "gpu-temperature" = {
-              display = "text";
               glyph = "cpu-temperature";
-              show_label = false;
+              show_value = true;
               stat = "gpu_temp";
               type = "sysmon";
+              visualization = "none";
             };
             "gpu-vram" = {
-              display = "text";
-              show_label = false;
+              show_value = true;
               stat = "gpu_vram";
               type = "sysmon";
+              visualization = "none";
             };
-            network_rx.display = "text";
-            network_tx.display = "text";
+            network_rx.visualization = "none";
+            network_tx.visualization = "none";
             ram = {
-              display = "text";
-              show_label = false;
+              show_value = true;
+              visualization = "none";
             };
             temp = {
-              display = "text";
-              show_label = false;
+              show_value = true;
+              visualization = "none";
             };
+            # max_length ported from a live GUI edit (2026-08-16)
+            weather.max_length = 320;
             workspaces = {
-              display = "name";
-              minimal = true;
+              label_source = "name";
+              max_label_chars = 3;
+              style = "minimal";
             };
           };
 
