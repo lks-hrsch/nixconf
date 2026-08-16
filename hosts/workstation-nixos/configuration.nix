@@ -123,9 +123,15 @@
           # was already wedged by the Hyprland v0.55.3 monitor-disconnect SEGV 30s
           # earlier. External reports of standalone notifier hangs on 595 exist
           # though (open-gpu-kernel-modules#1157), so we keep the proven path.
-          # TODO(2026-Q3): retry the notifier default (remove this line) once a
-          # 595.x driver with the suspend-notifier fix lands in nixpkgs and the
-          # known-bad combo (PVMA=1 + notifiers=1 + no units) is resolved upstream.
+          # Re-checked 2026-08-16 (Hyprland now 0.56.2, noctalia v5): driver is
+          # still 595.71.05, same as the hang - no bump happened, so the SEGV
+          # confounder being gone proves nothing about the notifier path itself.
+          # Upstream #1157 is still open with no fix version. Units-based path
+          # confirmed working since (clean suspend/resume 2026-07-12, journal).
+          # Retry condition, not a date: drop this line once
+          # `hardware.nvidia.package.version` moves past 595.71.05, then verify
+          # via /proc/driver/nvidia/params and a real `systemctl suspend` test
+          # before trusting it unattended.
           powerManagement.kernelSuspendNotifier = false;
 
           # Use the NVidia open source kernel module (not to be confused with the
