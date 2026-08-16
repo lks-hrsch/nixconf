@@ -70,124 +70,126 @@ _: {
         (unstable.python3.withPackages (ps: [ ps.claude-agent-sdk ]))
       ];
 
-      # graphify skill CLI: PyPI package `graphifyy`, command `graphify`
-      programs.uv.tool.packages = [ "graphifyy" ];
+      programs = {
+        # graphify skill CLI: PyPI package `graphifyy`, command `graphify`
+        uv.tool.packages = [ "graphifyy" ];
 
-      programs.claude-code = {
-        enable = true;
-        enableMcpIntegration = true;
-        package = pkgs.unstable.claude-code;
-        marketplaces = {
-          superpowers = superpowers;
-          claude-mem = claude-mem;
-          openai-codex = codex-plugin-cc;
-          ponytail = ponytail;
-          caveman = caveman;
-        };
-        plugins = [
-          "${official}/plugins/code-review"
-          "${official}/plugins/code-simplifier"
-          "${official}/plugins/claude-md-management"
-          "${official}/plugins/claude-security"
-          "${official}/plugins/security-guidance"
-          "${official}/plugins/pyright-lsp"
-          "${official}/plugins/rust-analyzer-lsp"
-          "${official}/plugins/swift-lsp"
-          "${official}/plugins/typescript-lsp"
-          # superpowers is an external plugin referenced by the official marketplace
-          superpowers
-          # claude-mem
-          "${claude-mem}/plugin"
-          # openai codex plugin — /codex:* review & delegate commands
-          "${codex-plugin-cc}/plugins/codex"
-          # ponytail — lazy-senior-dev ruleset; /ponytail{,-review,-audit,-debt,-gain,-help}
-          ponytail
-          # caveman — ultra-compressed prose mode; /caveman, active by default
-          caveman
-        ];
-        settings = {
-          skillListingBudgetFraction = 0.05;
-          model = "opusplan";
-          effortLevel = "xhigh";
-          cleanupPeriodDays = 30;
-          permissions = {
-            allow = [
-              # file metadata (no content)
-              "Bash(ls:*)"
-              "Bash(stat:*)"
-              "Bash(file:*)"
-              "Bash(wc:*)"
-              "Bash(du:*)"
-              "Bash(df:*)"
-              # navigation / output
-              "Bash(pwd)"
-              "Bash(which:*)"
-              "Bash(basename:*)"
-              "Bash(dirname:*)"
-              "Bash(date:*)"
-              "Bash(echo:*)"
-              "Bash(printf:*)"
-              # text transforms (stdin/pipeline, not file reading)
-              "Bash(sort:*)"
-              "Bash(uniq:*)"
-              "Bash(cut:*)"
-              "Bash(tr:*)"
-              # system info
-              "Bash(ps:*)"
-              "Bash(uname:*)"
-              # git read-only (structure/history, no file content)
-              "Bash(git log:*)"
-              "Bash(git status:*)"
-              "Bash(git branch:*)"
-              "Bash(git remote:*)"
-              "Bash(git ls-files:*)"
-              "Bash(git stash list:*)"
-              "Bash(git rev-parse:*)"
-              # nix read-only
-              "Bash(nix flake show:*)"
-              "Bash(nix path-info:*)"
-              # web
-              "WebFetch(domain:github.com)"
-              "WebFetch(domain:raw.githubusercontent.com)"
-              "WebFetch(domain:nix.dev)"
-              "WebFetch(domain:mynixos.com)"
-              "WebFetch(domain:wiki.nixos.org)"
-              # mcp
-              "mcp__plugin_claude-code-home-manager_context7__resolve-library-id"
-              "mcp__plugin_claude-code-home-manager_context7__query-docs"
-              "mcp__plugin_claude-code-home-manager_nixos__nix"
-              "mcp__plugin_claude-code-home-manager_nixos__nix_versions"
-              "mcp__plugin_claude-code-home-manager_grep-app__searchGitHub"
-              "mcp__plugin_claude-code-home-manager_obsidian__read_note"
-              "mcp__plugin_claude-code-home-manager_obsidian__read_multiple_notes"
-              "mcp__plugin_claude-code-home-manager_obsidian__search_notes"
-              "mcp__plugin_claude-code-home-manager_obsidian__list_directory"
-            ];
-            defaultMode = "default";
+        claude-code = {
+          enable = true;
+          enableMcpIntegration = true;
+          package = pkgs.unstable.claude-code;
+          marketplaces = {
+            superpowers = superpowers;
+            claude-mem = claude-mem;
+            openai-codex = codex-plugin-cc;
+            ponytail = ponytail;
+            caveman = caveman;
           };
-          statusLine = {
-            type = "command";
-            command = "bash ~/.claude/statusline-command.sh";
+          plugins = [
+            "${official}/plugins/code-review"
+            "${official}/plugins/code-simplifier"
+            "${official}/plugins/claude-md-management"
+            "${official}/plugins/claude-security"
+            "${official}/plugins/security-guidance"
+            "${official}/plugins/pyright-lsp"
+            "${official}/plugins/rust-analyzer-lsp"
+            "${official}/plugins/swift-lsp"
+            "${official}/plugins/typescript-lsp"
+            # superpowers is an external plugin referenced by the official marketplace
+            superpowers
+            # claude-mem
+            "${claude-mem}/plugin"
+            # openai codex plugin — /codex:* review & delegate commands
+            "${codex-plugin-cc}/plugins/codex"
+            # ponytail — lazy-senior-dev ruleset; /ponytail{,-review,-audit,-debt,-gain,-help}
+            ponytail
+            # caveman — ultra-compressed prose mode; /caveman, active by default
+            caveman
+          ];
+          settings = {
+            skillListingBudgetFraction = 0.05;
+            model = "opusplan";
+            effortLevel = "xhigh";
+            cleanupPeriodDays = 30;
+            permissions = {
+              allow = [
+                # file metadata (no content)
+                "Bash(ls:*)"
+                "Bash(stat:*)"
+                "Bash(file:*)"
+                "Bash(wc:*)"
+                "Bash(du:*)"
+                "Bash(df:*)"
+                # navigation / output
+                "Bash(pwd)"
+                "Bash(which:*)"
+                "Bash(basename:*)"
+                "Bash(dirname:*)"
+                "Bash(date:*)"
+                "Bash(echo:*)"
+                "Bash(printf:*)"
+                # text transforms (stdin/pipeline, not file reading)
+                "Bash(sort:*)"
+                "Bash(uniq:*)"
+                "Bash(cut:*)"
+                "Bash(tr:*)"
+                # system info
+                "Bash(ps:*)"
+                "Bash(uname:*)"
+                # git read-only (structure/history, no file content)
+                "Bash(git log:*)"
+                "Bash(git status:*)"
+                "Bash(git branch:*)"
+                "Bash(git remote:*)"
+                "Bash(git ls-files:*)"
+                "Bash(git stash list:*)"
+                "Bash(git rev-parse:*)"
+                # nix read-only
+                "Bash(nix flake show:*)"
+                "Bash(nix path-info:*)"
+                # web
+                "WebFetch(domain:github.com)"
+                "WebFetch(domain:raw.githubusercontent.com)"
+                "WebFetch(domain:nix.dev)"
+                "WebFetch(domain:mynixos.com)"
+                "WebFetch(domain:wiki.nixos.org)"
+                # mcp
+                "mcp__plugin_claude-code-home-manager_context7__resolve-library-id"
+                "mcp__plugin_claude-code-home-manager_context7__query-docs"
+                "mcp__plugin_claude-code-home-manager_nixos__nix"
+                "mcp__plugin_claude-code-home-manager_nixos__nix_versions"
+                "mcp__plugin_claude-code-home-manager_grep-app__searchGitHub"
+                "mcp__plugin_claude-code-home-manager_obsidian__read_note"
+                "mcp__plugin_claude-code-home-manager_obsidian__read_multiple_notes"
+                "mcp__plugin_claude-code-home-manager_obsidian__search_notes"
+                "mcp__plugin_claude-code-home-manager_obsidian__list_directory"
+              ];
+              defaultMode = "default";
+            };
+            statusLine = {
+              type = "command";
+              command = "bash ~/.claude/statusline-command.sh";
+            };
+            promptSuggestionEnabled = false;
+            autoMemoryEnabled = true;
+            autoDreamEnabled = true;
+            remoteControlAtStartup = false;
+            feedbackSurveyRate = 0;
+            tui = "fullscreen";
           };
-          promptSuggestionEnabled = false;
-          autoMemoryEnabled = true;
-          autoDreamEnabled = true;
-          remoteControlAtStartup = false;
-          feedbackSurveyRate = 0;
-          tui = "fullscreen";
         };
+
+        zsh.shellAliases =
+          let
+            secretPath = name: config.sops.secrets."claude-code/provider/${name}".path;
+          in
+          {
+            claude-work = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" claude";
+            claude-collana-private = "DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
+            claude-collana = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
+            claude-develappers = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_SONNET_MODEL=develappers-coding ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding CLAUDE_MEM_MODEL=develappers-coding claude --model develappers-coding";
+          };
       };
-
-      programs.zsh.shellAliases =
-        let
-          secretPath = name: config.sops.secrets."claude-code/provider/${name}".path;
-        in
-        {
-          claude-work = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" claude";
-          claude-collana-private = "DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
-          claude-collana = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
-          claude-develappers = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_SONNET_MODEL=develappers-coding ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding CLAUDE_MEM_MODEL=develappers-coding claude --model develappers-coding";
-        };
 
       # CLAUDE_MEM_MODEL=general is set by the gateway aliases and resolved via LiteLLM at runtime.
       home.file = {
