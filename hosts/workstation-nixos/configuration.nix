@@ -4,6 +4,11 @@
     { pkgs, lib, ... }:
     let
       nv-fan-control = import ./_nv-fan-control.nix { inherit pkgs; };
+      nv-oc = import ./_nv-oc.nix { inherit pkgs; };
+      # RTX 4090 NVML limits (queried live): mem offset -2000..+6000 MHz,
+      # power limit 10..600 W. 600 is the hardware ceiling, no headroom above it.
+      nvMemOffset = 1000;
+      nvPowerLimitWatts = 600;
     in
     {
       imports = with config.flake.modules.nixos; [
@@ -155,6 +160,7 @@
         gnugrep
         dig
         nv-fan-control
+        nv-oc
         unstable.eduvpn-client
       ];
 
@@ -175,6 +181,20 @@
         serviceConfig = {
           Type = "oneshot";
           ExecStart = "${nv-fan-control}/bin/nv-fan-control 55";
+        };
+      };
+
+      # ponytail: boot-only, like nvidia-fan-startup - offsets revert after
+      # suspend/resume. If that bites, add suspend.target/hibernate.target to
+      # after+wantedBy (the systemd inversion idiom re-runs the unit on wake);
+      # same fix applies to nvidia-fan-startup.
+      systemd.services.nvidia-oc-startup = {
+        description = "Set NVIDIA Memory Overclock and Power Limit at Startup";
+        after = [ "multi-user.target" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${nv-oc}/bin/nv-oc ${toString nvMemOffset} ${toString nvPowerLimitWatts}";
         };
       };
 
