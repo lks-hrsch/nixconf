@@ -10,7 +10,10 @@ _: {
     programs.uv = {
       enable = true;
       tool = {
-        packages = [ "huggingface_hub" ];
+        packages = [
+          "huggingface_hub"
+          "kaggle"
+        ];
         prune = true;
       };
     };
