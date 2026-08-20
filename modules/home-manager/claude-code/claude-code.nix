@@ -61,7 +61,19 @@ _: {
         "claude-code/provider/collana/auth-token" = { };
         "claude-code/provider/develappers/base-url" = { };
         "claude-code/provider/develappers/auth-token" = { };
+        "claude-mem/env" = { };
       };
+
+      # jq-patched, not home.file-owned: claude-mem writes other keys back at runtime (cloud-sync, mode-creator, telegram).
+      home.activation.claudeMemGatewaySettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        settings="$HOME/.claude-mem/settings.json"
+        if [ -f "$settings" ]; then
+          ${pkgs.jq}/bin/jq \
+            '.CLAUDE_MEM_PROVIDER = "claude" | .CLAUDE_MEM_CLAUDE_AUTH_METHOD = "gateway" | .CLAUDE_MEM_MODEL = "coding"' \
+            "$settings" > "$settings.tmp"
+          mv "$settings.tmp" "$settings"
+        fi
+      '';
 
       home.packages = with pkgs; [
         nodejs_24
@@ -195,19 +207,16 @@ _: {
       home.file = {
         ".claude/statusline-command.sh" = statusline;
 
+        # claude-mem gateway credentials, symlinked out of the Nix store
+        ".claude-mem/.env".source = config.lib.file.mkOutOfStoreSymlink (
+          config.sops.secrets."claude-mem/env".path
+        );
+
         # ~/.claude-work: CLAUDE_CONFIG_DIR for claude-work/-collana/-develappers — mirrors the
         # base setup so those sessions get the same settings, statusline and skills.
         ".claude-work/statusline-command.sh" = statusline;
-        # Same file minus `model`: "opusplan" hardcodes real Anthropic model IDs, bypassing
-        # ANTHROPIC_MODEL — the gateway aliases only know "coding"/"general", so plan-mode
-        # toggles would 404 instantly if opusplan stayed in.
         ".claude-work/settings.json".source =
-          pkgs.runCommand "claude-work-settings.json" { nativeBuildInputs = [ pkgs.jq ]; }
-            ''
-              jq 'del(.model)' ${
-                config.home.file."${config.programs.claude-code.configDir}/settings.json".source
-              } > $out
-            '';
+          config.home.file."${config.programs.claude-code.configDir}/settings.json".source;
       }
       // lib.mapAttrs' (
         name: src:
