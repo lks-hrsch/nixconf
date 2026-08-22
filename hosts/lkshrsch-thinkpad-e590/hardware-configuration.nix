@@ -15,9 +15,7 @@
         "${inputs.nixos-hardware}/common/cpu/intel/whiskey-lake"
         "${inputs.nixos-hardware}/common/gpu/intel/whiskey-lake"
         "${inputs.nixos-hardware}/common/pc/ssd"
-        # Enable after Secure Boot keys are enrolled (README step 4) — too
-        # early locks the machine out of booting.
-        # inputs.lanzaboote.nixosModules.lanzaboote
+        inputs.lanzaboote.nixosModules.lanzaboote
       ];
 
       hardware = {
@@ -47,17 +45,25 @@
         };
 
         loader = {
-          # Installed with systemd-boot; flipped to lanzaboote per README step 4.
-          systemd-boot.enable = true;
+          # lanzaboote replaces systemd-boot entirely — it installs its own
+          # signed stub. Both enabled at once is a hard eval error.
+          systemd-boot.enable = false;
           efi.canTouchEfiVariables = true;
         };
-        # Once lanzaboote is enabled, uncomment:
-        # loader.systemd-boot.enable = lib.mkForce false;
-        # lanzaboote = {
-        #   enable = true;
-        #   pkiBundle = "/var/lib/sbctl";
-        # };
+
+        # Keys come from `sbctl create-keys` (README step 6); the bundle must
+        # exist on the target before this ever gets deployed, or the generation
+        # it builds is unsigned and will not boot with Secure Boot on.
+        lanzaboote = {
+          enable = true;
+          pkiBundle = "/var/lib/sbctl";
+        };
       };
+
+      # Secure Boot key management. Not pulled in by lanzaboote's module, but
+      # needed for the initial `create-keys`/`enroll-keys` and for `sbctl
+      # verify` after every generation change.
+      environment.systemPackages = [ pkgs.sbctl ];
 
       security.tpm2 = {
         enable = true;

@@ -147,17 +147,59 @@ Unlock with the recovery passphrase from step 3. greetd autologins into
 Hyprland. Confirm the machine is on the network (`ip -br addr`) and reachable
 over SSH before continuing.
 
-### 6. Secure Boot keys (on the laptop)
+Then place the **user** copy of the age key. `modules/sops.nix` reads two
+separate paths — `/etc/sops/age/keys.txt` for the system (line 16) and
+`~/.config/sops/age/keys.txt` for home-manager (line 36). `--extra-files` can
+only stage the first: it runs before `/home/lkshrsch` exists, so the user copy
+has to be made after first boot, or `home-manager-lkshrsch.service` fails
+activation with `sops-install-secrets: cannot read keyfile`.
 
 ```bash
-sudo sbctl create-keys
+install -d -m 700 ~/.config/sops/age
+sudo install -m 600 -o "$USER" -g users /etc/sops/age/keys.txt ~/.config/sops/age/keys.txt
+systemctl --user restart sops-nix.service
+sudo systemctl restart home-manager-lkshrsch.service
 ```
 
-Edit `hardware-configuration.nix`: comment out `boot.loader.systemd-boot.enable`
-and uncomment the `lib.mkForce false` + `boot.lanzaboote` block, then
+It is the same key — `.sops.yaml` has a single recipient, and every host gets a
+copy of it.
+
+### 6. Secure Boot keys (on the laptop)
+
+`sbctl` is in `environment.systemPackages` (`hardware-configuration.nix`), but
+on a fresh install that package is not on the machine yet — the deploy that
+brings it is the same one that enables lanzaboote, and lanzaboote refuses to
+build a signed generation without an existing key bundle. Break the cycle with
+a throwaway shell:
 
 ```bash
-sudo nixos-rebuild switch --flake .#lkshrsch-thinkpad-e590
+sudo nix shell nixpkgs#sbctl -c sbctl create-keys   # creates /var/lib/sbctl
+```
+
+Then enable `inputs.lanzaboote.nixosModules.lanzaboote` in
+`hardware-configuration.nix` — the import, `boot.loader.systemd-boot.enable =
+false`, and the `boot.lanzaboote` block — and deploy. Verify before rebooting:
+
+```bash
+sudo sbctl verify          # ESP is umask=0077, so every check here needs sudo
+sudo bootctl status
+```
+
+Expect every `/boot/EFI/Linux/nixos-generation-*.efi` signed, and
+`/boot/EFI/nixos/kernel-*.efi` **not** signed — lanzaboote signs only the UKI
+stub, which embeds the kernel/initrd hashes and refuses to boot on mismatch.
+Upstream's getting-started guide shows the same `✗` line as expected output.
+Don't delete `/boot/EFI/nixos`: those are lanzaboote's own content-addressed
+kernel and initrd, not systemd-boot leftovers.
+
+Stale Type #1 entries in `/boot/loader/entries/` *are* leftovers, though, and
+point at kernel paths that no longer exist. Nothing regenerates them once
+`systemd-boot.enable = false`, and under Secure Boot they'd be dud menu
+entries. Delete them; the UKIs are Type #2 and auto-discovered from the
+filesystem:
+
+```bash
+sudo rm -f /boot/loader/entries/nixos-generation-*.conf
 ```
 
 Reboot into BIOS, **clear the Secure Boot keys / enter Setup Mode**, boot back
@@ -165,13 +207,25 @@ into the installed system:
 
 ```bash
 sudo sbctl enroll-keys --microsoft   # keeps option-ROM/firmware modules happy
-sudo sbctl verify
+sudo sbctl status                    # expect: Setup Mode ✗ Disabled
+```
+
+If that fails with `File is immutable: /sys/firmware/efi/efivars/...`, clear
+the efivarfs write-protection flag on each file it names and re-run — the
+enrollment rewrites those variables anyway. `chattr` lives in `e2fsprogs`,
+which this host doesn't install (btrfs only), so borrow it:
+
+```bash
+sudo nix shell nixpkgs#e2fsprogs -c chattr -i \
+  /sys/firmware/efi/efivars/KEK-8be4df61-93ca-11d2-aa0d-00e098032b8c \
+  /sys/firmware/efi/efivars/db-d719b2cb-3d3a-4596-a3bc-dad00e67656f
+sudo sbctl enroll-keys --microsoft
 ```
 
 Reboot, enable Secure Boot in BIOS, confirm:
 
 ```bash
-bootctl status | grep -i 'secure boot'   # expect: enabled (user)
+sudo bootctl status | grep -i 'secure boot'   # expect: enabled (user)
 ```
 
 Secure Boot must be **on and enrolled before step 7** — PCR 7 measures exactly
@@ -221,7 +275,8 @@ After install, on the laptop:
 | :--- | :--- |
 | `sudo true` | accepts the password set in step 4 |
 | `ip -br addr` | `enp4s0` has a DHCP lease |
-| `ls /run/secrets/` | sops secrets decrypted with the age key from `/etc/sops/age/keys.txt` |
+| `sudo ls /run/secrets/` | sops secrets decrypted with the age key from `/etc/sops/age/keys.txt` |
+| `systemctl --failed` | empty — a failed `home-manager-lkshrsch.service` means the step-5 user age key is missing |
 | `bootctl status` | `Secure Boot: enabled (user)`, stub = lanzaboote |
 | `sbctl verify` | all files in `/boot` signed |
 | `sudo cryptsetup luksDump /dev/nvme0n1p3` | keyslots: passphrase, tpm2, fido2 |
@@ -229,9 +284,8 @@ After install, on the laptop:
 | reboot after a test `--wipe-slot=tpm2` | prompts, YubiKey touch unlocks |
 | `swapon --show` | `/dev/mapper/cryptswap`, ~48G |
 | `systemctl hibernate` then power on | resumes back into the session |
-| `hyprctl monitors` | one output, matches `desktop.monitors.primary` |
-| `vainfo` | `iHD` driver, no NVIDIA references |
-| `systemctl --failed` | empty |
+| `hyprctl monitors` | one output, matches `desktop.monitors.primary` — only answers from inside the Hyprland session, never over SSH or a TTY |
+| `nix shell nixpkgs#libva-utils -c vainfo` | `iHD` driver, no NVIDIA references (`vainfo` is not installed by default; `nix run` fails here — it looks for a `libva-utils` binary that does not exist) |
 
 ## Day-2 operations
 
