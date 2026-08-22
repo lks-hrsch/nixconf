@@ -65,6 +65,12 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    impermanence.url = "github:nix-community/impermanence";
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v1.1.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # Deliberately NOT following our nixpkgs: mac-app-util is a Common Lisp
