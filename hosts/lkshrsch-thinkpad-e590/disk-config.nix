@@ -68,47 +68,33 @@ _: {
                     content = {
                       type = "btrfs";
                       extraArgs = [ "-f" ];
-                      # lz4 over zstd: faster, less CPU per I/O.
+                      # lzo over zstd: faster, less CPU per I/O.
                       subvolumes = {
                         "/@root" = {
                           mountpoint = "/";
                           mountOptions = [
-                            "compress=lz4"
+                            "compress=lzo"
                             "noatime"
                           ];
                         };
                         "/@nix" = {
                           mountpoint = "/nix";
                           mountOptions = [
-                            "compress=lz4"
+                            "compress=lzo"
                             "noatime"
                           ];
                         };
                         "/@home" = {
                           mountpoint = "/home";
                           mountOptions = [
-                            "compress=lz4"
+                            "compress=lzo"
                             "noatime"
                           ];
                         };
                         "/@snapshots" = {
                           mountpoint = "/.snapshots";
                           mountOptions = [
-                            "compress=lz4"
-                            "noatime"
-                          ];
-                        };
-                        # Impermanence (see impermanence.nix). @root-blank: never
-                        # mounted, stays empty forever — the initrd wipe unit
-                        # snapshots it over @root on every boot. @persist:
-                        # survives the wipe, holds bind-mount sources.
-                        "/@root-blank" = {
-                          mountpoint = null;
-                        };
-                        "/@persist" = {
-                          mountpoint = "/persist";
-                          mountOptions = [
-                            "compress=lz4"
+                            "compress=lzo"
                             "noatime"
                           ];
                         };
@@ -120,55 +106,11 @@ _: {
             };
           };
 
-          # One LUKS container, btrfs subvolumes for Obsidian/Documents/
-          # Downloads — they share one free-space pool instead of fixed sizes
-          # locked in until a reformat. Unlocked late (not in
-          # boot.initrd.luks.devices) via a keyfile on the decrypted root
-          # (README, install step 7).
-          sata = {
-            # SanDisk SDSSDP128G, pinned by serial — the installer's own USB
-            # stick also shows up as /dev/sd* on this machine.
-            device = lib.mkDefault "/dev/disk/by-id/ata-SanDisk_SDSSDP128G_152141400006";
-            type = "disk";
-            content = {
-              type = "gpt";
-              partitions = {
-                cryptdata = {
-                  name = "cryptdata";
-                  size = "100%";
-                  content = {
-                    type = "luks";
-                    name = "cryptdata";
-                    initrdUnlock = false;
-                    passwordFile = "/tmp/cryptroot.key";
-                    settings.allowDiscards = true;
-                    content = {
-                      type = "btrfs";
-                      extraArgs = [ "-f" ];
-                      subvolumes = {
-                        "/@obsidian" = {
-                          mountpoint = "/home/lkshrsch/Obsidian.nosync";
-                          mountOptions = [ "noatime" ];
-                        };
-                        "/@documents" = {
-                          mountpoint = "/home/lkshrsch/Documents";
-                          mountOptions = [ "noatime" ];
-                        };
-                        "/@downloads" = {
-                          mountpoint = "/home/lkshrsch/Downloads";
-                          mountOptions = [ "noatime" ];
-                        };
-                        "/@snapshots" = {
-                          mountpoint = "/.snapshots-data";
-                          mountOptions = [ "noatime" ];
-                        };
-                      };
-                    };
-                  };
-                };
-              };
-            };
-          };
+          # The SATA SSD is currently disabled — see _sata-disabled.nix (the
+          # leading `_` keeps it out of import-tree). Its cryptdata device
+          # never appeared at boot and blocked the machine from starting.
+          # Until that is fixed, Documents/Downloads/Obsidian.nosync live as
+          # plain directories under /home on the NVMe.
         };
       };
     };

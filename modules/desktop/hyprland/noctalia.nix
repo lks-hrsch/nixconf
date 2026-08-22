@@ -118,6 +118,8 @@ in
               default.path = stablePath;
               monitors = {
                 ${primary}.path = stablePath;
+              }
+              // lib.optionalAttrs (secondary != null) {
                 ${secondary}.path = stablePath;
               };
             };
@@ -232,6 +234,12 @@ in
             ];
 
             monitor = {
+              # Primary monitor — full bar from the main widget lists
+              ${primary} = {
+                enabled = true;
+              };
+            }
+            // lib.optionalAttrs (secondary != null) {
               # Secondary (portrait) monitor — workspaces, plus weather/privacy
               # ported from a live GUI edit (2026-08-16)
               ${secondary} = {
@@ -239,10 +247,6 @@ in
                 start = [ "weather" ];
                 center = [ "workspaces" ];
                 end = [ "privacy" ];
-              };
-              # Primary monitor — full bar from the main widget lists
-              ${primary} = {
-                enabled = true;
               };
             };
           };
@@ -308,7 +312,9 @@ in
             schema_version = 2;
             widget_order = [
               "lockscreen-login-box@${primary}"
-              "lockscreen-login-box@${secondary}"
+            ]
+            ++ lib.optionals (secondary != null) [ "lockscreen-login-box@${secondary}" ]
+            ++ [
               "lockscreen-widget-0000000000000001"
               "lockscreen-widget-0000000000000002"
               "lockscreen-widget-0000000000000003"
@@ -322,15 +328,6 @@ in
 
             widget = {
               # Login boxes — positions are monitor-geometry-specific
-              "lockscreen-login-box@${secondary}" = {
-                box_height = 0.0;
-                box_width = 0.0;
-                cx = 540.0;
-                cy = 1797.0;
-                output = secondary;
-                rotation = 0.0;
-                type = "login_box";
-              };
               "lockscreen-login-box@${primary}" = {
                 box_height = 0.0;
                 box_width = 0.0;
@@ -340,6 +337,19 @@ in
                 rotation = 0.0;
                 type = "login_box";
               };
+            }
+            // lib.optionalAttrs (secondary != null) {
+              "lockscreen-login-box@${secondary}" = {
+                box_height = 0.0;
+                box_width = 0.0;
+                cx = 540.0;
+                cy = 1797.0;
+                output = secondary;
+                rotation = 0.0;
+                type = "login_box";
+              };
+            }
+            // {
               "lockscreen-widget-0000000000000001" = {
                 box_height = 176.0;
                 box_width = 512.0;

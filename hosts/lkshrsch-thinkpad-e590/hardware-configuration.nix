@@ -65,6 +65,11 @@
         tctiEnvironment.enable = true;
       };
 
+      # NOTE: the cryptdata (SATA) crypttab entry lived here and is currently
+      # removed along with the rest of the SATA config — see
+      # _sata-disabled.nix for the full block and the open question about why
+      # it never unlocked. Restore both together.
+
       services = {
         udev.packages = [ pkgs.yubikey-personalization ];
         logind.settings.Login.HandleLidSwitch = "suspend";

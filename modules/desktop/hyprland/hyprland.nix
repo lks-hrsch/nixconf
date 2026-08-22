@@ -109,6 +109,8 @@
               scale = 1;
               vrr = 2;
             }
+          ]
+          ++ lib.optionals (secondary != null) [
             {
               output = secondary;
               mode = "highres";
@@ -157,18 +159,20 @@
             }
           ];
 
-          # define workspaces — 1–9 on primary, L1–L9 on secondary
+          # define workspaces — 1–9 on primary, L1–L9 on secondary (if present)
           workspace_rule =
             builtins.genList (i: {
               workspace = toString (i + 1);
               monitor = primary;
               default = i == 0;
             }) 9
-            ++ builtins.genList (i: {
-              workspace = "name:L${toString (i + 1)}";
-              monitor = secondary;
-              default = i == 0;
-            }) 9;
+            ++ lib.optionals (secondary != null) (
+              builtins.genList (i: {
+                workspace = "name:L${toString (i + 1)}";
+                monitor = secondary;
+                default = i == 0;
+              }) 9
+            );
 
           # autostart (was exec-once) — list form so noctalia.nix's hook
           # merges as its own hl.on call
