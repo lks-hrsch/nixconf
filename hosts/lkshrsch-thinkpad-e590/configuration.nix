@@ -5,15 +5,18 @@
     {
       imports = with config.flake.modules.nixos; [
         base
-        homeManager
+        podman
+        alloy
+        netbird
+        onepassword
+        flatpak
+        avahi
+        pipewire
+        librepods
+        syncthing
         desktop
         desktop-hyprland
-        pipewire
-        avahi
-        onepassword
-        syncthing
-        netbird
-        podman
+        homeManager
       ];
 
       networking = {
@@ -27,8 +30,9 @@
         };
       };
 
-      # systemd-resolved is load-bearing: NM uses `dns = "systemd-resolved"`,
-      # and networkd hands the wired link's DNS + split-DNS domains to it.
+      # Load-bearing with `dns = "systemd-resolved"` above: NM stops writing
+      # /etc/resolv.conf, so without resolved nothing answers lookups while
+      # raw-IP routing keeps working — it reads as a DNS-only outage.
       services.resolved.enable = true;
 
       hardware.bluetooth = {
