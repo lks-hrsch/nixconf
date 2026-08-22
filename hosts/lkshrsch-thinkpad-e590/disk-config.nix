@@ -5,8 +5,8 @@ _: {
       disko.devices = {
         disk = {
           nvme = {
-            # Toshiba KBG30ZMT512G, pinned by serial — bare /dev/nvme0n1 isn't
-            # safe for a full-disk-format target.
+            # Pinned by serial — a bare /dev/nvme0n1 isn't safe to point a
+            # full-disk format at.
             device = lib.mkDefault "/dev/disk/by-id/nvme-KBG30ZMT512G_TOSHIBA_79BPA0KZPQMN";
             type = "disk";
             content = {
@@ -24,10 +24,10 @@ _: {
                     mountOptions = [ "umask=0077" ];
                   };
                 };
-                # Real partition (not swapfile) for hibernate resume; 48G covers
-                # the planned 32G RAM upgrade. LUKS with a persistent key (not
-                # swapDevices.randomEncryption) — a fresh per-boot key would make
-                # the hibernated image undecryptable on resume.
+                # Partition (not swapfile) so hibernate can resume; 48G covers
+                # the planned 32G RAM. Persistent LUKS key, not
+                # randomEncryption — a per-boot key makes the image
+                # undecryptable on resume.
                 swap = {
                   name = "swap";
                   size = "48G";
@@ -54,9 +54,9 @@ _: {
                   content = {
                     type = "luks";
                     name = "cryptroot";
-                    # Recovery passphrase (README). TPM2/FIDO2 slots are
-                    # enrolled post-install; crypttabExtraOpts tells initrd to
-                    # try them first.
+                    # Recovery passphrase, keyslot 0. TPM2/FIDO2 slots are
+                    # enrolled post-install (README steps 7-8);
+                    # crypttabExtraOpts makes initrd try those first.
                     passwordFile = "/tmp/cryptroot.key";
                     settings = {
                       allowDiscards = true;
@@ -106,11 +106,8 @@ _: {
             };
           };
 
-          # The SATA SSD is currently disabled — see _sata-disabled.nix (the
-          # leading `_` keeps it out of import-tree). Its cryptdata device
-          # never appeared at boot and blocked the machine from starting.
-          # Until that is fixed, Documents/Downloads/Obsidian.nosync live as
-          # plain directories under /home on the NVMe.
+          # SATA SSD disabled — see _sata-disabled.nix. Until it is fixed,
+          # Documents/Downloads/Obsidian.nosync are plain dirs under /home.
         };
       };
     };

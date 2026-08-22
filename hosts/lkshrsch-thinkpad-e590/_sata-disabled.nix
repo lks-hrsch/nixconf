@@ -1,30 +1,23 @@
-# DISABLED — the leading `_` excludes this file from import-tree
-# auto-discovery (see .claude/CLAUDE.md), so nothing here is evaluated.
+# DISABLED — the leading `_` keeps this out of import-tree auto-discovery
+# (see .claude/CLAUDE.md), so nothing here is evaluated.
 #
-# Why: the SATA SSD's stage-2 unlock never produced /dev/mapper/cryptdata at
-# boot, so every mount below timed out and blocked the machine from coming up.
-# Pulled out wholesale to get a bootable system; the NVMe carries everything
-# in the meantime (Documents/Downloads/Obsidian.nosync are just ordinary
-# directories under /home on @home).
-#
-# Unresolved: the crypttab entry did not unlock the device, despite the
-# keyfile being enrolled in LUKS keyslot 1 (verified with
-# `cryptsetup open --test-passphrase`) and shipped by --extra-files. Prime
-# suspect is ordering/availability of either /etc/crypttab or the keyfile at
-# the moment systemd's crypttab generator runs. Debug from a booted system:
+# The stage-2 unlock never produced /dev/mapper/cryptdata, so every mount
+# below timed out and blocked boot. Still unexplained: the keyfile was
+# verifiably enrolled in LUKS keyslot 1 and shipped by --extra-files. Prime
+# suspect is whether /etc/crypttab or the keyfile is available when systemd's
+# crypttab generator runs. Debug from a booted system:
 #   systemctl status systemd-cryptsetup@cryptdata.service
 #   journalctl -b -u systemd-cryptsetup@cryptdata.service
 #   ls -l /etc/crypttab /etc/cryptsetup-keys.d/data.key
 #
-# NOTE: this was written while the host used impermanence, so the keyfile
-# lived at /persist/etc/cryptsetup-keys.d/data.key to survive the root wipe.
-# Impermanence is gone and / persists, so on re-enable the keyfile belongs at
-# the ordinary /etc/cryptsetup-keys.d/data.key and the --extra-files staging
-# path changes to match.
+# Written when the host used impermanence, so the keyfile lived at
+# /persist/etc/cryptsetup-keys.d/data.key. That is gone — on re-enable it
+# belongs at /etc/cryptsetup-keys.d/data.key, and the --extra-files staging
+# path moves with it.
 #
 # To re-enable: rename to sata.nix, restore the crypttab entry in
-# hardware-configuration.nix, and redeploy. The on-disk LUKS container and
-# its subvolumes are untouched by disabling this — no data is lost.
+# hardware-configuration.nix, redeploy. The on-disk container is untouched;
+# no data is lost by leaving this off.
 _: {
   configurations.nixos."lkshrsch-thinkpad-e590".module =
     { lib, ... }:

@@ -36,11 +36,7 @@
         powerOnBoot = true;
       };
 
-      # Confirm with `hyprctl monitors` on first boot.
-      desktop.monitors.primary = "eDP-1";
-
-      # SSD subvolumes (disk-config.nix) mount straight at their final home
-      # paths — no bind-mount or xdg.userDirs override needed.
+      desktop.monitors.primary = "eDP-1"; # confirmed via `hyprctl monitors`
 
       system.stateVersion = "26.05";
     };

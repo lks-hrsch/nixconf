@@ -45,24 +45,19 @@
         };
 
         loader = {
-          # lanzaboote replaces systemd-boot entirely — it installs its own
-          # signed stub. Both enabled at once is a hard eval error.
-          systemd-boot.enable = false;
+          systemd-boot.enable = false; # lanzaboote installs its own signed stub
           efi.canTouchEfiVariables = true;
         };
 
-        # Keys come from `sbctl create-keys` (README step 6); the bundle must
-        # exist on the target before this ever gets deployed, or the generation
-        # it builds is unsigned and will not boot with Secure Boot on.
+        # pkiBundle must already exist on the target (`sbctl create-keys`,
+        # README step 6) or the generation builds unsigned.
         lanzaboote = {
           enable = true;
           pkiBundle = "/var/lib/sbctl";
         };
       };
 
-      # Secure Boot key management. Not pulled in by lanzaboote's module, but
-      # needed for the initial `create-keys`/`enroll-keys` and for `sbctl
-      # verify` after every generation change.
+      # Not pulled in by lanzaboote's module; needed for `sbctl verify`.
       environment.systemPackages = [ pkgs.sbctl ];
 
       security.tpm2 = {
@@ -71,10 +66,8 @@
         tctiEnvironment.enable = true;
       };
 
-      # NOTE: the cryptdata (SATA) crypttab entry lived here and is currently
-      # removed along with the rest of the SATA config — see
-      # _sata-disabled.nix for the full block and the open question about why
-      # it never unlocked. Restore both together.
+      # The cryptdata (SATA) crypttab entry belongs here — removed with the
+      # rest of the SATA config, see _sata-disabled.nix. Restore both together.
 
       services = {
         udev.packages = [ pkgs.yubikey-personalization ];

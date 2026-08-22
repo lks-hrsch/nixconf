@@ -8,6 +8,18 @@ support.
 `/` is an ordinary persistent btrfs subvolume. An impermanent (wiped-every-boot)
 root was built and then removed — see [Known issues](#known-issues).
 
+## Status
+
+| Piece | State |
+| :--- | :--- |
+| Install, boot, network (wired + wifi) | done |
+| Hyprland + Noctalia on the iGPU (`iHD`) | done |
+| Lanzaboote, keys enrolled, Secure Boot `enabled (user)` | done |
+| TPM2 unlock, PCR 7, both LUKS containers | done |
+| YubiKey FIDO2 slots | **pending** — recovery passphrase is the only backup until then |
+| Hibernate/resume | **untested** — swap partition and `resumeDevice` are wired |
+| SATA SSD | **disabled** — see [Known issues](#known-issues) |
+
 ## Hardware
 
 | Component | Spec |
@@ -164,6 +176,33 @@ sudo systemctl restart home-manager-lkshrsch.service
 It is the same key — `.sops.yaml` has a single recipient, and every host gets a
 copy of it.
 
+Two more per-machine bits that Nix does not declare, both inside the 1Password
+desktop app on the laptop:
+
+1. **Settings → Developer → Use the SSH agent.** Off on every fresh install
+   regardless of `modules/onepassword.nix`; it is stored in
+   `~/.config/1Password/settings/`. Until it is on, `~/.1password/agent.sock`
+   does not exist and every outgoing SSH fails, because `modules/ssh.nix` points
+   `IdentityAgent` at that socket.
+2. **The agent's vault filter.** With no `agent.toml` the agent only offers keys
+   from the `Private` vault, so `ssh-add -l` reports "The agent has no
+   identities":
+
+   ```bash
+   mkdir -p ~/.config/1Password/ssh
+   printf '[[ssh-keys]]\nvault = "Private - Infrastructure"\n' > ~/.config/1Password/ssh/agent.toml
+   SSH_AUTH_SOCK=~/.1password/agent.sock ssh-add -l
+   ```
+
+   The agent only reads this at startup, so toggle it off/on after editing.
+   Invalid TOML makes the agent refuse to start entirely — `ssh-add` then says
+   `Connection refused` instead of "no identities", and the reason is only
+   visible in `~/.config/1Password/logs/1Password_r*.log`:
+   `Failed to deserialize SSH agent configuration`.
+
+Note this is about SSH *out of* the laptop. Incoming sshd is
+`services.openssh` from `modules/ssh.nix` and needs nothing manual.
+
 ### 6. Secure Boot keys (on the laptop)
 
 `sbctl` is in `environment.systemPackages` (`hardware-configuration.nix`), but
@@ -277,8 +316,9 @@ After install, on the laptop:
 | `ip -br addr` | `enp4s0` has a DHCP lease |
 | `sudo ls /run/secrets/` | sops secrets decrypted with the age key from `/etc/sops/age/keys.txt` |
 | `systemctl --failed` | empty — a failed `home-manager-lkshrsch.service` means the step-5 user age key is missing |
-| `bootctl status` | `Secure Boot: enabled (user)`, stub = lanzaboote |
-| `sbctl verify` | all files in `/boot` signed |
+| `sudo bootctl status` | `Secure Boot: enabled (user)` |
+| `sudo sbctl status` | `Setup Mode ✗ Disabled`, `Vendor Keys microsoft` |
+| `sudo sbctl verify` | every `EFI/Linux/*.efi` signed; `EFI/nixos/kernel-*.efi` unsigned is expected |
 | `sudo cryptsetup luksDump /dev/nvme0n1p3` | keyslots: passphrase, tpm2, fido2 |
 | reboot with YubiKey removed | unlocks silently via TPM |
 | reboot after a test `--wipe-slot=tpm2` | prompts, YubiKey touch unlocks |
@@ -365,17 +405,23 @@ keeping if it is ever revisited:
   `/var/lib/systemd/journal` (a plausible-looking wrong path) silently
   discards every boot's log, which is exactly what you need when debugging.
 
-### Boot stall after "Started D-Bus System Message Bus"
+### Boot stall after "Started D-Bus System Message Bus" (resolved)
 
-Unresolved. The console freezes at that line, the machine never reaches the
-network, and Ctrl+Alt+Fn does not switch VTs. It survived both the removal of
-the SATA disk and the removal of impermanence. A crashed compositor holding
-the VT in `KD_GRAPHICS` mode produces exactly this signature, so greetd/Hyprland
-on the Intel iGPU is the leading suspect over anything in stage 1.
+For several installs the console froze at that line, the machine never reached
+the network, and Ctrl+Alt+Fn would not switch VTs. It went away with the
+removal of impermanence and its workarounds, and has not recurred.
 
-Useful next probe: temporarily `services.greetd.enable = lib.mkForce false;`
-to boot to a plain getty, which separates "the system does not boot" from
-"the desktop does not start".
+Which change was decisive was never isolated — several landed together
+(impermanence removed, the SATA mounts pulled out, `dhcpcd` forced off so it
+stopped fighting NetworkManager). Kept here because the *signature* is worth
+recognising: a stall right after D-Bus with dead VT switching means userspace,
+not stage 1. The probe that separates "the system does not boot" from "the
+desktop does not start" is `services.greetd.enable = lib.mkForce false;` — boot
+to a plain getty and look again.
+
+Related trap: journald only writes to disk if `/var/log/journal` exists. While
+impermanence was persisting `/var/lib/systemd/journal` instead, every boot's
+evidence was discarded — which is why this took so long to pin down.
 
 ## Deliberately out of scope
 
