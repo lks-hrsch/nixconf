@@ -119,6 +119,7 @@ _: {
             caveman
           ];
           settings = {
+            outputStyle = "Concise";
             skillListingBudgetFraction = 0.05;
             model = "opusplan";
             effortLevel = "xhigh";
