@@ -5,7 +5,7 @@
   ...
 }:
 let
-  overlays = config.repo.overlays;
+  inherit (config.repo) overlays;
   revision = self.rev or self.dirtyRev or null;
 in
 {
@@ -14,7 +14,6 @@ in
     {
       imports = [
         config.flake.modules.darwin.onepassword
-        config.flake.modules.darwin.firefox
         config.flake.modules.darwin.homebrew
         config.flake.modules.darwin.nixvim
         config.flake.modules.darwin.time
@@ -34,8 +33,8 @@ in
           { config, lib, ... }:
           {
             nixpkgs = {
-              hostPlatform = "aarch64-darwin";
-              config.allowUnfree = true;
+              hostPlatform = lib.mkDefault "aarch64-darwin";
+              config.allowUnfree = lib.mkDefault true;
               overlays = [
                 overlays.unstable
                 overlays.firefox-addons
@@ -48,13 +47,15 @@ in
               watchIdAuth = true;
             };
 
-            networking.applicationFirewall = {
-              enable = true;
-              enableStealthMode = true;
-            };
+            networking = {
+              applicationFirewall = {
+                enable = true;
+                enableStealthMode = true;
+              };
 
-            networking.computerName = lib.mkDefault config.networking.hostName;
-            networking.localHostName = lib.mkDefault config.networking.hostName;
+              computerName = lib.mkDefault config.networking.hostName;
+              localHostName = lib.mkDefault config.networking.hostName;
+            };
 
             # this will allow you to use nix-darwin with Determinate.
             nix.enable = false;
@@ -64,6 +65,16 @@ in
               stateVersion = 6;
 
               defaults = {
+                CustomUserPreferences = {
+                  "com.apple.desktopservices" = {
+                    DSDontWriteNetworkStores = true;
+                  };
+                };
+                dock = {
+                  expose-group-apps = true;
+                  launchanim = false;
+                  mru-spaces = false;
+                };
                 finder = {
                   AppleShowAllFiles = true;
                   AppleShowAllExtensions = true;
@@ -83,13 +94,14 @@ in
                   AppleShowAllFiles = true;
                   AppleShowScrollBars = "WhenScrolling";
                   AppleTemperatureUnit = "Celsius";
+                  _HIHideMenuBar = false;
                 };
-                CustomUserPreferences = {
-                  "com.apple.desktopservices" = {
-                    DSDontWriteNetworkStores = true;
-                  };
-                };
+                spaces.spans-displays = false;
                 smb.NetBIOSName = lib.mkDefault config.networking.hostName;
+                universalaccess.reduceMotion = true;
+                WindowManager = {
+                  EnableStandardClickToShowDesktop = false;
+                };
               };
             };
           }

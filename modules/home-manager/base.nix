@@ -13,21 +13,20 @@
     { ... }:
     {
       imports = with config.flake.modules.homeManager; [
-        alacritty
         claude-code
-        firefox
+        codex
         git
         gpg
         latex
-        manual
         mcp
-        obsidian
+        opencode
         podman
-        zsh
+        skills
         sops
         ssh
         stylix
-        vscode
+        uv
+        zsh
       ];
 
       programs.home-manager.enable = true;

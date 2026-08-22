@@ -28,6 +28,9 @@ _: {
           taps = [
             "netbirdio/tap"
           ];
+          brews = [
+            "netbirdio/tap/netbird"
+          ];
           casks = [
             "netbirdio/tap/netbird-ui"
           ];

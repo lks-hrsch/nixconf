@@ -5,6 +5,7 @@
     {
       imports = with config.flake.modules.darwin; [
         base
+        netbird
       ];
 
       networking.hostName = "lkshrsch-mb-pro-m1";

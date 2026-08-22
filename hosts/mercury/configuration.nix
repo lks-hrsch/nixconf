@@ -15,13 +15,14 @@
     {
       imports = with config.flake.modules.nixos; [
         base
+        alloy
         podman
         netbird
         (modulesPath + "/installer/scan/not-detected.nix")
         (modulesPath + "/profiles/qemu-guest.nix")
       ];
 
-      facter.reportPath =
+      hardware.facter.reportPath =
         if builtins.pathExists ./facter.json then
           ./facter.json
         else
@@ -29,6 +30,14 @@
 
       networking = {
         hostName = "mercury";
+        hosts = {
+          "127.0.0.1" = [
+            "open-webui.deimos.mars.lukashirsch.de"
+            "netbird.lukashirsch.de"
+            "authelia.lukashirsch.de"
+            "auth.lukashirsch.de"
+          ];
+        };
         # netcup nameservers
         nameservers = [
           "46.38.225.230"

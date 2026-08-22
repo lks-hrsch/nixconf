@@ -1,6 +1,6 @@
 { config, ... }:
 {
-  flake.modules.homeManager.desktop-apps-thunderbird =
+  flake.modules.homeManager.thunderbird =
     { pkgs, ... }:
     {
       accounts = import ../../../secrets/accounts.nix { };

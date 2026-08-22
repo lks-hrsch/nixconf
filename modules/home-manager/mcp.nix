@@ -1,27 +1,21 @@
-_: {
+{ config, ... }:
+let
+  inherit (config.repo.constants) obsidianBasePath;
+in
+{
   flake.modules.homeManager.mcp =
     { config, ... }:
     {
       programs.mcp = {
         enable = true;
         servers = {
-          sequential-thinking = {
-            type = "stdio";
-            command = "npx";
-            args = [
-              "-y"
-              "@modelcontextprotocol/server-sequential-thinking"
-            ];
-            description = "Dynamic problem-solving through sequential reasoning steps, enabling structured thought revision and complex multi-step analysis";
-          };
-          time = {
-            type = "stdio";
-            command = "uvx";
-            args = [
-              "mcp-server-time"
-              "--local-timezone=Europe/Berlin"
-            ];
-            description = "Time awareness tools: current time, timezone conversion, and timestamp utilities (local timezone: Europe/Berlin)";
+          websearch = {
+            type = "http";
+            url = "https://mcp.tavily.com/mcp/";
+            headers = {
+              "Authorization" = "Bearer {file:${config.sops.secrets."mcp/tavily/api-key".path}}";
+            };
+            description = "Real-time web search with content extraction, crawling, and deep research";
           };
           context7 = {
             type = "http";
@@ -29,36 +23,30 @@ _: {
             # headers = {
             #   "CONTEXT7_API_KEY" = "YOUR_API_KEY"
             # };
-            description = "Fetches up-to-date, version-specific library documentation and code examples directly from source to prevent hallucinated APIs";
+            description = "Up-to-date code documentation from source repositories, version-specific";
           };
-          microsoft-learn = {
+          grep-app = {
             type = "http";
-            url = "https://learn.microsoft.com/api/mcp";
-            description = "Real-time access to Microsoft Learn documentation, code samples, and best practices for Azure services and Microsoft technologies, ensuring accurate and current information without hallucination";
+            url = "https://mcp.grep.app";
+            description = "Code search across public GitHub repositories with caching & batch operations";
           };
-          memory = {
-            type = "stdio";
-            command = "npx";
-            args = [
-              "-y"
-              "@modelcontextprotocol/server-memory"
-            ];
-            description = "Persistent memory across sessions";
-          };
+          # https://github.com/bitbonsai/mcpvault
           obsidian = {
             type = "stdio";
             command = "npx";
             args = [
-              "@mauricio.wolff/mcp-obsidian@latest"
-              "${config.home.homeDirectory}/Obsidian.nosync/private"
+              "@bitbonsai/mcpvault@latest"
+              # Private vault only — the work-develappers vault is not
+              # exposed via MCP.
+              "${config.home.homeDirectory}/${obsidianBasePath}/private"
             ];
-            description = "Read and manage notes in the local Obsidian private vault";
+            description = "Secure access to local Obsidian vault for notes management";
           };
           nixos = {
             type = "stdio";
             command = "uvx";
             args = [ "mcp-nixos" ];
-            description = "Real-time NixOS package search, configuration options, Home Manager settings, and nix-darwin documentation";
+            description = "Real-time NixOS ecosystem search (130K+ packages, 23K+ system options)";
           };
         };
       };

@@ -1,5 +1,4 @@
 secrets/** filter=git-crypt diff=git-crypt
 
-hosts/mars/deimos/stacks/** filter=git-crypt diff=git-crypt
-hosts/mercury/stacks/** filter=git-crypt diff=git-crypt
+hosts/**/stacks/** filter=git-crypt diff=git-crypt
 hosts/**/vpn.nix filter=git-crypt diff=git-crypt

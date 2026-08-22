@@ -12,6 +12,7 @@
         "docker"
         "video"
         "games"
+        "netbird-wt0"
       ];
     };
 

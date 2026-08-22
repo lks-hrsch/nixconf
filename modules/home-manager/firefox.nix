@@ -1,30 +1,21 @@
 { config, ... }:
 {
-  flake.modules.darwin.firefox = _: {
-    # On macOS, programs.firefox.package doesn't automatically create app symlinks
-
-    homebrew = {
-      casks = [
-        "firefox"
-      ];
-    };
-  };
   flake.modules.homeManager.firefox =
     {
       pkgs,
       ...
     }:
-    let
-      firefox-package =
-        if pkgs.stdenv.isDarwin then
-          pkgs.lib.makeOverridable (args: pkgs.runCommand "firefox-0.0.0" { } "mkdir $out") { }
-        else
-          pkgs.unstable.firefox-bin;
-    in
     {
       programs.firefox = {
         enable = true;
-        package = firefox-package;
+        # On darwin the app must come from Homebrew (signed, in /Applications)
+        # so the 1Password extension can integrate with the desktop app;
+        # nix-store Firefox fails 1Password's code-sign/location check.
+        # Home-manager still manages the profile below either way.
+        package = if pkgs.stdenv.isDarwin then null else pkgs.unstable.firefox-bin;
+        # macOS Firefox reads from ~/Library/Application Support/Firefox, not ~/.mozilla/firefox
+        configPath =
+          if pkgs.stdenv.isDarwin then "Library/Application Support/Firefox" else ".mozilla/firefox";
 
         profiles.${config.flake.users.owner.username} = {
           search = {
@@ -36,6 +27,7 @@
               "ecosia".metaData.hidden = true;
               "amazondotcom-us".metaData.hidden = true;
               "wikipedia".metaData.hidden = true;
+              "perplexity".metaData.hidden = true;
 
               "Nix Packages" = {
                 urls = [
@@ -58,13 +50,15 @@
                   }
                 ];
                 icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-                definedAliases = [ "@n" ];
+                definedAliases = [ "@nix" ];
               };
             };
           };
 
           settings = {
             "browser.startup.homepage" = "https://start.duckduckgo.com";
+            "browser.startup.page" = 3; # open previous windows and tabs
+            "browser.newtabpage.activity-stream.showSponsored" = false;
             "browser.aboutConfig.showWarning" = false; # No warning when going to config
             "browser.warnOnQuitShortcut" = false;
 
@@ -75,6 +69,10 @@
             "browser.shell.checkDefaultBrowser" = false;
             "browser.shell.defaultBrowserCheckCount" = 1;
             "browser.bookmarks.restore_default_bookmarks" = false;
+
+            # Native vertical tabs (new sidebar)
+            "sidebar.revamp" = true;
+            "sidebar.verticalTabs" = true;
 
             "general.smoothScroll" = true;
             "media.hardware-video-decoding.force-enabled" = true;
@@ -122,14 +120,20 @@
             # Disable "save password" prompt
             "signon.rememberSignons" = false;
 
+            # Disable save/autofill of payment methods and addresses
+            "extensions.formautofill.creditCards.enabled" = false;
+            "extensions.formautofill.addresses.enabled" = false;
+
             # Harden
             "privacy.trackingprotection.enabled" = true;
             "dom.security.https_only_mode" = true;
           };
           extensions = {
+            # search for addons here: https://github.com/nix-community/nur-combined/blob/main/repos/rycee/pkgs/firefox-addons/addons.json
             packages = with pkgs.firefox-addons; [
               ublock-origin
               youtube-shorts-block
+              web-clipper-obsidian
               onepassword-password-manager
             ];
           };

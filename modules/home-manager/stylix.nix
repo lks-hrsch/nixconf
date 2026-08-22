@@ -7,7 +7,7 @@ _: {
     }:
     let
       #################################################################################
-      # Catppuccin Mocha Palette (Full) with Base16 Mapping Override and change to OLED
+      # Catppuccin Mocha Palette (Full) with Base16 Mapping Override
       #################################################################################
       # Define each color using its common name, then build a Base16 mapping.
       # https://catppuccin.com/palette/
@@ -38,31 +38,35 @@ _: {
         surface2 = "#585b70"; # Darker background for panels
         surface1 = "#45475a"; # Medium surface background
         surface0 = "#313244"; # Lighter surface background
-        base = "#040404"; # "#1e1e2e"; # Original base (kept for reference)
-        mantle = "#080808"; # "#181825"; # Slightly lighter than base (e.g. for status bars)
-        crust = "#000000"; # "#11111b"; # Deepest shade (used as base00 below)
+        base = "#1e1e2e"; # Mocha base — unused (base00 overridden to pure black for OLED)
+        mantle = "#181825"; # one step below base — also unused in the mapping
+        crust = "#11111b"; # deepest Mocha shade — used as base01 (alternate background)
 
       };
-      # Base16 Mapping: Building the mapping by referencing the named colors.
+      # Base16 mapping (standard Catppuccin Mocha, OLED dark-end override).
+      # Comments give the Stylix UI role first (drives GTK/Qt/Firefox/VS Code/
+      # terminal across all targets) then the base16 syntax role.
+      # https://nix-community.github.io/stylix/styling.html
       # https://github.com/catppuccin/base16/blob/main/base16/mocha.yaml
-      # Note: Here we want base00 to use "crust".
+      # OLED override: base00 is pure black; base01 lifted to crust (#11111b)
+      # so alternate backgrounds/panels stay visible against it.
       base16 = {
-        base00 = catppuccinMocha.crust; # Default Background
-        base01 = catppuccinMocha.mantle; # Lighter Background
-        base02 = catppuccinMocha.surface0; # Selection Background
-        base03 = catppuccinMocha.surface1; # Comments/invisibles
-        base04 = catppuccinMocha.surface2; # Dark Foreground
-        base05 = catppuccinMocha.text; # Default Foreground
-        base06 = catppuccinMocha.rosewater; # Light Foreground
-        base07 = catppuccinMocha.lavender; # Light Background
-        base08 = catppuccinMocha.red; # Variables/XML tags/diff deleted
-        base09 = catppuccinMocha.peach; # Integers/XML attributes
-        base0A = catppuccinMocha.yellow; # Classes/markup bold/search background
-        base0B = catppuccinMocha.green; # Strings/markup code
-        base0C = catppuccinMocha.teal; # Support/regex/quotes
-        base0D = catppuccinMocha.blue; # Functions/headings
-        base0E = catppuccinMocha.mauve; # Keywords/selectors/markup italic
-        base0F = catppuccinMocha.flamingo; # Deprecated/embedded language tags
+        base00 = "#000000"; # default background (OLED pure black, overrides Mocha base)
+        base01 = catppuccinMocha.crust; # alternate background — status bars, panels, cards
+        base02 = catppuccinMocha.surface0; # selection background
+        base03 = catppuccinMocha.surface1; # unfocused/low-urgency borders; comments, invisibles
+        base04 = catppuccinMocha.surface2; # alternate text (status bars); dark foreground
+        base05 = catppuccinMocha.text; # default text / foreground
+        base06 = catppuccinMocha.rosewater; # light foreground (rarely used)
+        base07 = catppuccinMocha.lavender; # light background (rarely used)
+        base08 = catppuccinMocha.red; # error / urgent; variables, diff deleted
+        base09 = catppuccinMocha.peach; # urgent-alt; integers, constants
+        base0A = catppuccinMocha.yellow; # warning; classes, search background
+        base0B = catppuccinMocha.green; # accent/icon palette; strings, diff added
+        base0C = catppuccinMocha.teal; # accent/icon palette; support, regex, escapes
+        base0D = catppuccinMocha.blue; # focus/selection accent; functions, headings
+        base0E = catppuccinMocha.mauve; # accent/icon palette; keywords, selectors
+        base0F = catppuccinMocha.flamingo; # accent/icon palette; deprecated, embedded tags
       };
     in
     {
@@ -109,15 +113,12 @@ _: {
         };
 
         cursor = {
-          name = "Bibata-Modern-Classic";
-          package = pkgs.bibata-cursors;
+          name = "macOS";
+          package = pkgs.apple-cursor;
           size = 22;
         };
 
         targets = {
-          mako = {
-            enable = false; # The option definition `services.mako.extraConfig' in `/nix/store/hfig46d452pr4i0g5ks17571z38cs1il-source/modules/mako/hm.nix' no longer has any effect; please remove it. Use services.mako.settings instead.
-          };
           firefox = {
             profileNames = [ config.home.username ];
           };
@@ -127,10 +128,11 @@ _: {
               config.home.username
             ];
           };
-          waybar = {
-            addCss = false;
-          };
           gnome.enable = pkgs.stdenv.isLinux; # Only enable GNOME theming on Linux
+          # Noctalia v5 owns wallpapers; stylix's hyprland target would
+          # otherwise force-enable the redundant hyprpaper service, which
+          # crashes on monitor disconnect/DPMS events.
+          hyprland.hyprpaper.enable = false;
         };
       };
     };

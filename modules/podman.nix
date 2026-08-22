@@ -41,7 +41,11 @@ _: {
 
         homebrew = {
           taps = [
-            "slp/krunkit"
+            # Trust the tap (Homebrew 6.0); note it doesn't cover krunkit's transitive same-tap deps — see HOMEBREW_NO_REQUIRE_TAP_TRUST in darwin/homebrew.nix.
+            {
+              name = "libkrun/krun";
+              trusted = true;
+            }
           ];
           brews = [
             "helm"
@@ -49,7 +53,7 @@ _: {
             "docker-compose"
             "podman"
             "podman-compose"
-            "slp/krunkit/krunkit"
+            "libkrun/krun/krunkit"
           ];
           casks = [
             "podman-desktop"
@@ -64,18 +68,13 @@ _: {
           ...
         }:
         {
-          home.packages =
-            with pkgs;
-            [
-              kubectl
-              minikube
+          home.packages = with pkgs; [
+            kubectl
+            minikube
 
-              argocd
-              kubeseal
-            ]
-            ++ lib.optionals pkgs.stdenv.isLinux [
-              podman-desktop
-            ];
+            argocd
+            kubeseal
+          ];
 
           programs.k9s.enable = true;
         };

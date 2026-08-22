@@ -17,7 +17,11 @@ _: {
       services.pipewire = {
         enable = true;
         alsa.enable = true;
-        alsa.support32Bit = true;
+        # Disabled via mkForce: steam.nix sets this to true, but the i686 PipeWire
+        # now pulls libcamera → numpy → lapack → openblas (i686) which Hydra
+        # doesn't cache, causing a multi-hour local build. 32-bit audio clients
+        # still work via pipewire-pulse.
+        alsa.support32Bit = lib.mkForce false;
         pulse.enable = true;
         wireplumber.enable = true;
 

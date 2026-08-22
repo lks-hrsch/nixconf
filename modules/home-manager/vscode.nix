@@ -3,26 +3,6 @@
   flake.modules.homeManager.vscode =
     { pkgs, ... }:
     let
-      vscodeVersion = "1.114.0";
-      vscodePackage =
-        if pkgs.stdenv.hostPlatform.isDarwin then
-          pkgs.unstable.vscode.overrideAttrs (old: rec {
-            version = vscodeVersion;
-            src = pkgs.fetchurl {
-              name = "VSCode_${version}_darwin-arm64.zip";
-              url = "https://update.code.visualstudio.com/${version}/darwin-arm64/stable";
-              sha256 = "sha256-nWkNoryvsD2SPkc5veQ12+DWPXgWPJjfWwUcC7PjbC4=";
-            };
-          })
-        else
-          pkgs.unstable.vscode.overrideAttrs (old: rec {
-            version = vscodeVersion;
-            src = pkgs.fetchurl {
-              name = "VSCode_${version}_linux-x64.tar.gz";
-              url = "https://update.code.visualstudio.com/${version}/linux-x64/stable";
-              sha256 = "sha256-D+2JWjC0kutfkEF5QKOKwh9Z8+jWgMgMN2b8pKwYays=";
-            };
-          });
       marketplace = pkgs.vscode-marketplace-release;
 
       # extensions for all profiles
@@ -45,15 +25,18 @@
         mhutchie.git-graph
         donjayamanne.githistory
 
-        github.copilot-chat
         github.vscode-pull-request-github
         github.vscode-github-actions
 
         # AI Tools
         anthropic.claude-code
+        sst-dev.opencode
 
         # nix extensions
         jnoortheen.nix-ide
+
+        # yaml
+        redhat.vscode-yaml
       ];
 
       # settings for all profiles
@@ -66,11 +49,12 @@
 
         "editor.formatOnSave" = true;
         "editor.formatOnPaste" = true;
+        "editor.aiStats.enabled" = true;
         "workbench.editorLargeFileConfirmation" = 100; # 100 MB
 
         "diffEditor.ignoreTrimWhitespace" = false;
 
-        "git.autofetch" = "all";
+        # "git.autofetch" = "all";
 
         "nix.formatterPath" = "nixfmt";
         "nix.enableLanguageServer" = true;
@@ -83,92 +67,122 @@
           };
         };
 
+        "github.gitProtocol" = "ssh";
+
+        "github.copilot.chat.rateLimitAutoSwitchToAuto" = true;
         "github.copilot.nextEditSuggestions.enabled" = true;
+        "github.copilot.nextEditSuggestions.extendedRange" = true;
         "github.copilot.nextEditSuggestions.fixes" = true;
-        "github.copilot.chat.editor.temporalContext.enabled" = true;
-        "github.copilot.chat.edits.temporalContext.enabled" = true;
         "github.copilot.chat.codesearch.enabled" = true;
-        "github.copilot.chat.useResponsesApi" = true;
         "github.copilot.chat.githubMcpServer.enabled" = true;
         "github.copilot.chat.newWorkspace.useContext7" = true;
+        "github.copilot.chat.gpt54ConcisePrompt.enabled" = true;
+        "github.copilot.chat.gpt54LargePrompt.enabled" = true;
+        "github.copilot.chat.switchAgent.enabled" = true;
+        "github.copilot.chat.agent.backgroundTodoAgent.enabled" = true;
 
+        "chat.disableAIFeatures" = false;
         "chat.mcp.gallery.enabled" = true;
         "chat.mcp.discovery.enabled" = {
           "claude-desktop" = true;
           "cursor-global" = true;
           "cursor-workspace" = true;
         };
+        "chat.tools.compressOutput.enabled" = true;
+
+        "claudeCode.hideOnboarding" = true;
+        "claudeCode.useTerminal" = true;
       };
     in
     {
       home.packages = with pkgs; [
         nil
-        nixfmt-rfc-style
+        nixfmt
         nixpkgs-fmt
 
         # for MCP
         uv
         nodejs_24
+
+        # for Python
+        unstable.pyrefly
+        unstable.ruff
+
+        # for YAML
+        unstable.yaml-language-server
       ];
 
-      programs.vscode = {
-        enable = true;
-        package = vscodePackage;
+      programs = {
+        gh = {
+          enable = true;
+        };
 
-        profiles = {
-          default = {
-            extensions = defaultExtensions;
-            userSettings = defaultSettings;
-            enableMcpIntegration = true;
-          };
+        vscode = {
+          enable = true;
+          package = pkgs.unstable.vscode;
 
-          "${config.flake.users.owner.username}" = {
-            extensions =
-              defaultExtensions
-              ++ (with marketplace; [
-                # Add additional extensions specific to the owner profile here
-                # C/C++ extensions
-                llvm-vs-code-extensions.vscode-clangd
-                # vadimcn.vscode-lldb
-
-                # Rust extensions
-                rust-lang.rust-analyzer
-                tauri-apps.tauri-vscode
-
-                # python extensions
-                ms-python.python
-                ms-python.vscode-pylance
-                ms-python.debugpy
-                charliermarsh.ruff
-                ms-toolsai.jupyter
-                ms-toolsai.jupyter-keymap
-                ms-toolsai.jupyter-renderers
-                ms-toolsai.vscode-jupyter-slideshow
-                ms-toolsai.vscode-jupyter-cell-tags
-                ms-toolsai.vscode-jupyter-powertoys
-
-                # web development
-                ms-vscode.vscode-typescript-next
-                bradlc.vscode-tailwindcss
-                biomejs.biome
-                # ms-playwright.playwright
-              ])
-              ++ [
-                (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-                  mktplcRef = {
-                    publisher = "ms-playwright";
-                    name = "playwright";
-                    version = "1.1.17";
-                    sha256 = "1w3gih8igk3hairqi90pd919rqf4vadk0mm49xs92k7kp3v15158";
-                  };
-                })
-              ];
-            userSettings = defaultSettings // {
-              # Add additional settings specific to the owner profile here
-              "playwright.pickLocatorCopyToClipboard" = true;
-              "playwright.reuseBrowser" = true;
+          profiles = {
+            default = {
+              extensions = defaultExtensions;
+              userSettings = defaultSettings;
+              enableMcpIntegration = true;
             };
-            enableMcpIntegration = true;
+
+            "${config.flake.users.owner.username}" = {
+              extensions =
+                defaultExtensions
+                ++ (with marketplace; [
+                  # Add additional extensions specific to the owner profile here
+                  # C/C++ extensions
+                  llvm-vs-code-extensions.vscode-clangd
+                  # vadimcn.vscode-lldb
+
+                  # Rust extensions
+                  rust-lang.rust-analyzer
+                  tauri-apps.tauri-vscode
+
+                  # python extensions
+                  ms-python.python
+                  ms-python.vscode-pylance
+                  ms-python.debugpy
+                  meta.pyrefly
+                  charliermarsh.ruff
+                  ms-toolsai.jupyter
+                  ms-toolsai.jupyter-keymap
+                  ms-toolsai.jupyter-renderers
+                  ms-toolsai.vscode-jupyter-slideshow
+                  ms-toolsai.vscode-jupyter-cell-tags
+                  ms-toolsai.vscode-jupyter-powertoys
+
+                  # web development
+                  ms-vscode.vscode-typescript-next
+                  bradlc.vscode-tailwindcss
+                  biomejs.biome
+                  # ms-playwright.playwright
+                ])
+                ++ [
+                  (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
+                    mktplcRef = {
+                      publisher = "ms-playwright";
+                      name = "playwright";
+                      version = "1.1.19";
+                      sha256 = "1xppas4qla2bsppb89ks4mnrby2g3gra4irabnimkcmaz4m3wr9p";
+                    };
+                  })
+                ];
+              userSettings = defaultSettings // {
+                # Add additional settings specific to the owner profile here
+                "playwright.pickLocatorCopyToClipboard" = true;
+                "playwright.reuseBrowser" = true;
+
+                "python.analysis.aiCodeActions" = {
+                  "implementAbstractClasses" = true;
+                  "generateSymbol" = true;
+                  "convertFormatString" = true;
+                };
+              };
+              enableMcpIntegration = true;
+            };
           };
         };
       };

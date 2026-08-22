@@ -2,10 +2,14 @@
 ## and may be overwritten by future invocations.  Please make changes
 ## to /etc/nixos/configuration.nix instead.
 
-outer:
+{ config, ... }:
+let
+  sshKey = config.repo.constants.sshPublicKey;
+in
 {
   configurations.nixos."workstation-nixos".module =
     {
+      pkgs,
       config,
       lib,
       modulesPath,
@@ -15,6 +19,12 @@ outer:
       imports = [
         (modulesPath + "/installer/scan/not-detected.nix")
       ];
+
+      hardware.facter.reportPath =
+        if builtins.pathExists ./facter.json then
+          ./facter.json
+        else
+          throw "Missing hosts/workstation-nixos/facter.json. Run: sudo nix run github:numtide/nixos-facter -- -o hosts/workstation-nixos/facter.json";
 
       boot = {
         initrd = {
@@ -31,17 +41,17 @@ outer:
             "nvidia_drm"
             "igc" # lspci -v | grep -iA8 'network\|ethernet'
           ];
-          kernelModules = [ ];
 
-          # Remote unlock for encrypted ZFS: enable networking and SSH in initrd
+          # Remote unlock for encrypted ZFS: enable networking and SSH in initrd.
+          # boot.initrd.network.ssh and boot.initrd.secrets remain valid under
+          # systemd-initrd; the ip= kernelParam supplies the static address.
           network = {
             enable = true;
             ssh = {
               enable = true;
               port = 2222; # connect with: ssh -p 2222 root@<initrd-ip>
               hostKeys = [ "/etc/ssh/ssh_host_ed25519_key" ];
-              authorizedKeys = [ outer.config.repo.constants.sshPublicKey ];
-              # shell = "/bin/cryptsetup-askpass";
+              authorizedKeys = [ sshKey ];
             };
             udhcpc.enable = false;
           };
@@ -49,32 +59,55 @@ outer:
           secrets = {
             "/etc/ssh/ssh_host_ed25519_key" = "/etc/ssh/ssh_host_ed25519_key";
           };
+
+          # TODO(systemd-initrd remote unlock): under systemd-initrd root's home
+          # is /var/empty and ZFS key prompts go through systemd ask-password.
+          # Until this is tested, remote unlock via SSH:2222 may require the
+          # physical console. Uncomment the unit below once verified.
+          #
+          # systemd.services.zfs-unlock-profile = {
+          #   description = "Attach SSH login to the ZFS passphrase prompt";
+          #   wantedBy = [ "initrd.target" ];
+          #   before = [ "initrd-root-fs.target" ];
+          #   unitConfig.DefaultDependencies = false;
+          #   serviceConfig.Type = "oneshot";
+          #   script = ''
+          #     mkdir -p /var/empty
+          #     echo "systemd-tty-ask-password-agent --watch" > /var/empty/.profile
+          #   '';
+          # };
         };
 
         kernelModules = [
           "kvm-amd"
         ];
-        blacklistedKernelModules = [ ];
 
         kernelParams = [
           "acpi_enforce_resources=lax"
-          "amd_pstate=guided"
+          "acpi_osi=\"!Windows 2015\""
+          "amd_pstate=active"
           "nvidia_drm.modeset=1"
-          "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-          "zfs.zfs_arc_max=4294967296" # 4 GiB https://nixos.wiki/wiki/ZFS
+          # Override the default /tmp (tmpfs, RAM-backed) with /var/tmp (ZFS, disk-backed) so the
+          # VRAM dump on suspend doesn't compete with system RAM when the GPU has large allocations.
+          "nvidia.NVreg_TemporaryFilePath=/var/tmp"
+          "zfs.zfs_arc_max=2147483648" # 2 GiB https://nixos.wiki/wiki/ZFS
           "zfs.zfs_prefetch_disable=1"
           "ip=192.168.1.40::192.168.1.1:255.255.255.0:workstation-nixos::none"
         ];
-        extraModulePackages = [ ];
 
-        # ZFS support (ensures ZFS is included in initrd too)
-        supportedFilesystems = [ "zfs" ];
+        # Use the systemd-boot EFI boot loader.
+        loader = {
+          systemd-boot.enable = true;
+          efi.canTouchEfiVariables = true;
+        };
       };
 
       powerManagement = {
         enable = true;
-        cpuFreqGovernor = "schedutil";
+        cpuFreqGovernor = "powersave";
       };
+
+      services.power-profiles-daemon.enable = true;
 
       fileSystems = {
         "/" = {
@@ -103,19 +136,21 @@ outer:
         };
 
         "/boot" = {
-          device = "/dev/disk/by-uuid/85D5-EFB5";
+          device = "/dev/disk/by-partuuid/d7167427-97f5-492e-8abe-a2f75030d774";
           fsType = "vfat";
           options = [
             "fmask=0077"
             "dmask=0077"
-            "umask=0077"
             "defaults"
           ];
         };
       };
 
       swapDevices = [
-        { device = "/dev/disk/by-uuid/f00a98eb-9c92-4d75-8009-5ab76504c274"; }
+        {
+          device = "/dev/disk/by-partlabel/Linux\\\\x20swap";
+          randomEncryption = true;
+        }
       ];
 
       hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;

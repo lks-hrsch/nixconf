@@ -15,24 +15,34 @@ _: {
         autoUpdate = true;
         upgrade = true;
         cleanup = "zap";
+        # Homebrew 5.1.15+ requires --force when --cleanup is used
+        extraFlags = [ "--force" ];
+        # Homebrew 6.0 tap-trust doesn't cover transitively-loaded deps from 3rd-party taps (krunkit -> virglrenderer); disable the check. Deprecated escape hatch — revisit when removed.
+        extraEnv.HOMEBREW_NO_REQUIRE_TAP_TRUST = "1";
       };
 
       taps = [
         "tw93/tap" # for mole
+        "steipete/tap"
       ];
 
       # CLI tools (formulae)
       brews = [
         "helm"
         "mas" # https://github.com/mas-cli/mas
+        "pdfpc" # nixpkgs build crashes on render on aarch64-darwin, see modules/home-manager/latex.nix
+        "steipete/tap/remindctl"
         "tw93/tap/mole" # https://github.com/tw93/Mole
       ];
 
       # GUI applications (casks)
       casks = [
         "aldente"
-        "anki"
         "claude"
+        # Signed app in /Applications required for 1Password desktop-app
+        # integration; profile is managed by home-manager (firefox.nix).
+        "firefox"
+        "open-webui"
         "postman"
         "rustdesk"
         "spotify"
