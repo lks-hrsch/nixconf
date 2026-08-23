@@ -9,6 +9,7 @@
         alloy
         netbird
         onepassword
+        yubikey
         flatpak
         avahi
         pipewire

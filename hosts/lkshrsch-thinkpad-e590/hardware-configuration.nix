@@ -70,7 +70,6 @@
       # rest of the SATA config, see _sata-disabled.nix. Restore both together.
 
       services = {
-        udev.packages = [ pkgs.yubikey-personalization ];
         logind.settings.Login.HandleLidSwitch = "suspend";
         power-profiles-daemon.enable = true;
       };

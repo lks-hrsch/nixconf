@@ -15,8 +15,8 @@ root was built and then removed — see [Known issues](#known-issues).
 | Install, boot, network (wired + wifi) | done |
 | Hyprland + Noctalia on the iGPU (`iHD`) | done |
 | Lanzaboote, keys enrolled, Secure Boot `enabled (user)` | done |
-| TPM2 unlock, PCR 7, both LUKS containers | done |
-| YubiKey FIDO2 slots | **pending** — recovery passphrase is the only backup until then |
+| TPM2 unlock, PCR 7 | `cryptswap` only |
+| YubiKey FIDO2 unlock (touch, no PIN), two keys | `cryptroot` only — see [Boot chain](#boot-chain) |
 | Hibernate/resume | **untested** — swap partition and `resumeDevice` are wired |
 | SATA SSD | plain ext4 scratchpad at `/mnt/scratchpad` — see [`sata-scratchpad.nix`](./sata-scratchpad.nix) |
 | Home NAS (`mars`) CIFS mounts | done — 7 shares under `/mnt/mars/*`, see [`home-nas-mounts.nix`](./home-nas-mounts.nix) |
@@ -73,16 +73,29 @@ with a 60s idle timeout, so they only connect on first access.
 UEFI firmware (Secure Boot ON)
   → Lanzaboote stub (signed, verified by firmware)
     → signed kernel + initrd (systemd-initrd)
-      → LUKS2 "cryptswap" unlock (same TPM2/FIDO2/passphrase as cryptroot)
+      → LUKS2 "cryptswap" unlock: TPM2 (PCR 7), else recovery passphrase
         → resume from hibernate, if a hibernation image is present
-      → LUKS2 "cryptroot" unlock: TPM2 (PCR 7) if boot chain unchanged,
-        else YubiKey FIDO2 touch, else recovery passphrase
+      → LUKS2 "cryptroot" unlock: YubiKey FIDO2 touch (no PIN),
+        else recovery passphrase — no TPM2 slot on this volume
         → btrfs @root → /
 ```
 
-`cryptswap` is LUKS-wrapped with a **persistent** key (TPM2/FIDO2/passphrase),
-not `swapDevices.randomEncryption` — a fresh per-boot key (as used on
-`workstation-nixos`) would make the hibernated image undecryptable on resume.
+`cryptroot` and `cryptswap` deliberately use **different** factors, not the same
+key: LUKS keyslots are alternatives (any one unlocks), not a conjunction — there
+is no "TPM2 *and* FIDO2" mode in systemd or cryptsetup. Putting root behind
+FIDO2 matters because greetd autologins straight to the desktop
+(see [Access model](#access-model)); TPM2-only root would make a stolen laptop
+self-boot into a live session. FIDO2 is enrolled **without** a client PIN
+(`--fido2-with-client-pin=no`), so unlocking root is possession + touch, not a
+true two-factor — see the security note in step 8.
+
+Swap keeps its TPM2 slot for a silent second stage and because
+`resumeDevice = true` needs the hibernation image on swap decryptable without
+user interaction. This does mean a hibernation image — if hibernate is ever
+used; it is `untested` today — is reachable with TPM2 alone. `cryptswap` is
+LUKS-wrapped with a **persistent** key, not `swapDevices.randomEncryption` — a
+fresh per-boot key (as used on `workstation-nixos`) would make the hibernated
+image undecryptable on resume.
 
 ## Access model
 
@@ -91,7 +104,13 @@ administer.
 
 - greetd uses `initial_session` (`modules/desktop/hyprland/base.nix`), i.e.
   **autologin** as `lkshrsch`. Reaching the desktop needs no password.
-- `sudo` **does** need one (`security.sudo.wheelNeedsPassword = true`).
+- `sudo` **does** need one (`security.sudo.wheelNeedsPassword = true`) — but
+  `security.pam.services.sudo.u2f.enable` (`modules/nixos/yubikey.nix`) puts
+  `pam_u2f` ahead of the password check as `sufficient`, so a registered
+  YubiKey touch satisfies `sudo` without typing the password. Same wiring on
+  `polkit-1`, which covers 1Password's "unlock using system authentication".
+  Anyone holding a registered key can `sudo` — treat the keys like a second
+  root credential.
 - `root` has no `authorizedKeys` and sshd runs `PermitRootLogin
   prohibit-password`, so there is no key-based root login either.
 - `mutableUsers` is the NixOS default `true` and nothing in this host sets a
@@ -280,31 +299,50 @@ sudo bootctl status | grep -i 'secure boot'   # expect: enabled (user)
 Secure Boot must be **on and enrolled before step 7** — PCR 7 measures exactly
 this state; enrolling the TPM first binds to the wrong value.
 
-### 7. TPM2 enrollment
+### 7. TPM2 enrollment (swap only)
 
-`cryptswap` is `/dev/nvme0n1p2`, `cryptroot` is `/dev/nvme0n1p3` (ESP is p1):
+`cryptswap` is `/dev/nvme0n1p2`, `cryptroot` is `/dev/nvme0n1p3` (ESP is p1).
+`cryptroot` does **not** get a TPM2 slot — see [Boot chain](#boot-chain) for why:
 
 ```bash
-sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/nvme0n1p3
 sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/nvme0n1p2
 ```
 
 PCR 7 alone (Secure Boot policy) survives kernel/generation updates, unlike
-PCR 4/8/9. Re-enroll both after a BIOS update or key rotation (see below).
+PCR 4/8/9. Re-enroll after a BIOS update or key rotation (see below).
 
-### 8. YubiKey enrollment
+### 8. YubiKey enrollment (root only)
+
+Enroll **both** YubiKeys before removing any TPM2 fallback — this is the only
+unlock path for `cryptroot` once step F below runs.
 
 ```bash
+# key A inserted; touch it when systemd-cryptenroll asks
 sudo systemd-cryptenroll --fido2-device=auto \
-  --fido2-with-client-pin=yes /dev/nvme0n1p3
+  --fido2-with-client-pin=no --fido2-with-user-presence=yes /dev/nvme0n1p3
+# swap to key B, repeat
 sudo systemd-cryptenroll --fido2-device=auto \
-  --fido2-with-client-pin=yes /dev/nvme0n1p2
+  --fido2-with-client-pin=no --fido2-with-user-presence=yes /dev/nvme0n1p3
 ```
 
-Repeat both with a **second YubiKey** before trusting this as the only
-physical key. `crypttabExtraOpts` in `disk-config.nix` already tells initrd to
-try `tpm2-device=auto`, then `fido2-device=auto`, then fall back to the
-recovery passphrase, for both devices.
+> **Security note.** `--fido2-with-client-pin=no` means unlocking `cryptroot`
+> needs only possession of a YubiKey plus a touch — one factor, not two.
+> Combined with greetd's autologin, whoever has the laptop *and* a key reaches
+> a live desktop with no further prompt. This is a deliberate trade for a
+> touch-only boot (no PIN to type before the desktop even loads); flip
+> `--fido2-with-client-pin=yes` and re-enroll if that trade should be undone.
+
+If this machine already has a TPM2 slot on `cryptroot` from an earlier install
+(check with `sudo cryptsetup luksDump /dev/nvme0n1p3`), remove it once both
+keys are enrolled and tested:
+
+```bash
+sudo systemd-cryptenroll --wipe-slot=tpm2 /dev/nvme0n1p3
+```
+
+`crypttabExtraOpts` in `disk-config.nix` tells initrd to try `tpm2-device=auto`
+then `fido2-device=auto` then the recovery passphrase for both volumes — on
+`cryptroot` the TPM2 attempt simply finds no slot and falls through to FIDO2.
 
 ## Verification
 
@@ -329,9 +367,13 @@ After install, on the laptop:
 | `sudo bootctl status` | `Secure Boot: enabled (user)` |
 | `sudo sbctl status` | `Setup Mode ✗ Disabled`, `Vendor Keys microsoft` |
 | `sudo sbctl verify` | every `EFI/Linux/*.efi` signed; `EFI/nixos/kernel-*.efi` unsigned is expected |
-| `sudo cryptsetup luksDump /dev/nvme0n1p3` | keyslots: passphrase, tpm2, fido2 |
-| reboot with YubiKey removed | unlocks silently via TPM |
-| reboot after a test `--wipe-slot=tpm2` | prompts, YubiKey touch unlocks |
+| `sudo cryptsetup luksDump /dev/nvme0n1p3` | keyslots: passphrase, fido2, fido2 — no tpm2 |
+| `sudo cryptsetup luksDump /dev/nvme0n1p2` | keyslots: passphrase, tpm2 |
+| reboot with a YubiKey inserted | root prompts for a touch (no PIN), unlocks; swap unlocks silently via TPM |
+| reboot with **no** YubiKey inserted | root falls through to the recovery passphrase prompt |
+| `fido2-token -L` | both enrolled keys listed |
+| `sudo -k && sudo true` | "Please touch the device", no password needed |
+| `pamtester polkit-1 "$USER" authenticate` | touch prompt |
 | `swapon --show` | `/dev/mapper/cryptswap`, ~48G |
 | `systemctl hibernate` then power on | resumes back into the session |
 | `hyprctl monitors` | one output, matches `desktop.monitors.primary` — only answers from inside the Hyprland session, never over SSH or a TTY |
@@ -340,12 +382,18 @@ After install, on the laptop:
 ## Day-2 operations
 
 - **TPM re-enrollment** (after a BIOS/firmware update changes PCR 7): rerun
-  step 7's commands with `--wipe-slot=tpm2` added, against both
-  `/dev/nvme0n1p3` and `/dev/nvme0n1p2`.
-- **Add another YubiKey**: repeat step 8 for both devices; each key gets its
-  own FIDO2 slot.
-- **Lost all YubiKeys / TPM won't unlock**: boot to the recovery passphrase
-  prompt (it always remains a valid key slot on both containers).
+  step 7's command with `--wipe-slot=tpm2` added, against `/dev/nvme0n1p2`
+  only — swap is the only volume with a TPM2 slot.
+- **Add another YubiKey**: repeat step 8's enrollment command against
+  `/dev/nvme0n1p3` for the new key; it gets its own FIDO2 slot alongside the
+  existing two.
+- **Revoke a lost YubiKey**: `sudo cryptsetup luksDump /dev/nvme0n1p3` to find
+  its slot number, then `sudo systemd-cryptenroll --wipe-slot=<n>
+  /dev/nvme0n1p3`. Also delete that key's line from every machine's
+  `~/.config/Yubico/u2f_keys` (PAM for `sudo`/`polkit-1`) — LUKS and PAM
+  enrollments are tracked separately and both must be revoked.
+- **Lost all YubiKeys**: boot to the recovery passphrase prompt for
+  `cryptroot` (always a valid key slot); TPM2 still unlocks `cryptswap`.
 - **`sbctl` after a BIOS reset clears Secure Boot keys**: redo step 6 from
   `sudo sbctl create-keys` — no reinstall needed, the enrolled LUKS slots are
   untouched.
@@ -377,6 +425,29 @@ Without the manual `cryptsetup open`, disko fails with
 `cryptswap` but never `cryptroot`.
 
 ## Known issues
+
+### GNOME Keyring cannot be unlocked by a YubiKey
+
+`pam_gnome_keyring` derives the keyring's encryption key from the user's
+**login password** — FIDO2/U2F supplies no password, so no PAM configuration
+can make a YubiKey unlock it. This is a design limit of gnome-keyring, not a
+config gap. With greetd autologin (unchanged by this work), the keyring
+already gets no password today and prompts on first secret use; the YubiKey
+work does not change that. A workaround exists — program a YubiKey OTP slot as
+a static password and use that string as the keyring password — but it is not
+configured here: the password becomes a fixed string typed as keystrokes, and
+changing it means reprogramming the token.
+
+### Hibernation would expose `cryptroot`'s key via the TPM2-only swap slot
+
+`cryptswap` keeps a TPM2-only slot (see [Boot chain](#boot-chain)) while
+`cryptroot` is FIDO2-only. A hibernation image on swap contains all of RAM,
+including `cryptroot`'s unlocked LUKS master key — so if hibernate is ever
+used, anyone who can decrypt swap with the TPM alone (no YubiKey needed)
+recovers that key too, defeating the FIDO2 gate on root. Not exploitable today
+because hibernate is `untested`/unused and `HandleLidSwitch = "suspend"`. If
+hibernate is enabled later, either enroll FIDO2 on `/dev/nvme0n1p2` as well
+(second touch per boot) or add `boot.kernelParams = [ "nohibernate" ]`.
 
 ### SATA SSD: LUKS+btrfs abandoned, now plain ext4 scratch (resolved)
 
