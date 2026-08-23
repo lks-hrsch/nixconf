@@ -69,6 +69,7 @@ _: {
 
         # Random useful apps
         "AusweisApp" = 948660805;
+        "Yubico Authenticator" = 1497506650;
       };
     };
   };
