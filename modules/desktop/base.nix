@@ -15,6 +15,16 @@
         };
       };
 
+      options.desktop.bar.gpuStats = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          Show the VRAM and GPU-temperature bar widgets. Integrated Intel
+          GPUs expose neither (no lmem sysfs, no i915 hwmon), so both render
+          blank there — set false on such hosts.
+        '';
+      };
+
       config = {
         i18n.inputMethod = {
           enable = true;
@@ -23,6 +33,15 @@
         };
 
         services.gnome.gnome-keyring.enable = true;
+
+        # Auto-mount removable storage (USB sticks, SD cards) without user
+        # action; udisks2 does the mounting, gvfs backs Nautilus, devmon
+        # watches udisks2 and triggers the mount.
+        services = {
+          devmon.enable = true;
+          gvfs.enable = true;
+          udisks2.enable = true;
+        };
 
         nixpkgs.overlays = [
           config.repo.overlays.firefox-addons

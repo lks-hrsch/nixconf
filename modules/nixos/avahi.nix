@@ -15,6 +15,8 @@ _: {
             addresses = true;
             workstation = true;
           };
+
+          nssmdns4 = lib.mkIf (!config.boot.isContainer) true;
         };
 
         # When avahi owns mDNS, prevent systemd-resolved from running a competing

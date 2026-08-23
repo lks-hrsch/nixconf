@@ -44,6 +44,8 @@ _: {
         };
       };
 
+      services.upower.enable = true;
+
       # make pipewire realtime-capable
       # https://mynixos.com/nixpkgs/option/security.rtkit.enable
       security.rtkit.enable = true;

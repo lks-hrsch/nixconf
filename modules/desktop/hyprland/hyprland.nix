@@ -119,6 +119,16 @@
               transform = 1;
               vrr = 2;
             }
+          ]
+          ++ [
+            # Catch-all so any output not named above (e.g. a USB-C monitor)
+            # still comes up instead of staying disabled.
+            {
+              output = "";
+              mode = "preferred";
+              position = "auto";
+              scale = 1;
+            }
           ];
 
           window_rule = [

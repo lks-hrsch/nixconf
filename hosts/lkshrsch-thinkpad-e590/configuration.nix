@@ -41,6 +41,9 @@
       };
 
       desktop.monitors.primary = "eDP-1"; # confirmed via `hyprctl monitors`
+      desktop.bar.gpuStats = false; # UHD 620: no VRAM, no GPU hwmon — see noctalia.log
+
+      services.fwupd.enable = true;
 
       system.stateVersion = "26.05";
     };

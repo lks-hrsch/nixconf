@@ -13,6 +13,7 @@ in
     }:
     let
       inherit (osConfig.desktop.monitors) primary secondary;
+      inherit (osConfig.desktop.bar) gpuStats;
       colors = config.lib.stylix.colors.withHashtag;
     in
     {
@@ -223,8 +224,12 @@ in
               "ram"
               "temp"
               "gpu"
+            ]
+            ++ lib.optionals gpuStats [
               "gpu-vram"
               "gpu-temperature"
+            ]
+            ++ [
               "network_rx"
               "network_tx"
               "tray"
@@ -269,19 +274,6 @@ in
               type = "sysmon";
               visualization = "none";
             };
-            "gpu-temperature" = {
-              glyph = "cpu-temperature";
-              show_value = true;
-              stat = "gpu_temp";
-              type = "sysmon";
-              visualization = "none";
-            };
-            "gpu-vram" = {
-              show_value = true;
-              stat = "gpu_vram";
-              type = "sysmon";
-              visualization = "none";
-            };
             network_rx.visualization = "none";
             network_tx.visualization = "none";
             ram = {
@@ -298,6 +290,21 @@ in
               label_source = "name";
               max_label_chars = 3;
               style = "minimal";
+            };
+          }
+          // lib.optionalAttrs gpuStats {
+            "gpu-temperature" = {
+              glyph = "cpu-temperature";
+              show_value = true;
+              stat = "gpu_temp";
+              type = "sysmon";
+              visualization = "none";
+            };
+            "gpu-vram" = {
+              show_value = true;
+              stat = "gpu_vram";
+              type = "sysmon";
+              visualization = "none";
             };
           };
 

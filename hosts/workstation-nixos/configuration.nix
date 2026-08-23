@@ -147,15 +147,6 @@
           daemon.enable = true;
         };
       };
-      # https://discourse.nixos.org/t/how-to-automatically-mount-external-hard-drive/15563
-      # https://www.reddit.com/r/NixOS/comments/185f0x4/how_to_mount_a_usb_drive/
-      # https://mynixos.com/nixpkgs/option/services.upower.enable
-      services = {
-        devmon.enable = true;
-        gvfs.enable = true;
-        udisks2.enable = true;
-        upower.enable = true;
-      };
 
       environment.systemPackages = with pkgs; [
         nixos-icons
