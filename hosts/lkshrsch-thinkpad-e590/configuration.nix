@@ -22,6 +22,7 @@
       networking = {
         hostName = "lkshrsch-thinkpad-e590";
         hostId = "89b448ab"; # head -c 8 /etc/machine-id
+        useDHCP = false;
         networkmanager = {
           enable = true;
           dns = "systemd-resolved";
@@ -44,6 +45,8 @@
       desktop.bar.gpuStats = false; # UHD 620: no VRAM, no GPU hwmon — see noctalia.log
 
       services.fwupd.enable = true;
+
+      boot.kernelParams = [ "intel_iommu=on" ];
 
       system.stateVersion = "26.05";
     };

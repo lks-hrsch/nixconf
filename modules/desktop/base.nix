@@ -66,6 +66,7 @@
         environment.systemPackages = with pkgs; [
           nautilus # file manager
           pavucontrol # sound
+          wsdd # gvfs execs this on demand for SMB network browsing
 
           # some dependencies
           gtk3

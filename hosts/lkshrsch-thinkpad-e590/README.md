@@ -18,7 +18,8 @@ root was built and then removed — see [Known issues](#known-issues).
 | TPM2 unlock, PCR 7, both LUKS containers | done |
 | YubiKey FIDO2 slots | **pending** — recovery passphrase is the only backup until then |
 | Hibernate/resume | **untested** — swap partition and `resumeDevice` are wired |
-| SATA SSD | **disabled** — see [Known issues](#known-issues) |
+| SATA SSD | plain ext4 scratchpad at `/mnt/scratchpad` — see [`sata-scratchpad.nix`](./sata-scratchpad.nix) |
+| Home NAS (`mars`) CIFS mounts | done — 7 shares under `/mnt/mars/*`, see [`home-nas-mounts.nix`](./home-nas-mounts.nix) |
 
 ## Hardware
 
@@ -28,7 +29,7 @@ root was built and then removed — see [Known issues](#known-issues).
 | GPU | Intel UHD Graphics 620 (iGPU) |
 | RAM | 16 GB (planned upgrade to 32 GB) |
 | Disk 1 | 512 GB NVMe (Toshiba KBG30ZMT512G) — OS, `$HOME`, swap |
-| Disk 2 | 128 GB SATA SSD (SanDisk SDSSDP128G) — **currently unused** |
+| Disk 2 | 128 GB SATA SSD (SanDisk SDSSDP128G) — plain ext4, mounted at `/mnt/scratchpad` |
 
 ## Disk layout
 
@@ -56,6 +57,15 @@ in this repo yet, so nothing writes to it until one is added.
 
 The ESP is 1G rather than the usual 512M because lanzaboote stores a signed
 kernel + initrd per generation and fills a small ESP quickly.
+
+The 128 GB SATA SSD (`sda`) is outside disko/LUKS entirely — plain ext4,
+declared in [`sata-scratchpad.nix`](./sata-scratchpad.nix), mounted at
+`/mnt/scratchpad` with `nofail` since it's data, not boot-critical.
+
+Seven CIFS shares from the home NAS (`mars.lukashirsch.de`) are mounted at
+`/mnt/mars/{backup,benchmark,datasets,home,media,photos,university}`, declared
+in [`home-nas-mounts.nix`](./home-nas-mounts.nix). All are `x-systemd.automount`
+with a 60s idle timeout, so they only connect on first access.
 
 ## Boot chain
 
@@ -368,21 +378,46 @@ Without the manual `cryptsetup open`, disko fails with
 
 ## Known issues
 
-### SATA SSD disabled
+### SATA SSD: LUKS+btrfs abandoned, now plain ext4 scratch (resolved)
 
-The 128 GB SATA SSD is not configured. Its disko block is parked in
-[`_sata-disabled.nix`](./_sata-disabled.nix) — the leading `_` excludes the
-file from `import-tree` auto-discovery, so nothing in it is evaluated.
+The 128 GB SATA SSD originally held one LUKS container (`cryptdata`) with
+btrfs subvolumes for Obsidian/Documents/Downloads, unlocked in stage 2 by a
+keyfile rather than in initrd. `/dev/mapper/cryptdata` never appeared at
+boot, and the dependent mounts stalled the machine, so that layout was pulled
+out wholesale (root cause never isolated; the keyfile was verifiably
+enrolled in LUKS keyslot 1).
 
-It held one LUKS container (`cryptdata`) with btrfs subvolumes for
-Obsidian/Documents/Downloads, unlocked in stage 2 by a keyfile rather than in
-initrd. `/dev/mapper/cryptdata` never appeared at boot, and the dependent
-mounts stalled the machine, so it was pulled out wholesale. Root cause is
-still unknown; the keyfile was verifiably enrolled in LUKS keyslot 1. The
-on-disk container is untouched, so re-enabling it loses no data.
+It's since been reformatted plain ext4 and is mounted at `/mnt/scratchpad`
+via [`sata-scratchpad.nix`](./sata-scratchpad.nix) — see that file's header
+for the one-time `mkfs.ext4` step. Documents/Downloads/Obsidian.nosync stay
+ordinary directories under `/home` on the NVMe; this disk is scratch space
+only.
 
-Until then Documents/Downloads/Obsidian.nosync are ordinary directories under
-`/home` on the NVMe.
+### USB-C / UCSI not implemented in firmware
+
+`ucsi_acpi USBC000:00: error -ENODEV: PPM init failed` on every boot. The
+E590's ACPI tables don't implement the UCSI interface Linux expects for
+USB-C role/alt-mode negotiation. Cosmetic — DisplayPort alt-mode over the
+USB-C port still works via the normal DP/USB muxing, it's just not visible to
+`ucsi_acpi`. No kernel-side fix; this is a firmware gap on Lenovo's side.
+
+### Intermittent USB enumeration failures on the front USB-A port (`usb1-port2`)
+
+Occasional `usb 1-2: device descriptor read/64, error -71` /
+`Device not responding to setup address` bursts, always for a **low-speed**
+device (mouse/receiver class — see `new low-speed USB device` in the same
+burst), never for a plugged-in monitor. Points to a flaky cable, connector,
+or peripheral on that one port rather than a driver or config problem;
+nothing here to fix in Nix.
+
+### BIOS / ME firmware not updatable via fwupd
+
+`fwupdmgr get-devices` shows BIOS 1.25 (`Internal SPI Controller (BIOS)`) and
+ME 12.0.35.1427 as present but not `updatable` — the SPI region is locked and
+Lenovo doesn't publish E590 UEFI/ME images to LVFS. `fwupdmgr security` marks
+`csme11 v12.0.35.1427` invalid for this reason. A BIOS/ME update, if ever
+needed, means a manual flash from Lenovo's own installer — out of scope for
+this repo.
 
 ### Impermanence removed
 
