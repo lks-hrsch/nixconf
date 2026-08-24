@@ -26,7 +26,7 @@ on nixos:
 sudo nix flake update
 
 # apply configuration
-sudo nixos-rebuild switch --upgrade --flake ".#workstation-nixos"
+sudo nixos-rebuild switch --upgrade --flake ".#lkshrsch-workstation"
 ```
 
 build a nixos on nixos:

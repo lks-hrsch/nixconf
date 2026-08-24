@@ -94,7 +94,7 @@ Swap keeps its TPM2 slot for a silent second stage and because
 user interaction. This does mean a hibernation image — if hibernate is ever
 used; it is `untested` today — is reachable with TPM2 alone. `cryptswap` is
 LUKS-wrapped with a **persistent** key, not `swapDevices.randomEncryption` — a
-fresh per-boot key (as used on `workstation-nixos`) would make the hibernated
+fresh per-boot key (as used on `lkshrsch-workstation`) would make the hibernated
 image undecryptable on resume.
 
 ## Access model
@@ -123,7 +123,7 @@ genuine one-time step.
 
 ## First-install runbook
 
-Run from `workstation-nixos`. Steps 6–8 are interactive **on the laptop** — a
+Run from `lkshrsch-workstation`. Steps 6–8 are interactive **on the laptop** — a
 YubiKey touch and a BIOS visit cannot be scripted.
 
 **Plug in ethernet before starting.** No wifi credentials exist on a fresh
@@ -346,14 +346,14 @@ then `fido2-device=auto` then the recovery passphrase for both volumes — on
 
 ## Verification
 
-Before touching the laptop, on `workstation-nixos`:
+Before touching the laptop, on `lkshrsch-workstation`:
 
 ```bash
 nix run nixpkgs#statix -- check .
 nix flake check
 nix eval .#nixosConfigurations.lkshrsch-thinkpad-e590.config.system.build.toplevel.drvPath
 # regression guard for the shared desktop-module edits — must still evaluate:
-nix eval .#nixosConfigurations.workstation-nixos.config.system.build.toplevel.drvPath
+nix eval .#nixosConfigurations.lkshrsch-workstation.config.system.build.toplevel.drvPath
 ```
 
 After install, on the laptop:

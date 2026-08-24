@@ -1,5 +1,5 @@
 outer: {
-  configurations.nixos."workstation-nixos".module =
+  configurations.nixos."lkshrsch-workstation".module =
     {
       config,
       pkgs,

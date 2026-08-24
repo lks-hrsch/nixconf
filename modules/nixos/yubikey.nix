@@ -20,13 +20,18 @@
           control = "sufficient";
           settings = {
             cue = true; # otherwise PAM waits for a touch with no prompt
+            # pamu2fcfg defaults origin/appid to pam://$HOSTNAME, binding a
+            # credential to one machine. Pinned so the authfile below works on
+            # every host that imports this module, survives a hostname rename.
+            origin = "pam://lkshrsch";
+            appid = "pam://lkshrsch";
             # Declarative instead of ~/.config/Yubico/u2f_keys: same file on every
             # host that imports this module, no per-machine `pamu2fcfg` step. Each
             # line is `username:keyhandle,pubkey,cosetype,options[:...]` — public
             # key material only (no secret half), same trust level as an SSH
             # authorized_keys entry, safe to commit.
             authfile = pkgs.writeText "u2f-mappings" ''
-              ${config.flake.users.owner.username}:zGgSjwdn8pn1BKc/F2O2d0K2a6jVrDIW2SEBX21W7yV+pfiXacFEkpXwk+rpmD8qvNGx+0MPfck3M3kK3YJCRw==,xvkw9hYFacoKkue42dgKVqv1QkQL83+Cxlear7CpSg2VmGOabWf/uXPW4J5vcFuC5cQfCR0xfRPzfkxxd5eluw==,es256,+presence:x8aZBEdw4FzGq0M+TDkcNoufMgeDK52oVVo695mO9fiCxaYdexhf0DsBjtLhyDmXrwR6rCol0M58KnPIQLHgIw==,fSsC1qCW8pw34UUBp0f+tc2pKdx+uyVg/DjlAH6lWlZXK+gkmnNdnQy2khKeUw+XTqcCnR/7hTDfjbF+iae4iQ==,es256,+presence
+              ${config.flake.users.owner.username}:iBPqNL7isPeQMLTFTlUXFZIenV/o06K0zEOfnb3ZkBgnVf51MTdqOt8c6+pIAhXzDC1bySNUBQRczeGRK4TW/Q==,igqTqJNMseTBYp6yQ9OAo0V9w3CB1OADQHV7jDR5fHMWpf/DTdNwYzbIs+GZQbyjxyRkZ7DTIi2RhVOX+oc4+g==,es256,+presence:IGozUhEPNxA+hxIOxB09HyAXZXopTna79C/7xZD6GezG2CsUHYHNxCVJnZLT7KWzhUsyQbX9e6iTpzeBUkHNtg==,kBHEFlwIyBMAVUmpD2eGjdJv2cm4g3pmZmJrSabfsk8OfWw0TCr9tiCf3Pp6ch7xANL7ojAI8fs8weTdluKjkw==,es256,+presence
             '';
           };
         };

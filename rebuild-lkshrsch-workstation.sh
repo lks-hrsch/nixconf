@@ -1,0 +1,1 @@
+nixos-rebuild switch --upgrade --flake ".#lkshrsch-workstation"

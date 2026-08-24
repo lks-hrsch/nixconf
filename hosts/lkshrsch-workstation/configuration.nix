@@ -1,6 +1,6 @@
 { config, ... }:
 {
-  configurations.nixos."workstation-nixos".module =
+  configurations.nixos."lkshrsch-workstation".module =
     { pkgs, lib, ... }:
     let
       nv-fan-control = import ./_nv-fan-control.nix { inherit pkgs; };
@@ -17,6 +17,7 @@
         alloy
         netbird
         onepassword
+        yubikey
         flatpak
         avahi
         pipewire
@@ -38,7 +39,7 @@
       };
 
       networking = {
-        hostName = "workstation-nixos";
+        hostName = "lkshrsch-workstation";
         hostId = "99c58a86"; # head -c 8 /etc/machine-id
         # Split network stack: systemd-networkd owns the wired LAN (enp10s0,); NetworkManager owns WiFi + VPNs (openvpn / netbird / wireguard).
         useNetworkd = true;
