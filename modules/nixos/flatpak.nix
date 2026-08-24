@@ -30,5 +30,11 @@
           };
         };
       };
+
+      # nix-flatpak orders this after network.target, which is up long before DNS resolves
+      systemd.services.flatpak-managed-install = {
+        after = [ "network-online.target" ];
+        wants = [ "network-online.target" ];
+      };
     };
 }

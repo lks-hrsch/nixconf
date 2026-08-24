@@ -41,6 +41,12 @@
           devmon.enable = true;
           gvfs.enable = true;
           udisks2.enable = true;
+
+          # gvfsd-wsdd talks to a *running* wsdd over /run/wsdd/wsdd.sock
+          samba-wsdd = {
+            enable = true;
+            discovery = true;
+          };
         };
 
         nixpkgs.overlays = [
@@ -66,7 +72,6 @@
         environment.systemPackages = with pkgs; [
           nautilus # file manager
           pavucontrol # sound
-          wsdd # gvfs execs this on demand for SMB network browsing
 
           # some dependencies
           gtk3
