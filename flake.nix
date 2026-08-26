@@ -65,7 +65,7 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nixos-hardware.url = "github:lks-hrsch/nixos-hardware/master";
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -1048,15 +1048,15 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1787144466,
-        "narHash": "sha256-HHfv2/HkNSKbbSyU9iD/g8lbP6r4tl33sSw1W4rXCk0=",
-        "owner": "NixOS",
+        "lastModified": 1787705789,
+        "narHash": "sha256-GCqPrdbznpOBN8Ab1lnOZg7OE8t5l+vede62RLopnGo=",
+        "owner": "lks-hrsch",
         "repo": "nixos-hardware",
-        "rev": "0471accf8d0a8210b31d947497d179ecc99e0021",
+        "rev": "89f684a86ede9fe42d58b41da509716f63703dd3",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
+        "owner": "lks-hrsch",
         "ref": "master",
         "repo": "nixos-hardware",
         "type": "github"

@@ -1,9 +1,8 @@
-{ config, inputs, ... }:
+{ inputs, ... }:
 {
   configurations.nixos."lkshrsch-thinkpad-e590".module =
     {
       pkgs,
-      lib,
       config,
       modulesPath,
       ...
@@ -11,10 +10,7 @@
     {
       imports = [
         (modulesPath + "/installer/scan/not-detected.nix")
-        "${inputs.nixos-hardware}/lenovo/thinkpad" # trackpoint + TLP
-        "${inputs.nixos-hardware}/common/cpu/intel/whiskey-lake"
-        "${inputs.nixos-hardware}/common/gpu/intel/whiskey-lake"
-        "${inputs.nixos-hardware}/common/pc/ssd"
+        "${inputs.nixos-hardware}/lenovo/thinkpad/e590"
         inputs.lanzaboote.nixosModules.lanzaboote
       ];
 
@@ -25,7 +21,6 @@
           else
             throw "Missing hosts/lkshrsch-thinkpad-e590/facter.json. Run nixos-anywhere with --generate-hardware-config nixos-facter hosts/lkshrsch-thinkpad-e590/facter.json.";
 
-        cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
         graphics.enable = true;
         gpgSmartcards.enable = true;
       };
