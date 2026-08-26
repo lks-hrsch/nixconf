@@ -8,7 +8,7 @@ outer: {
     let
       inherit (outer.config.flake.users) owner;
       host = "mars.lukashirsch.de";
-      automount_opts = "x-systemd.automount,noauto,_netdev,x-systemd.idle-timeout=60,x-systemd.mount-timeout=30s,x-systemd.requires=network-online.target,x-systemd.after=network-online.target";
+      automount_opts = "x-systemd.automount,noauto,_netdev,x-systemd.idle-timeout=60,x-systemd.mount-timeout=60s,x-systemd.requires=network-online.target,x-systemd.after=network-online.target,vers=3.1.1";
     in
     {
       sops.secrets."smb-credentials-mars" = {

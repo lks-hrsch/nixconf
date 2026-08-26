@@ -24,6 +24,7 @@
         hostName = "lkshrsch-thinkpad-e590";
         hostId = "89b448ab"; # head -c 8 /etc/machine-id
         useDHCP = false;
+        dhcpcd.enable = false;
         networkmanager = {
           enable = true;
           dns = "systemd-resolved";

@@ -35,7 +35,12 @@ _: {
         darwin.zsh = baseZshConfig;
 
         homeManager.zsh =
-          { lib, pkgs, config, ... }:
+          {
+            lib,
+            pkgs,
+            config,
+            ...
+          }:
           {
             home.packages = with pkgs; [
               jq
@@ -94,6 +99,9 @@ _: {
               btop = {
                 enable = true;
                 package = pkgs.unstable.btop;
+                settings = {
+                  disks_filter = "exclude=/mnt/mars/backup /mnt/mars/benchmark /mnt/mars/datasets /mnt/mars/home /mnt/mars/media /mnt/mars/photos /mnt/mars/university";
+                };
               };
             };
           };

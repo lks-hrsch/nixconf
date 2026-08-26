@@ -22,19 +22,10 @@
           "org.videolan.VLC"
         ];
 
-        update = {
-          onActivation = true;
-          auto = {
-            enable = true;
-            onCalendar = "weekly";
-          };
+        update.auto = {
+          enable = true;
+          onCalendar = "weekly";
         };
-      };
-
-      # nix-flatpak orders this after network.target, which is up long before DNS resolves
-      systemd.services.flatpak-managed-install = {
-        after = [ "network-online.target" ];
-        wants = [ "network-online.target" ];
       };
     };
 }
