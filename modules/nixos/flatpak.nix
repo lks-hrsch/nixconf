@@ -26,6 +26,8 @@
           enable = true;
           onCalendar = "weekly";
         };
+
+        overrides."org.signal.Signal".Environment.SIGNAL_PASSWORD_STORE = "gnome-libsecret";
       };
     };
 }
