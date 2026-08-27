@@ -13,7 +13,6 @@ in
     }:
     let
       inherit (osConfig.desktop.monitors) primary secondary;
-      inherit (osConfig.desktop.bar) gpuStats;
       colors = config.lib.stylix.colors.withHashtag;
     in
     {
@@ -92,6 +91,7 @@ in
             animation.enabled = false;
 
             panel = {
+              control_center_placement = "floating";
               session_placement = "floating";
               session_position = "center";
               shadow = false;
@@ -131,6 +131,7 @@ in
             mode = "dark";
             source = "custom";
             custom_palette = "stylix";
+            pure_black_dark = true;
 
             templates = {
               enable_builtin_templates = false;
@@ -151,17 +152,23 @@ in
 
           # ── Idle ─────────────────────────────────────────────────────────────
 
-          idle.behavior = {
-            lock = {
-              timeout = 600;
-              command = "noctalia:session lock";
-              enabled = true;
-            };
-            "screen-off" = {
-              timeout = 1800;
-              command = "noctalia:dpms-off";
-              resume_command = "noctalia:dpms-on";
-              enabled = true;
+          idle = {
+            behavior_order = [
+              "screen-off"
+              "lock"
+            ];
+            behavior = {
+              "screen-off" = {
+                timeout = 300;
+                command = "noctalia:dpms-off";
+                resume_command = "noctalia:dpms-on";
+                enabled = true;
+              };
+              lock = {
+                timeout = 600;
+                command = "noctalia:session lock";
+                enabled = true;
+              };
             };
           };
 
@@ -184,10 +191,11 @@ in
 
           system.monitor = {
             enabled = true;
-            cpu_poll_seconds = 5;
-            gpu_poll_seconds = 5;
-            memory_poll_seconds = 5;
-            network_poll_seconds = 5;
+            cpu_poll_seconds = 10;
+            disk_poll_seconds = 10;
+            gpu_poll_seconds = 10;
+            memory_poll_seconds = 10;
+            network_poll_seconds = 10;
           };
 
           # ── Control Center shortcuts ─────────────────────────────────────────
@@ -200,7 +208,9 @@ in
 
           # ── Bar ──────────────────────────────────────────────────────────────
 
-          bar.main = {
+          # Per-host overrides (osConfig.desktop.bar, modules/desktop/base.nix)
+          # merge over these defaults — in practice just the `end` widget row.
+          bar.main = lib.recursiveUpdate {
             position = "top";
             background_opacity = 0.0;
             capsule = true;
@@ -217,6 +227,7 @@ in
             start = [
               "control-center"
               "workspaces"
+              "tray"
             ];
             center = [ "active_window" ];
             end = [
@@ -224,15 +235,10 @@ in
               "ram"
               "temp"
               "gpu"
-            ]
-            ++ lib.optionals gpuStats [
               "gpu-vram"
               "gpu-temperature"
-            ]
-            ++ [
               "network_rx"
               "network_tx"
-              "tray"
               "caffeine"
               "date"
               "clock"
@@ -254,15 +260,15 @@ in
                 end = [ "privacy" ];
               };
             };
-          };
+          } osConfig.desktop.bar;
 
           # ── Per-widget settings ──────────────────────────────────────────────
-
-          # v5 renamed sysmon presentation keys: display="text" -> visualization="none",
-          # show_label=false -> show_value=true. GPU (uppercase, no type=) was a stale
-          # duplicate of gpu below and resolved to an invalid widget type - dropped.
           widget = {
             "control-center".glyph = "snowflake";
+            battery = {
+              display_mode = "graphic";
+              show_label = true;
+            };
             CPU = {
               show_value = true;
               type = "sysmon";
@@ -271,6 +277,19 @@ in
             gpu = {
               show_value = true;
               stat = "gpu_usage";
+              type = "sysmon";
+              visualization = "none";
+            };
+            "gpu-temperature" = {
+              glyph = "cpu-temperature";
+              show_value = true;
+              stat = "gpu_temp";
+              type = "sysmon";
+              visualization = "none";
+            };
+            "gpu-vram" = {
+              show_value = true;
+              stat = "gpu_vram";
               type = "sysmon";
               visualization = "none";
             };
@@ -290,21 +309,6 @@ in
               label_source = "name";
               max_label_chars = 3;
               style = "minimal";
-            };
-          }
-          // lib.optionalAttrs gpuStats {
-            "gpu-temperature" = {
-              glyph = "cpu-temperature";
-              show_value = true;
-              stat = "gpu_temp";
-              type = "sysmon";
-              visualization = "none";
-            };
-            "gpu-vram" = {
-              show_value = true;
-              stat = "gpu_vram";
-              type = "sysmon";
-              visualization = "none";
             };
           };
 

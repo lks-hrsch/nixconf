@@ -15,13 +15,16 @@
         };
       };
 
-      options.desktop.bar.gpuStats = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
+      options.desktop.bar = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
         description = ''
-          Show the VRAM and GPU-temperature bar widgets. Integrated Intel
-          GPUs expose neither (no lmem sysfs, no i915 hwmon), so both render
-          blank there — set false on such hosts.
+          Per-host overrides for noctalia's bar.main settings. Keys are
+          noctalia's own, so anything under [bar.main] is reachable. Typos
+          are caught by `noctalia config validate` at build time.
+        '';
+        example = lib.literalExpression ''
+          { end = [ "CPU" "ram" "battery" "clock" ]; }
         '';
       };
 

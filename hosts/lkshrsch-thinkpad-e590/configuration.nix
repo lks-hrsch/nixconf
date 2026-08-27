@@ -44,7 +44,24 @@
       };
 
       desktop.monitors.primary = "eDP-1"; # confirmed via `hyprctl monitors`
-      desktop.bar.gpuStats = false; # UHD 620: no VRAM, no GPU hwmon — see noctalia.log
+      desktop.bar = {
+        start = [
+          "control-center"
+          "workspaces"
+          "tray"
+        ];
+        end = [
+          "CPU"
+          "ram"
+          "gpu"
+          "network"
+          "caffeine"
+          "battery"
+          "power_profile"
+          "date"
+          "clock"
+        ];
+      };
 
       services.fwupd.enable = true;
 
