@@ -32,31 +32,7 @@
       url = "github:nix-community/nix-vscode-extensions";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    hyprland = {
-      # v0.56.2: carries both fixes the earlier v0.55.4 hold was waiting on.
-      # - SEGV on last-monitor-disconnect (hyprwm/Hyprland#15048, symptom fix)
-      #   plus its root-cause refactor #14547 — both landed by v0.56.0.
-      # - Rotated-output regression from v0.56.0 (transform rotated pixels but
-      #   not logical geometry, discussion #15512) — fixed by #15587, confirmed
-      #   present in v0.56.2's src/output/Monitor.cpp (m_size recompute in
-      #   applyMonitorRuleSoft + isMirror guard in onConnect).
-      # We set transform = 1 on the secondary monitor
-      # (modules/desktop/hyprland/hyprland.nix), so re-run the rotation
-      # reproducer after this bump: confirm the secondary reports portrait
-      # logical geometry in `hyprctl monitors -j` (.width/.height swapped vs
-      # .transform 1). Also spot-check DPMS: hyprctl dispatch dpms off;
-      # sleep 90; dpms on.
-      url = "github:hyprwm/Hyprland/v0.56.2";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-    hyprland-contrib = {
-      url = "github:hyprwm/contrib";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-    noctalia = {
-      url = "github:noctalia-dev/noctalia";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
+    noctalia.url = "github:noctalia-dev/noctalia/cachix";
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";

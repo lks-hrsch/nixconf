@@ -1,4 +1,4 @@
-{ inputs, ... }:
+_:
 {
   flake.modules.homeManager.desktop-hyprland-hyprland =
     {
@@ -28,7 +28,7 @@
       home.packages = [
         pkgs.hyprpicker
         pkgs.wl-clipboard
-        inputs.hyprland-contrib.packages.${pkgs.stdenv.hostPlatform.system}.grimblast
+        pkgs.grimblast
       ];
 
       wayland.windowManager.hyprland = {
