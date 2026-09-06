@@ -67,7 +67,11 @@
       constants = import ./secrets/constants.nix;
     in
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [ inputs.flake-parts.flakeModules.modules ] ++ moduleTree.imports ++ hostTree.imports;
+      imports = [
+        inputs.flake-parts.flakeModules.modules
+        moduleTree
+        hostTree
+      ];
 
       options.repo = {
         constants = inputs.nixpkgs.lib.mkOption {

@@ -1,8 +1,0 @@
-{
-  "version": "1.134.0",
-  "platforms": {
-    "x86_64-linux":   { "plat": "linux-x64",   "sha256": "sha256-kzYXAHn1J/HKYtrTmUewINsGvT6Mrn4eYJe+pZTzdzM=" },
-    "aarch64-linux":  { "plat": "linux-arm64",  "sha256": "sha256-pVgSIP7fnHNBFK9kssi1SeCuXoLXHPXJUeO01CUQS5k=" },
-    "aarch64-darwin": { "plat": "darwin-arm64", "sha256": "sha256-bfGBZGWI8BMjOdGfW9+yC9DW2wXlgBBh8S4NyTyF+nA=" }
-  }
-}
