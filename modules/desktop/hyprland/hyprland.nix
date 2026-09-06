@@ -1,5 +1,4 @@
-_:
-{
+_: {
   flake.modules.homeManager.desktop-hyprland-hyprland =
     {
       pkgs,
@@ -18,8 +17,19 @@ _:
       mod = "SUPER";
 
       # Lua bind helpers — each renders as hl.bind(keys, <lua>, opts?)
-      bind = keys: lua: { _args = [ keys (mkLuaInline lua) ]; };
-      bind' = keys: lua: opts: { _args = [ keys (mkLuaInline lua) opts ]; };
+      bind = keys: lua: {
+        _args = [
+          keys
+          (mkLuaInline lua)
+        ];
+      };
+      bind' = keys: lua: opts: {
+        _args = [
+          keys
+          (mkLuaInline lua)
+          opts
+        ];
+      };
       exec = keys: cmd: bind keys ''hl.dsp.exec_cmd("${cmd}")'';
     in
     {
@@ -194,7 +204,7 @@ _:
                   function()
                     hl.exec_cmd("uwsm app -- ibus start --type wayland")
                     hl.exec_cmd("uwsm app -- 1password --silent")
-                    hl.exec_cmd("uwsm app -- librepods --hide")
+                    hl.exec_cmd("uwsm app -- env QT_QUICK_CONTROLS_STYLE=Fusion librepods --hide")
                   end'')
               ];
             }

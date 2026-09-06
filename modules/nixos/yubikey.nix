@@ -1,7 +1,15 @@
 { config, ... }:
+let
+  inherit (config.flake.users.owner) username;
+in
 {
   flake.modules.nixos.yubikey =
-    { pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       # CCID/PIV/OATH applets; FIDO2 and U2F go over hidraw and need no daemon.
       services.pcscd.enable = true;
@@ -31,7 +39,7 @@
             # key material only (no secret half), same trust level as an SSH
             # authorized_keys entry, safe to commit.
             authfile = pkgs.writeText "u2f-mappings" ''
-              ${config.flake.users.owner.username}:iBPqNL7isPeQMLTFTlUXFZIenV/o06K0zEOfnb3ZkBgnVf51MTdqOt8c6+pIAhXzDC1bySNUBQRczeGRK4TW/Q==,igqTqJNMseTBYp6yQ9OAo0V9w3CB1OADQHV7jDR5fHMWpf/DTdNwYzbIs+GZQbyjxyRkZ7DTIi2RhVOX+oc4+g==,es256,+presence:IGozUhEPNxA+hxIOxB09HyAXZXopTna79C/7xZD6GezG2CsUHYHNxCVJnZLT7KWzhUsyQbX9e6iTpzeBUkHNtg==,kBHEFlwIyBMAVUmpD2eGjdJv2cm4g3pmZmJrSabfsk8OfWw0TCr9tiCf3Pp6ch7xANL7ojAI8fs8weTdluKjkw==,es256,+presence
+              ${username}:iBPqNL7isPeQMLTFTlUXFZIenV/o06K0zEOfnb3ZkBgnVf51MTdqOt8c6+pIAhXzDC1bySNUBQRczeGRK4TW/Q==,igqTqJNMseTBYp6yQ9OAo0V9w3CB1OADQHV7jDR5fHMWpf/DTdNwYzbIs+GZQbyjxyRkZ7DTIi2RhVOX+oc4+g==,es256,+presence:IGozUhEPNxA+hxIOxB09HyAXZXopTna79C/7xZD6GezG2CsUHYHNxCVJnZLT7KWzhUsyQbX9e6iTpzeBUkHNtg==,kBHEFlwIyBMAVUmpD2eGjdJv2cm4g3pmZmJrSabfsk8OfWw0TCr9tiCf3Pp6ch7xANL7ojAI8fs8weTdluKjkw==,es256,+presence
             '';
           };
         };
@@ -40,6 +48,12 @@
         services = {
           sudo.u2f.enable = true;
           polkit-1.u2f.enable = true; # 1Password "unlock using system authentication"
+
+          # required, not "sufficient" above — sufficient skips pam_unix/gnome_keyring, leaving the login keyring locked
+          greetd = lib.mkIf config.services.greetd.enable {
+            u2f.enable = true;
+            u2f.control = "required";
+          };
         };
       };
     };

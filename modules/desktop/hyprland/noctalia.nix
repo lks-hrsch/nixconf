@@ -153,6 +153,7 @@ in
           # ── Idle ─────────────────────────────────────────────────────────────
 
           idle = {
+            pre_action_fade_seconds = 5;
             behavior_order = [
               "screen-off"
               "lock"
@@ -160,13 +161,12 @@ in
             behavior = {
               "screen-off" = {
                 timeout = 300;
-                command = "noctalia:dpms-off";
-                resume_command = "noctalia:dpms-on";
+                action = "screen_off";
                 enabled = true;
               };
               lock = {
                 timeout = 600;
-                command = "noctalia:session lock";
+                action = "lock";
                 enabled = true;
               };
             };
