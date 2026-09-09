@@ -1,4 +1,8 @@
-_: {
+{ config, ... }:
+let
+  inherit (config.flake.users.owner) username;
+in
+{
   flake = {
     modules = {
       nixos.netbird =
@@ -18,6 +22,9 @@ _: {
               };
             };
           };
+
+          # netbird creates the client's group as "netbird-<name>" (services/networking/netbird.nix).
+          users.users.${username}.extraGroups = [ "netbird-wt0" ];
         };
 
       darwin.netbird = _: {

@@ -3,16 +3,15 @@
   flake = {
     users.owner = {
       username = "lkshrsch";
+      uid = 1000;
       home = {
         nixos = "/home/lkshrsch";
         darwin = "/Users/lkshrsch";
       };
       extraGroups = [
         "wheel"
-        "docker"
         "video"
         "games"
-        "netbird-wt0"
       ];
     };
 
@@ -30,7 +29,7 @@
             shell = pkgs.zsh;
             openssh.authorizedKeys.keys = [ config.repo.constants.sshPublicKey ];
             isNormalUser = true;
-            inherit (config.flake.users.owner) extraGroups;
+            inherit (config.flake.users.owner) extraGroups uid;
           };
         };
 

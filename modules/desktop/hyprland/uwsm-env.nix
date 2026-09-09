@@ -1,13 +1,18 @@
 _: {
   flake.modules.homeManager.desktop-hyprland-uwsm-env =
-    { lib, pkgs, osConfig, ... }:
+    {
+      lib,
+      pkgs,
+      osConfig,
+      ...
+    }:
     let
       isNvidia = builtins.elem "nvidia" (osConfig.services.xserver.videoDrivers or [ ]);
     in
     {
-      home.file.uwsm-env = {
+      xdg.configFile.uwsm-env = {
         enable = true;
-        target = ".config/uwsm/env";
+        target = "uwsm/env";
         text = ''
           ##### General UI / toolkit ###############################################
           # export NIXOS_OZONE_WL="1"
@@ -25,7 +30,7 @@ _: {
           ##### CMake / Ninja tool-chain ###########################################
           export CMAKE_C_COMPILER="$HOME/.nix-profile/bin/clang"
           export CMAKE_CXX_COMPILER="$HOME/.nix-profile/bin/clang++"
-          export CMAKE_MAKE_PROGRAM="${pkgs.ninja}/bin/ninja"
+          export CMAKE_MAKE_PROGRAM="${lib.getExe pkgs.ninja}"
           export CMAKE_GENERATOR="Ninja"
         ''
         + lib.optionalString isNvidia ''
@@ -38,8 +43,8 @@ _: {
 
           ##### CUDA & linker flags ###############################################
           export CUDA_PATH="${pkgs.cudatoolkit}"
-          export LDFLAGS="-L/lib -L${pkgs.linuxPackages.nvidia_x11}/lib"
-          export LD_LIBRARY_PATH="${pkgs.linuxPackages.nvidia_x11}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          export LDFLAGS="-L/lib -L${osConfig.hardware.nvidia.package}/lib"
+          export LD_LIBRARY_PATH="${osConfig.hardware.nvidia.package}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
         ''
         + lib.optionalString (!isNvidia) ''
 
