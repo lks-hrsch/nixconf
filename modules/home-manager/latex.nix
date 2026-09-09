@@ -42,6 +42,6 @@ _: {
         # nixpkgs pdfpc on aarch64-darwin crashes on first render (libc++/poppler ABI
         # mismatch against the system libc++). Homebrew's build is self-consistent —
         # see modules/darwin/homebrew.nix.
-        ++ lib.optionals stdenv.isLinux [ pdfpc ];
+        ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pdfpc ];
     };
 }

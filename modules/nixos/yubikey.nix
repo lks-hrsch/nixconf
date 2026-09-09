@@ -29,10 +29,11 @@ in
           settings = {
             cue = true; # otherwise PAM waits for a touch with no prompt
             # pamu2fcfg defaults origin/appid to pam://$HOSTNAME, binding a
-            # credential to one machine. Pinned so the authfile below works on
-            # every host that imports this module, survives a hostname rename.
-            origin = "pam://lkshrsch";
-            appid = "pam://lkshrsch";
+            # credential to one machine. Pinned to the owner username instead
+            # so the authfile below works on every host that imports this
+            # module and survives a hostname rename.
+            origin = "pam://${username}";
+            appid = "pam://${username}";
             # Declarative instead of ~/.config/Yubico/u2f_keys: same file on every
             # host that imports this module, no per-machine `pamu2fcfg` step. Each
             # line is `username:keyhandle,pubkey,cosetype,options[:...]` — public

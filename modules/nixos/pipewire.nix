@@ -2,7 +2,6 @@ _: {
   flake.modules.nixos.pipewire =
     {
       lib,
-      config,
       pkgs,
       ...
     }:

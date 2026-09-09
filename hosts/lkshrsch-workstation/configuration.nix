@@ -1,7 +1,7 @@
 { config, ... }:
 {
   configurations.nixos."lkshrsch-workstation".module =
-    { pkgs, lib, ... }:
+    { pkgs, ... }:
     let
       nv-fan-control = import ./_nv-fan-control.nix { inherit pkgs; };
       nv-oc = import ./_nv-oc.nix { inherit pkgs; };

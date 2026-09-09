@@ -90,6 +90,7 @@ SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt sops secrets/secrets.yaml
 ## linting
 
 ``` bash
-❯ nix run nixpkgs#statix -- check overlays
-❯ nix run nixpkgs#statix -- fix overlays  
+❯ nix fmt                                # format every .nix file
+❯ nix run nixpkgs#statix -- check .      # anti-pattern lints
+❯ nix run nixpkgs#deadnix -- --fail .    # unused bindings/args
 ```

@@ -15,14 +15,12 @@ _: {
           };
         };
 
-      darwin.ssh =
-        { config, ... }:
-        {
-          services.openssh = {
-            enable = true;
-            # authorizedKeysFiles = [ config.sops.secrets."ssh-public-key".path ]; # Not supported on macOS/nix-darwin
-          };
+      darwin.ssh = _: {
+        services.openssh = {
+          enable = true;
+          # authorizedKeysFiles = [ config.sops.secrets."ssh-public-key".path ]; # Not supported on macOS/nix-darwin
         };
+      };
 
       homeManager.ssh =
         { pkgs, config, ... }:

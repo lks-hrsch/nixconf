@@ -32,7 +32,6 @@
       };
 
       nix = {
-        extraOptions = "experimental-features = nix-command flakes";
         gc = {
           automatic = true;
           dates = "weekly";
@@ -40,6 +39,12 @@
         };
         optimise.automatic = true;
         settings = {
+          # nix.extraOptions is appended after nix.settings and would silently
+          # clobber experimental-features set here by another module.
+          experimental-features = [
+            "nix-command"
+            "flakes"
+          ];
           auto-optimise-store = true;
           substituters = [
             "https://cache.nixos.org/"

@@ -29,9 +29,16 @@ _: {
                 servers = {
                   pyrefly = {
                     enable = true;
-                    cmd = [ "pyrefly" "lsp" ];
+                    cmd = [
+                      "pyrefly"
+                      "lsp"
+                    ];
                     filetypes = [ "python" ];
-                    rootMarkers = [ "pyrefly.toml" "pyproject.toml" ".git" ];
+                    rootMarkers = [
+                      "pyrefly.toml"
+                      "pyproject.toml"
+                      ".git"
+                    ];
                   };
                   ruff = {
                     enable = true;

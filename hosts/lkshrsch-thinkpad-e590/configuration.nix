@@ -1,7 +1,7 @@
 { config, ... }:
 {
   configurations.nixos."lkshrsch-thinkpad-e590".module =
-    { pkgs, lib, ... }:
+    { pkgs, ... }:
     {
       imports = with config.flake.modules.nixos; [
         base
