@@ -16,6 +16,15 @@ _: {
       ...
     }:
     let
+      # mattpocock/skills is pinned once; grill-me/grill-with-docs/tdd/improve-codebase-architecture
+      # below all point into different subdirs of the same rev.
+      mattpocockSkills = {
+        owner = "mattpocock";
+        repo = "skills";
+        rev = "801dca688564c529fa84f247f64472520d9ebe28";
+        hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+      };
+
       # name -> GitHub source pin + subdir containing SKILL.md
       skills = {
         obsidian = {
@@ -41,32 +50,16 @@ _: {
           hash = "sha256-176EeM1VhNSBH1cYUUy3oLST21PbV0v+tCNglfM9+6Y=";
           subdir = "skills/find-skills";
         };
-        grill-me = {
-          owner = "mattpocock";
-          repo = "skills";
-          rev = "801dca688564c529fa84f247f64472520d9ebe28";
-          hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+        grill-me = mattpocockSkills // {
           subdir = "skills/productivity/grill-me";
         };
-        grill-with-docs = {
-          owner = "mattpocock";
-          repo = "skills";
-          rev = "801dca688564c529fa84f247f64472520d9ebe28";
-          hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+        grill-with-docs = mattpocockSkills // {
           subdir = "skills/engineering/grill-with-docs";
         };
-        tdd = {
-          owner = "mattpocock";
-          repo = "skills";
-          rev = "801dca688564c529fa84f247f64472520d9ebe28";
-          hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+        tdd = mattpocockSkills // {
           subdir = "skills/engineering/tdd";
         };
-        improve-codebase-architecture = {
-          owner = "mattpocock";
-          repo = "skills";
-          rev = "801dca688564c529fa84f247f64472520d9ebe28";
-          hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+        improve-codebase-architecture = mattpocockSkills // {
           subdir = "skills/engineering/improve-codebase-architecture";
         };
       };
@@ -74,7 +67,17 @@ _: {
       # name -> store path of the skill's directory (containing SKILL.md). Identical
       # pins share one fetchFromGitHub derivation, so a repo is fetched only once.
       skillPaths = lib.mapAttrs (
-        _: s: "${pkgs.fetchFromGitHub { inherit (s) owner repo rev hash; }}/${s.subdir}"
+        _: s:
+        "${
+          pkgs.fetchFromGitHub {
+            inherit (s)
+              owner
+              repo
+              rev
+              hash
+              ;
+          }
+        }/${s.subdir}"
       ) skills;
     in
     {

@@ -18,12 +18,8 @@ _: {
         rev = "b7e93a4e7c950ba5b22a2bdb9a61e2631f75a51e";
         hash = "sha256-u6suHaAGCr3BufCUYhcgmwx/UWovCY7RPUCfKCg/0SU=";
       };
-      superpowers = pkgs.fetchFromGitHub {
-        owner = "obra";
-        repo = "superpowers";
-        rev = "3dcbd5c4b48e02263fbf4a3c01e3fe4f81d584d9"; # v6.2.0
-        hash = "sha256-F5LEk0yNWbMpan1vZSFZM76XSpsFGvA7h8q6Idrvenk=";
-      };
+      inherit (import ../../../overlays/claude-plugin-sources.nix pkgs) superpowers ponytail caveman;
+
       claude-mem = pkgs.fetchFromGitHub {
         owner = "thedotmack";
         repo = "claude-mem";
@@ -36,20 +32,6 @@ _: {
         repo = "codex-plugin-cc";
         rev = "db52e28f4d9ded852ab3942cea316258ae4ef346"; # v1.0.6
         hash = "sha256-S/R4kHTcIHBcG0TRX063C7ILXZZm0oMqunchPGg6ToU=";
-      };
-      # DietrichGebert/ponytail — repo root is both the marketplace and the plugin
-      ponytail = pkgs.fetchFromGitHub {
-        owner = "DietrichGebert";
-        repo = "ponytail";
-        rev = "16f29800fd2681bdf24f3eb4ccffe38be3baec6b"; # main as of 2026-07-15 (v4.8.4 + 53)
-        hash = "sha256-Y7d4s7uqjH6IbEXhqAiQ+yaxr6iiGcv2X64LuMtG1T8=";
-      };
-      # JuliusBrussee/caveman — repo root is both the marketplace and the plugin
-      caveman = pkgs.fetchFromGitHub {
-        owner = "JuliusBrussee";
-        repo = "caveman";
-        rev = "fcf7663366c217dc8f334a11028de52ed950ceab"; # v1.10.0
-        hash = "sha256-3lPEPb+hzomLLz4xfU7wQS++10gXP0UbXHXq/yluAGM=";
       };
     in
     {
@@ -64,23 +46,47 @@ _: {
         "claude-mem/env" = { };
       };
 
-      # jq-patched, not home.file-owned: claude-mem writes other keys back at runtime (cloud-sync, mode-creator, telegram).
-      home.activation.claudeMemGatewaySettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        settings="$HOME/.claude-mem/settings.json"
-        if [ -f "$settings" ]; then
-          ${pkgs.jq}/bin/jq \
-            '.CLAUDE_MEM_PROVIDER = "claude" | .CLAUDE_MEM_CLAUDE_AUTH_METHOD = "gateway" | .CLAUDE_MEM_MODEL = "coding"' \
-            "$settings" > "$settings.tmp"
-          mv "$settings.tmp" "$settings"
-        fi
-      '';
+      home = {
+        # jq-patched, not home.file-owned: claude-mem writes other keys back at runtime (cloud-sync, mode-creator, telegram).
+        activation.claudeMemGatewaySettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          settings="$HOME/.claude-mem/settings.json"
+          if [ -f "$settings" ]; then
+            run ${lib.getExe pkgs.jq} \
+              '.CLAUDE_MEM_PROVIDER = "claude" | .CLAUDE_MEM_CLAUDE_AUTH_METHOD = "gateway" | .CLAUDE_MEM_MODEL = "coding"' \
+              "$settings" > "$settings.tmp" && run mv "$settings.tmp" "$settings"
+          fi
+        '';
 
-      home.packages = with pkgs; [
-        nodejs_24
-        bun
-        # for the security-guidance and claude-security plugin hooks
-        (unstable.python3.withPackages (ps: [ ps.claude-agent-sdk ]))
-      ];
+        packages = with pkgs; [
+          nodejs_24
+          bun
+          # for the security-guidance and claude-security plugin hooks
+          (unstable.python3.withPackages (ps: [ ps.claude-agent-sdk ]))
+        ];
+
+        # CLAUDE_MEM_MODEL=general is set by the gateway aliases and resolved via LiteLLM at runtime.
+        file = {
+          ".claude/statusline-command.sh" = statusline;
+
+          # claude-mem gateway credentials, symlinked out of the Nix store
+          ".claude-mem/.env".source =
+            config.lib.file.mkOutOfStoreSymlink
+              config.sops.secrets."claude-mem/env".path;
+
+          # ~/.claude-work: CLAUDE_CONFIG_DIR for claude-work/-collana/-develappers — mirrors the
+          # base setup so those sessions get the same settings, statusline and skills.
+          ".claude-work/statusline-command.sh" = statusline;
+          ".claude-work/settings.json".source =
+            config.home.file."${config.programs.claude-code.configDir}/settings.json".source;
+        }
+        // lib.mapAttrs' (
+          name: src:
+          lib.nameValuePair ".claude-work/skills/${name}" {
+            source = src;
+            recursive = true;
+          }
+        ) config.programs.claude-code.skills;
+      };
 
       programs = {
         # graphify skill CLI: PyPI package `graphifyy`, command `graphify`
@@ -91,11 +97,11 @@ _: {
           enableMcpIntegration = true;
           package = pkgs.unstable.claude-code;
           marketplaces = {
-            superpowers = superpowers;
-            claude-mem = claude-mem;
+            inherit superpowers;
+            inherit claude-mem;
             openai-codex = codex-plugin-cc;
-            ponytail = ponytail;
-            caveman = caveman;
+            inherit ponytail;
+            inherit caveman;
           };
           plugins = [
             "${official}/plugins/code-review"
@@ -203,28 +209,5 @@ _: {
             claude-develappers = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_SONNET_MODEL=develappers-coding-low-think ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding CLAUDE_MEM_MODEL=develappers-coding claude --model develappers-coding";
           };
       };
-
-      # CLAUDE_MEM_MODEL=general is set by the gateway aliases and resolved via LiteLLM at runtime.
-      home.file = {
-        ".claude/statusline-command.sh" = statusline;
-
-        # claude-mem gateway credentials, symlinked out of the Nix store
-        ".claude-mem/.env".source = config.lib.file.mkOutOfStoreSymlink (
-          config.sops.secrets."claude-mem/env".path
-        );
-
-        # ~/.claude-work: CLAUDE_CONFIG_DIR for claude-work/-collana/-develappers — mirrors the
-        # base setup so those sessions get the same settings, statusline and skills.
-        ".claude-work/statusline-command.sh" = statusline;
-        ".claude-work/settings.json".source =
-          config.home.file."${config.programs.claude-code.configDir}/settings.json".source;
-      }
-      // lib.mapAttrs' (
-        name: src:
-        lib.nameValuePair ".claude-work/skills/${name}" {
-          source = src;
-          recursive = true;
-        }
-      ) config.programs.claude-code.skills;
     };
 }
