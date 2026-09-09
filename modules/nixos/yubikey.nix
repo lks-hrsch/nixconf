@@ -54,6 +54,13 @@ in
             u2f.enable = true;
             u2f.control = "required";
           };
+
+          # noctalia's lockscreen hardcodes PAM service "login" (no config knob),
+          # also the console/TTY stack; sulogin bypasses PAM so rescue still works.
+          login.u2f = {
+            enable = true;
+            control = "required";
+          };
         };
       };
     };
