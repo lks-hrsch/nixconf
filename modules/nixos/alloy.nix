@@ -1,14 +1,26 @@
-_:
-{
+_: {
   flake.modules.nixos.alloy =
     {
       config,
       lib,
-      pkgs,
       ...
     }:
     let
       cfg = config.alloy;
+
+      # Shared by every host importing this module: same Loki basic-auth
+      # secrets, same sops file, one canonical path regardless of which
+      # host's directory depth it used to be interpolated from.
+      monitoringSecret =
+        extra:
+        {
+          sopsFile = ../../secrets/secrets-mars-deimos.yaml;
+          owner = "apps";
+          group = "apps";
+          mode = "0400";
+          restartUnits = [ "alloy.service" ];
+        }
+        // extra;
 
       alloyConfig = ''
         // ---------- Sources ----------
@@ -121,15 +133,6 @@ _:
           description = "Loki push URL (HTTPS, basic auth).";
         };
 
-        basicAuthEnvFile = lib.mkOption {
-          type = lib.types.path;
-          description = ''
-            Path to an env file (typically a SOPS template) that defines
-            ALLOY_LOKI_USER and ALLOY_LOKI_PASS. Loaded by systemd via
-            EnvironmentFile and read by Alloy via sys.env().
-          '';
-        };
-
         collectPodman = lib.mkOption {
           type = lib.types.bool;
           default = true;
@@ -141,18 +144,41 @@ _:
       };
 
       config = lib.mkIf cfg.enable {
+        sops = {
+          secrets = {
+            "monitoring/loki_basic_auth_user" = monitoringSecret {
+              key = "monitoring/loki/basic_auth_user";
+            };
+            "monitoring/loki_basic_auth_pass" = monitoringSecret {
+              key = "monitoring/loki/basic_auth_password";
+            };
+          };
+
+          templates."alloy/loki-auth.env" = {
+            owner = "apps";
+            group = "apps";
+            mode = "0400";
+            content = ''
+              ALLOY_LOKI_USER=${config.sops.placeholder."monitoring/loki_basic_auth_user"}
+              ALLOY_LOKI_PASS=${config.sops.placeholder."monitoring/loki_basic_auth_pass"}
+            '';
+          };
+        };
+
         services.alloy = {
           enable = true;
           extraFlags = [ "--stability.level=public-preview" ];
+          environmentFile = config.sops.templates."alloy/loki-auth.env".path;
         };
 
+        # configPath defaults to /etc/alloy and auto-derives reloadTriggers
+        # (SIGHUP) from every *.alloy file placed here — a hand-rolled
+        # restartTriggers would instead force a full restart on every change.
         environment.etc."alloy/config.alloy".text = alloyConfig;
 
-        systemd.services.alloy = {
-          serviceConfig.EnvironmentFile = cfg.basicAuthEnvFile;
-          serviceConfig.SupplementaryGroups = lib.mkIf cfg.collectPodman [ "podman" ];
-          restartTriggers = [ alloyConfig ];
-        };
+        systemd.services.alloy.serviceConfig.SupplementaryGroups = lib.mkIf cfg.collectPodman [
+          "podman"
+        ];
       };
     };
 }
