@@ -1,7 +1,7 @@
 { config, ... }:
 {
   flake.modules.homeManager.vscode =
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
     let
       marketplace = pkgs.vscode-marketplace-release;
 
@@ -56,13 +56,16 @@
 
         # "git.autofetch" = "all";
 
-        "nix.formatterPath" = "nixfmt";
+        "[nix]" = {
+          "editor.defaultFormatter" = "jnoortheen.nix-ide";
+        };
+        "nix.formatterPath" = lib.getExe pkgs.nixfmt;
         "nix.enableLanguageServer" = true;
         "nix.serverPath" = "nil";
         "nix.serverSettings" = {
           "nil" = {
             "formatting" = {
-              "command" = [ "nixfmt" ];
+              "command" = [ (lib.getExe pkgs.nixfmt) ];
             };
           };
         };
@@ -98,7 +101,6 @@
       home.packages = with pkgs; [
         nil
         nixfmt
-        nixpkgs-fmt
 
         # for MCP
         uv
