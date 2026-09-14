@@ -22,7 +22,6 @@ _: {
       };
 
       taps = [
-        "tw93/tap" # for mole
         "steipete/tap"
       ];
 
@@ -32,7 +31,7 @@ _: {
         "mas" # https://github.com/mas-cli/mas
         "pdfpc" # nixpkgs build crashes on render on aarch64-darwin, see modules/home-manager/latex.nix
         "steipete/tap/remindctl"
-        "tw93/tap/mole" # https://github.com/tw93/Mole
+        "mole" # https://github.com/tw93/Mole, renamed from tw93/tap/mole into homebrew-core
       ];
 
       # GUI applications (casks)
