@@ -4,8 +4,14 @@ Concise operator runbook for migrating mercury to the NixOS host definition in t
 
 ## Status
 
+Mercury is live in production (Traefik, Authelia, LLDAP, crowdsec, mealie,
+vaultwarden, searxng, netbird all running, deployed via
+`hosts/mercury/README.md`'s operational contract) — this migration is done.
+Kept as historical install reference; the checklist below is not re-verified
+against current secrets/LDAP state.
+
 - [x] Step 1 backup completed (stacks, docker inventory, volume archives, wg0.conf)
-- [ ] Migration install not yet completed
+- [x] Migration install completed
 
 ---
 
