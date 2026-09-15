@@ -28,17 +28,12 @@ in
           control = "sufficient";
           settings = {
             cue = true; # otherwise PAM waits for a touch with no prompt
-            # pamu2fcfg defaults origin/appid to pam://$HOSTNAME, binding a
-            # credential to one machine. Pinned to the owner username instead
-            # so the authfile below works on every host that imports this
-            # module and survives a hostname rename.
+            # pamu2fcfg defaults origin/appid to pam://$HOSTNAME (one machine); pinned to
+            # username instead so the authfile below is portable across hosts/renames.
             origin = "pam://${username}";
             appid = "pam://${username}";
-            # Declarative instead of ~/.config/Yubico/u2f_keys: same file on every
-            # host that imports this module, no per-machine `pamu2fcfg` step. Each
-            # line is `username:keyhandle,pubkey,cosetype,options[:...]` — public
-            # key material only (no secret half), same trust level as an SSH
-            # authorized_keys entry, safe to commit.
+            # Declarative mapping, public key material only — safe to commit, same trust as authorized_keys.
+            # Deliberately NOT sops: login/greetd are `required`; coupling to decrypt success risks lockout for no secrecy gain.
             authfile = pkgs.writeText "u2f-mappings" ''
               ${username}:iBPqNL7isPeQMLTFTlUXFZIenV/o06K0zEOfnb3ZkBgnVf51MTdqOt8c6+pIAhXzDC1bySNUBQRczeGRK4TW/Q==,igqTqJNMseTBYp6yQ9OAo0V9w3CB1OADQHV7jDR5fHMWpf/DTdNwYzbIs+GZQbyjxyRkZ7DTIi2RhVOX+oc4+g==,es256,+presence:IGozUhEPNxA+hxIOxB09HyAXZXopTna79C/7xZD6GezG2CsUHYHNxCVJnZLT7KWzhUsyQbX9e6iTpzeBUkHNtg==,kBHEFlwIyBMAVUmpD2eGjdJv2cm4g3pmZmJrSabfsk8OfWw0TCr9tiCf3Pp6ch7xANL7ojAI8fs8weTdluKjkw==,es256,+presence
             '';

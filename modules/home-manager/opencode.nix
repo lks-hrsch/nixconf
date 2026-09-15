@@ -37,8 +37,8 @@ _: {
           "skills"."paths" = [ "${caveman}/skills" ];
           "plugin" = [
             # Retained existing version-pinned OpenCode npm plugins.
-            "opencode-with-claude@1.6.14"
-            "@tarquinen/opencode-dcp@3.1.14"
+            "opencode-with-claude@1.10.1"
+            "@tarquinen/opencode-dcp@3.1.15"
             # New native integrations are store-backed and installer-free.
             "${superpowers}/.opencode/plugins/superpowers.js"
             "${ponytail}/.opencode/plugins/ponytail.mjs"

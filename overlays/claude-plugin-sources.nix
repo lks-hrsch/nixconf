@@ -1,27 +1,26 @@
-# Shared GitHub source pins for plugins used by both
-# modules/home-manager/claude-code/claude-code.nix and modules/home-manager/opencode.nix.
-# Plain data, not a module — kept outside modules/ (import-tree would otherwise
-# try to evaluate it as one) and imported with `pkgs` from whichever module needs it.
+# Shared GitHub source pins for claude-code.nix + opencode.nix. Plain data, not a
+# module (import-tree would eval it) — imported with `pkgs` by whichever module needs it.
 pkgs: {
   # obra/superpowers — repo root is both the marketplace and the plugin
   superpowers = pkgs.fetchFromGitHub {
     owner = "obra";
     repo = "superpowers";
-    rev = "3dcbd5c4b48e02263fbf4a3c01e3fe4f81d584d9"; # v6.2.0
-    hash = "sha256-F5LEk0yNWbMpan1vZSFZM76XSpsFGvA7h8q6Idrvenk=";
+    rev = "b36e0829c6d0140e93cfef2ca599b1b07d4a7797"; # v6.3.0
+    hash = "sha256-EsGNO0dULWf5Bx6bGrCv2kI2Z8aKH0kRvGiuN23wChQ=";
   };
   # DietrichGebert/ponytail — repo root is both the marketplace and the plugin
   ponytail = pkgs.fetchFromGitHub {
     owner = "DietrichGebert";
     repo = "ponytail";
-    rev = "16f29800fd2681bdf24f3eb4ccffe38be3baec6b"; # main as of 2026-07-15 (v4.8.4 + 53)
-    hash = "sha256-Y7d4s7uqjH6IbEXhqAiQ+yaxr6iiGcv2X64LuMtG1T8=";
+    rev = "1d95ff7d39de12d87014ea40d4e22201bddc501b"; # v4.10.0
+    hash = "sha256-PES5XrSYx0VBXWVHEDRykGy0SAmJfV/luzy8Gfg0aAQ=";
   };
-  # JuliusBrussee/caveman — repo root is both the marketplace and the plugin
+  # JuliusBrussee/caveman — repo root is both marketplace and plugin. v2.0.0 added a
+  # BSL-1.1 component (self-host free, resale licensed); /caveman itself stays MIT — fine for personal use.
   caveman = pkgs.fetchFromGitHub {
     owner = "JuliusBrussee";
     repo = "caveman";
-    rev = "fcf7663366c217dc8f334a11028de52ed950ceab"; # v1.10.0
-    hash = "sha256-3lPEPb+hzomLLz4xfU7wQS++10gXP0UbXHXq/yluAGM=";
+    rev = "b82c0ad42c2bedc1f2cd78e414dadfaffbaaeec3"; # v2.6.0
+    hash = "sha256-tEQDv0sIsCzdzaq/tdUSN8nb2xmQJkmjPtq8wKChqvQ=";
   };
 }

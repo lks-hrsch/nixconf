@@ -389,9 +389,9 @@ After install, on the laptop:
   existing two.
 - **Revoke a lost YubiKey**: `sudo cryptsetup luksDump /dev/nvme0n1p3` to find
   its slot number, then `sudo systemd-cryptenroll --wipe-slot=<n>
-  /dev/nvme0n1p3`. Also delete that key's line from every machine's
-  `~/.config/Yubico/u2f_keys` (PAM for `sudo`/`polkit-1`) — LUKS and PAM
-  enrollments are tracked separately and both must be revoked.
+  /dev/nvme0n1p3`. Also delete that key's line from the declarative `authfile`
+  in `modules/nixos/yubikey.nix` (PAM for `sudo`/`polkit-1`) and rebuild — LUKS
+  and PAM enrollments are tracked separately and both must be revoked.
 - **Lost all YubiKeys**: boot to the recovery passphrase prompt for
   `cryptroot` (always a valid key slot); TPM2 still unlocks `cryptswap`.
 - **`sbctl` after a BIOS reset clears Secure Boot keys**: redo step 6 from
