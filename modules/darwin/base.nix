@@ -24,7 +24,6 @@ in
 
         config.flake.modules.darwin.homeManager
 
-        inputs.mac-app-util.darwinModules.default
         inputs.nixvim.nixDarwinModules.nixvim
         inputs.sops-nix.darwinModules.sops
       ]
