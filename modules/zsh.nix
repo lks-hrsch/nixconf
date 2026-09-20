@@ -15,12 +15,11 @@ _: {
               tmux.enable = true;
             };
 
-            # global system packages — btop comes from home-manager's programs.btop instead
-            # (homeManager.zsh below), which also carries its settings.
             environment.systemPackages = with pkgs; [
               ghosttyTerminfo # infocmp -x xterm-ghostty | ssh YOUR-SERVER -- tic -x -
               pciutils
               usbutils
+              unstable.btop
             ];
           };
       in
