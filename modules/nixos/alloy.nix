@@ -42,17 +42,23 @@ _: {
         // drop must happen here rather than in loki.process below.
         loki.relabel "journal_units" {
           forward_to = []
+      ''
+      + lib.optionalString cfg.collectPodman ''
           rule {
             // conmon writes CONTAINER_ID_FULL to the journal for every
             // container log line (journald log driver); Alloy exposes it
-            // as __journal_<lowercased field name>. Drop these here since
-            // they're collected with richer metadata via the Podman socket
-            // below, to avoid double-ingestion and a Loki->journal->Loki
-            // feedback loop.
+            // as __journal_<lowercased field name>. Only safe to drop when
+            // collectPodman is true: without the Podman-socket collector
+            // below to catch them, dropping these here would silently
+            // discard container logs instead of deduping them, so this
+            // whole rule is conditional on the same flag that gates that
+            // collector.
             source_labels = ["__journal_container_id_full"]
             regex         = ".+"
             action        = "drop"
           }
+      ''
+      + ''
           rule {
             source_labels = ["__journal__systemd_unit"]
             target_label  = "unit"
