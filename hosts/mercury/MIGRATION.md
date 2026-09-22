@@ -163,5 +163,13 @@ authelia crypto hash generate pbkdf2 --variant sha512 --iterations 310000 --pass
 
 1. Move remaining WireGuard keys to SOPS.
 2. Pin image versions (replace `latest` tags).
+   - `netbird-server`, `netbird-dashboard`, and `netbird-proxy`
+     (`hosts/mercury/stacks/netbird.nix`) are still unpinned. `netbird-server`'s
+     OCI `org.opencontainers.image.version` label (`24.04`) is not a real
+     Docker Hub tag (confirmed 404), and `netbird-proxy` has no version label
+     at all — so the running versions can't be reliably read from the
+     container metadata the way the other services' were. Check the NetBird
+     admin UI's version display instead, then pin all three together
+     (upstream requires matching management/proxy versions).
 3. Optionally add Authelia forward-auth for Vaultwarden.
 4. Restrict SSH to VPN paths only.

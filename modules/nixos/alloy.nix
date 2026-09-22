@@ -44,19 +44,19 @@ _: {
           forward_to = []
       ''
       + lib.optionalString cfg.collectPodman ''
-          rule {
-            // conmon writes CONTAINER_ID_FULL to the journal for every
-            // container log line (journald log driver); Alloy exposes it
-            // as __journal_<lowercased field name>. Only safe to drop when
-            // collectPodman is true: without the Podman-socket collector
-            // below to catch them, dropping these here would silently
-            // discard container logs instead of deduping them, so this
-            // whole rule is conditional on the same flag that gates that
-            // collector.
-            source_labels = ["__journal_container_id_full"]
-            regex         = ".+"
-            action        = "drop"
-          }
+        rule {
+          // conmon writes CONTAINER_ID_FULL to the journal for every
+          // container log line (journald log driver); Alloy exposes it
+          // as __journal_<lowercased field name>. Only safe to drop when
+          // collectPodman is true: without the Podman-socket collector
+          // below to catch them, dropping these here would silently
+          // discard container logs instead of deduping them, so this
+          // whole rule is conditional on the same flag that gates that
+          // collector.
+          source_labels = ["__journal_container_id_full"]
+          regex         = ".+"
+          action        = "drop"
+        }
       ''
       + ''
           rule {
