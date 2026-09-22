@@ -37,24 +37,31 @@ _: {
         }
 
         // Rules-only relabel block: forward_to is empty by design;
-        // loki.source.journal consumes the rules directly.
+        // loki.source.journal consumes the rules directly. __journal_*
+        // fields only exist at this relabeling stage, so the Podman-origin
+        // drop must happen here rather than in loki.process below.
         loki.relabel "journal_units" {
           forward_to = []
+          rule {
+            // conmon writes CONTAINER_ID_FULL to the journal for every
+            // container log line (journald log driver); Alloy exposes it
+            // as __journal_<lowercased field name>. Drop these here since
+            // they're collected with richer metadata via the Podman socket
+            // below, to avoid double-ingestion and a Loki->journal->Loki
+            // feedback loop.
+            source_labels = ["__journal_container_id_full"]
+            regex         = ".+"
+            action        = "drop"
+          }
           rule {
             source_labels = ["__journal__systemd_unit"]
             target_label  = "unit"
           }
         }
 
-        // Drop journal entries that came from Podman containers (they are
-        // collected with richer metadata via the Podman socket below) and
-        // drop Alloy's own output to avoid feedback loops.
+        // Drop Alloy's own output to avoid feedback loops.
         loki.process "host_journal" {
           forward_to = [loki.write.alloy.receiver]
-          stage.match {
-            selector = "{__journal__podman_container_id=~\".+\"}"
-            action   = "drop"
-          }
           stage.match {
             selector = "{unit=\"alloy.service\"}"
             action   = "drop"
