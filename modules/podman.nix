@@ -67,9 +67,6 @@ in
           home.packages = with pkgs; [
             kubectl
             minikube
-
-            argocd
-            kubeseal
           ];
 
           programs.k9s.enable = true;

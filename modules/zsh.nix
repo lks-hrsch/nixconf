@@ -44,6 +44,7 @@ _: {
           {
             home.packages = with pkgs; [
               jq
+              yq
               wget
               nmap
               iperf3
