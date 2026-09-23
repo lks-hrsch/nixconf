@@ -128,7 +128,7 @@ _: {
             outputStyle = "Concise";
             skillListingBudgetFraction = 0.05;
             model = "opusplan";
-            effortLevel = "xhigh";
+            effortLevel = "high";
             cleanupPeriodDays = 30;
             permissions = {
               allow = [
