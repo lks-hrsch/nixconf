@@ -15,6 +15,19 @@
         };
       };
 
+      options.desktop.bar = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+        description = ''
+          Per-host overrides for noctalia's bar.main settings. Keys are
+          noctalia's own, so anything under [bar.main] is reachable. Typos
+          are caught by `noctalia config validate` at build time.
+        '';
+        example = lib.literalExpression ''
+          { end = [ "CPU" "ram" "battery" "clock" ]; }
+        '';
+      };
+
       config = {
         i18n.inputMethod = {
           enable = true;
@@ -23,6 +36,21 @@
         };
 
         services.gnome.gnome-keyring.enable = true;
+
+        # Auto-mount removable storage (USB sticks, SD cards) without user
+        # action; udisks2 does the mounting, gvfs backs Nautilus, devmon
+        # watches udisks2 and triggers the mount.
+        services = {
+          devmon.enable = true;
+          gvfs.enable = true;
+          udisks2.enable = true;
+
+          # gvfsd-wsdd talks to a *running* wsdd over /run/wsdd/wsdd.sock
+          samba-wsdd = {
+            enable = true;
+            discovery = true;
+          };
+        };
 
         nixpkgs.overlays = [
           config.repo.overlays.firefox-addons
@@ -34,13 +62,11 @@
             "https://hyprland.cachix.org"
             "https://noctalia.cachix.org"
             "https://cache.nixos-cuda.org"
-            "https://cuda-maintainers.cachix.org"
           ];
           trusted-public-keys = [
             "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
             "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
             "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
-            "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
           ];
         };
 

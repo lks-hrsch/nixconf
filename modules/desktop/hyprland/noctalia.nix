@@ -91,6 +91,7 @@ in
             animation.enabled = false;
 
             panel = {
+              control_center_placement = "floating";
               session_placement = "floating";
               session_position = "center";
               shadow = false;
@@ -118,6 +119,8 @@ in
               default.path = stablePath;
               monitors = {
                 ${primary}.path = stablePath;
+              }
+              // lib.optionalAttrs (secondary != null) {
                 ${secondary}.path = stablePath;
               };
             };
@@ -128,6 +131,7 @@ in
             mode = "dark";
             source = "custom";
             custom_palette = "stylix";
+            pure_black_dark = true;
 
             templates = {
               enable_builtin_templates = false;
@@ -148,17 +152,23 @@ in
 
           # ── Idle ─────────────────────────────────────────────────────────────
 
-          idle.behavior = {
-            lock = {
-              timeout = 600;
-              command = "noctalia:session lock";
-              enabled = true;
-            };
-            "screen-off" = {
-              timeout = 1800;
-              command = "noctalia:dpms-off";
-              resume_command = "noctalia:dpms-on";
-              enabled = true;
+          idle = {
+            pre_action_fade_seconds = 5;
+            behavior_order = [
+              "screen-off"
+              "lock"
+            ];
+            behavior = {
+              "screen-off" = {
+                timeout = 300;
+                action = "screen_off";
+                enabled = true;
+              };
+              lock = {
+                timeout = 600;
+                action = "lock";
+                enabled = true;
+              };
             };
           };
 
@@ -181,10 +191,11 @@ in
 
           system.monitor = {
             enabled = true;
-            cpu_poll_seconds = 5;
-            gpu_poll_seconds = 5;
-            memory_poll_seconds = 5;
-            network_poll_seconds = 5;
+            cpu_poll_seconds = 10;
+            disk_poll_seconds = 10;
+            gpu_poll_seconds = 10;
+            memory_poll_seconds = 10;
+            network_poll_seconds = 10;
           };
 
           # ── Control Center shortcuts ─────────────────────────────────────────
@@ -197,7 +208,9 @@ in
 
           # ── Bar ──────────────────────────────────────────────────────────────
 
-          bar.main = {
+          # Per-host overrides (osConfig.desktop.bar, modules/desktop/base.nix)
+          # merge over these defaults — in practice just the `end` widget row.
+          bar.main = lib.recursiveUpdate {
             position = "top";
             background_opacity = 0.0;
             capsule = true;
@@ -214,6 +227,7 @@ in
             start = [
               "control-center"
               "workspaces"
+              "tray"
             ];
             center = [ "active_window" ];
             end = [
@@ -225,13 +239,18 @@ in
               "gpu-temperature"
               "network_rx"
               "network_tx"
-              "tray"
               "caffeine"
               "date"
               "clock"
             ];
 
             monitor = {
+              # Primary monitor — full bar from the main widget lists
+              ${primary} = {
+                enabled = true;
+              };
+            }
+            // lib.optionalAttrs (secondary != null) {
               # Secondary (portrait) monitor — workspaces, plus weather/privacy
               # ported from a live GUI edit (2026-08-16)
               ${secondary} = {
@@ -240,20 +259,16 @@ in
                 center = [ "workspaces" ];
                 end = [ "privacy" ];
               };
-              # Primary monitor — full bar from the main widget lists
-              ${primary} = {
-                enabled = true;
-              };
             };
-          };
+          } osConfig.desktop.bar;
 
           # ── Per-widget settings ──────────────────────────────────────────────
-
-          # v5 renamed sysmon presentation keys: display="text" -> visualization="none",
-          # show_label=false -> show_value=true. GPU (uppercase, no type=) was a stale
-          # duplicate of gpu below and resolved to an invalid widget type - dropped.
           widget = {
             "control-center".glyph = "snowflake";
+            battery = {
+              display_mode = "graphic";
+              show_label = true;
+            };
             CPU = {
               show_value = true;
               type = "sysmon";
@@ -308,7 +323,9 @@ in
             schema_version = 2;
             widget_order = [
               "lockscreen-login-box@${primary}"
-              "lockscreen-login-box@${secondary}"
+            ]
+            ++ lib.optionals (secondary != null) [ "lockscreen-login-box@${secondary}" ]
+            ++ [
               "lockscreen-widget-0000000000000001"
               "lockscreen-widget-0000000000000002"
               "lockscreen-widget-0000000000000003"
@@ -322,15 +339,6 @@ in
 
             widget = {
               # Login boxes — positions are monitor-geometry-specific
-              "lockscreen-login-box@${secondary}" = {
-                box_height = 0.0;
-                box_width = 0.0;
-                cx = 540.0;
-                cy = 1797.0;
-                output = secondary;
-                rotation = 0.0;
-                type = "login_box";
-              };
               "lockscreen-login-box@${primary}" = {
                 box_height = 0.0;
                 box_width = 0.0;
@@ -340,6 +348,19 @@ in
                 rotation = 0.0;
                 type = "login_box";
               };
+            }
+            // lib.optionalAttrs (secondary != null) {
+              "lockscreen-login-box@${secondary}" = {
+                box_height = 0.0;
+                box_width = 0.0;
+                cx = 540.0;
+                cy = 1797.0;
+                output = secondary;
+                rotation = 0.0;
+                type = "login_box";
+              };
+            }
+            // {
               "lockscreen-widget-0000000000000001" = {
                 box_height = 176.0;
                 box_width = 512.0;

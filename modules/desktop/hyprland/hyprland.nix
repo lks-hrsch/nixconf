@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+_: {
   flake.modules.homeManager.desktop-hyprland-hyprland =
     {
       pkgs,
@@ -18,8 +17,19 @@
       mod = "SUPER";
 
       # Lua bind helpers — each renders as hl.bind(keys, <lua>, opts?)
-      bind = keys: lua: { _args = [ keys (mkLuaInline lua) ]; };
-      bind' = keys: lua: opts: { _args = [ keys (mkLuaInline lua) opts ]; };
+      bind = keys: lua: {
+        _args = [
+          keys
+          (mkLuaInline lua)
+        ];
+      };
+      bind' = keys: lua: opts: {
+        _args = [
+          keys
+          (mkLuaInline lua)
+          opts
+        ];
+      };
       exec = keys: cmd: bind keys ''hl.dsp.exec_cmd("${cmd}")'';
     in
     {
@@ -28,7 +38,7 @@
       home.packages = [
         pkgs.hyprpicker
         pkgs.wl-clipboard
-        inputs.hyprland-contrib.packages.${pkgs.stdenv.hostPlatform.system}.grimblast
+        pkgs.grimblast
       ];
 
       wayland.windowManager.hyprland = {
@@ -109,6 +119,8 @@
               scale = 1;
               vrr = 2;
             }
+          ]
+          ++ lib.optionals (secondary != null) [
             {
               output = secondary;
               mode = "highres";
@@ -116,6 +128,16 @@
               scale = 1;
               transform = 1;
               vrr = 2;
+            }
+          ]
+          ++ [
+            # Catch-all so any output not named above (e.g. a USB-C monitor)
+            # still comes up instead of staying disabled.
+            {
+              output = "";
+              mode = "preferred";
+              position = "auto";
+              scale = 1;
             }
           ];
 
@@ -157,18 +179,20 @@
             }
           ];
 
-          # define workspaces — 1–9 on primary, L1–L9 on secondary
+          # define workspaces — 1–9 on primary, L1–L9 on secondary (if present)
           workspace_rule =
             builtins.genList (i: {
               workspace = toString (i + 1);
               monitor = primary;
               default = i == 0;
             }) 9
-            ++ builtins.genList (i: {
-              workspace = "name:L${toString (i + 1)}";
-              monitor = secondary;
-              default = i == 0;
-            }) 9;
+            ++ lib.optionals (secondary != null) (
+              builtins.genList (i: {
+                workspace = "name:L${toString (i + 1)}";
+                monitor = secondary;
+                default = i == 0;
+              }) 9
+            );
 
           # autostart (was exec-once) — list form so noctalia.nix's hook
           # merges as its own hl.on call
@@ -180,7 +204,7 @@
                   function()
                     hl.exec_cmd("uwsm app -- ibus start --type wayland")
                     hl.exec_cmd("uwsm app -- 1password --silent")
-                    hl.exec_cmd("uwsm app -- librepods --hide")
+                    hl.exec_cmd("uwsm app -- env QT_QUICK_CONTROLS_STYLE=Fusion librepods --hide")
                   end'')
               ];
             }

@@ -22,6 +22,7 @@ mercury is the public edge VPS for this fleet.
 | 443 | TCP | Traefik | TLS ingress for apps, OIDC, NetBird HTTP/gRPC |
 | 8883 | TCP | Traefik | MQTTS (TLS termination) for the ldr-connect broker |
 | 3478 | UDP | NetBird | STUN/TURN |
+| 51820 | UDP | NetBird proxy | Embedded WireGuard peer for NetBird-only private services |
 | 51821 | UDP | wg0 | Backbone VPN entrypoint |
 
 Notes:
@@ -33,9 +34,9 @@ Notes:
 
 | Network | Purpose | Members |
 | --- | --- | --- |
-| mercury-reverse-proxy | Ingress/routing plane | Traefik, Authelia, LLDAP UI, NetBird, Vaultwarden, SearXNG, Mosquitto (ldr-connect) |
-| mercury-id | Identity-only traffic | LLDAP, Authelia |
-| mercury-netbird | NetBird internal traffic | NetBird server, NetBird dashboard |
+| proxy | Ingress/routing plane | Traefik, Authelia, LLDAP UI, NetBird server/dashboard/proxy, Vaultwarden, SearXNG, Mealie, ical-feuerwehr, Mosquitto (ldr-connect) |
+| id | Identity-only traffic | LLDAP, Authelia |
+| netbird | NetBird internal traffic | NetBird server, NetBird dashboard, NetBird proxy, CrowdSec |
 
 ## Services
 
@@ -49,10 +50,13 @@ Notes:
 | Vaultwarden | Password manager | Public via Traefik on 443 |
 | SearXNG | Metasearch engine | Public via Traefik on 443 (Authelia forward-auth) |
 | Mosquitto (ldr-connect) | MQTT broker for ldr-connect | MQTTS via Traefik TCP/SNI on 8883 |
+| Mealie | Recipe manager (OIDC via Authelia) | Public via Traefik on 443 |
+| ical-feuerwehr | Calendar feed (simple-ical-server) | Public via Traefik on 443 |
+| CrowdSec | IP-reputation engine; LAPI for the NetBird proxy bouncer | Internal only (netbird network) |
 
 ## Current Routing Notes
 
-- LLDAP uses host-based routing on lldap.lukashirsch.de.
+- LLDAP uses host-based routing on lldap.mercury.lukashirsch.de.
 - Vaultwarden currently routes on both:
   - vaultwarden.mars.lukashirsch.de
   - vaultwarden.mercury.lukashirsch.de
@@ -67,6 +71,10 @@ Notes:
   Let's Encrypt via DNS-01). The names remain manual DNS-only A records at
   Cloudflare → 5.45.99.133. Clients must use TLS with SNI; plaintext 1883
   is no longer exposed.
+- NetBird peer session expiration (default 24h) is management-DB state, not
+  Nix: Dashboard → Settings → Authentication. SSO-enrolled peers expire and
+  must re-login ("peer login has expired" in netbird-server logs); mercury's
+  own setup-key peer (`vpn.nix`) does not.
 
 ## Architecture
 
@@ -77,16 +85,18 @@ Internet
       -> netbird.lukashirsch.de (NetBird)
       -> vaultwarden.*.lukashirsch.de (Vaultwarden, public)
       -> searxng.mercury.lukashirsch.de (SearXNG, Authelia forward-auth)
-      -> lldap.lukashirsch.de (LLDAP UI)
+      -> lldap.mercury.lukashirsch.de (LLDAP UI)
+      -> mealie.mercury.lukashirsch.de (Mealie)
+      -> calendar.ffw-freitelsdorf.*.lukashirsch.de (ical-feuerwehr)
 
 Identity plane
-  Authelia <-> LLDAP   (mercury-id)
+  Authelia <-> LLDAP   (id)
 
 NetBird plane
-  NetBird server <-> NetBird dashboard   (mercury-netbird)
+  NetBird server <-> dashboard <-> reverse-proxy <-> CrowdSec   (netbird)
 
 Routing plane
-  Traefik + routed services   (mercury-reverse-proxy)
+  Traefik + routed services   (proxy)
 
 Backbone/admin plane
   WireGuard wg0 (10.10.1.1)
@@ -95,7 +105,7 @@ Backbone/admin plane
 ## Runtime Policy
 
 - Services are managed as Podman quadlets via NixOS.
-- All containers are configured with autoUpdate = "registry".
+- All containers use `autoUpdate = "registry"` except CrowdSec (pinned, manual bumps).
 - All service units use Restart = "always".
 
 ## Identity and Access Flow
@@ -111,10 +121,16 @@ Backbone/admin plane
 - Use NetBird as the day-to-day user/device access plane.
 - Keep the public edge narrow: Traefik (including public Vaultwarden) + required VPN ports only.
 
-## deploy config
+## Deploy
 
-via darwin
+From `lkshrsch-workstation` (x86_64-linux, builds locally):
 
-``` bash
-❯ nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@mercury.lukashirsch.de --target-host root@mercury.lukashirsch.de
+```bash
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --target-host root@10.10.1.1
+```
+
+From macOS (builds on mercury):
+
+```bash
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@mercury.lukashirsch.de --target-host root@mercury.lukashirsch.de
 ```
