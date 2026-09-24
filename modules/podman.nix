@@ -34,6 +34,9 @@ in
 
           # dockerSocket.enable creates this group; membership is required to connect.
           users.users.${username}.extraGroups = [ "podman" ];
+          # Pinned (not dynamic) so containers can join it by number via addGroups —
+          # podman resolves group names inside the container's /etc/group, not the host's.
+          users.groups.podman.gid = 569;
         };
 
       darwin.podman = _: {
