@@ -7,7 +7,7 @@ let
   sshKey = config.repo.constants.sshPublicKey;
 in
 {
-  configurations.nixos."workstation-nixos".module =
+  configurations.nixos."lkshrsch-workstation".module =
     {
       pkgs,
       config,
@@ -24,7 +24,7 @@ in
         if builtins.pathExists ./facter.json then
           ./facter.json
         else
-          throw "Missing hosts/workstation-nixos/facter.json. Run: sudo nix run github:numtide/nixos-facter -- -o hosts/workstation-nixos/facter.json";
+          throw "Missing hosts/lkshrsch-workstation/facter.json. Run: sudo nix run github:numtide/nixos-facter -- -o hosts/lkshrsch-workstation/facter.json";
 
       boot = {
         initrd = {
@@ -92,7 +92,7 @@ in
           "nvidia.NVreg_TemporaryFilePath=/var/tmp"
           "zfs.zfs_arc_max=2147483648" # 2 GiB https://nixos.wiki/wiki/ZFS
           "zfs.zfs_prefetch_disable=1"
-          "ip=192.168.1.40::192.168.1.1:255.255.255.0:workstation-nixos::none"
+          "ip=192.168.1.40::192.168.1.1:255.255.255.0:lkshrsch-workstation::none"
         ];
 
         # Use the systemd-boot EFI boot loader.

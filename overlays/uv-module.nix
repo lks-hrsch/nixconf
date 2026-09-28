@@ -1,5 +1,5 @@
 # Extends home-manager's built-in `programs.uv` (modules/programs/uv.nix,
-# present at this repo's pinned rev af2beae5f0 on release-26.05) with just the
+# present at this repo's pinned rev fd0956c99 on release-26.05) with just the
 # `tool.packages`/`tool.prune` piece, backported from nix-community/home-manager
 # commit c51ac59e5 (2026-06-17, refined 6eba758fe 2026-06-22), which targets
 # release-26.11 and isn't in release-26.05 yet.

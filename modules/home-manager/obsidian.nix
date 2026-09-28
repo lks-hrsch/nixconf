@@ -85,7 +85,7 @@ in
       # load an ignore file that's a symlink escaping the folder root,
       # failing every scan with "too many levels of symbolic links".
       home.activation.obsidianStignore = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        install -m644 ${
+        run ${lib.getExe' pkgs.coreutils "install"} -m644 ${
           pkgs.writeText "obsidian-stignore" (
             ''
               **.nosync

@@ -6,10 +6,7 @@
 {
   configurations.nixos."mercury".module =
     {
-      lib,
-      pkgs,
       modulesPath,
-      inputs,
       ...
     }:
     {

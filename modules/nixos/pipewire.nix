@@ -2,7 +2,6 @@ _: {
   flake.modules.nixos.pipewire =
     {
       lib,
-      config,
       pkgs,
       ...
     }:
@@ -43,6 +42,8 @@ _: {
           };
         };
       };
+
+      services.upower.enable = true;
 
       # make pipewire realtime-capable
       # https://mynixos.com/nixpkgs/option/security.rtkit.enable

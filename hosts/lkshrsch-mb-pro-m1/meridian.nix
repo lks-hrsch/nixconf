@@ -15,8 +15,6 @@
       meridianBase =
         inputs.meridian.packages.${pkgs.stdenv.hostPlatform.system}.meridian
           or inputs.meridian.packages.${pkgs.stdenv.hostPlatform.system}.default;
-      # Meridian >= 1.53 takes claude-code from nixpkgs and is meta.broken
-      # when it's too old; inject the overlay build (overlays/claude-code.nix).
       meridian = meridianBase.override { claude-code = pkgs.unstable.claude-code; };
 
       keyPath = config.sops.secrets."meridian/api-key".path;

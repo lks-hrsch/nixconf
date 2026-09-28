@@ -15,30 +15,35 @@ _: {
               tmux.enable = true;
             };
 
-            # global system packages
             environment.systemPackages = with pkgs; [
-              unstable.btop
               ghosttyTerminfo # infocmp -x xterm-ghostty | ssh YOUR-SERVER -- tic -x -
               pciutils
               usbutils
+              unstable.btop
             ];
           };
       in
       {
         nixos.zsh =
-          { pkgs, ... }@args:
-          (baseZshConfig args)
-          // {
+          { pkgs, ... }:
+          {
+            imports = [ baseZshConfig ];
             users.defaultUserShell = pkgs.zsh;
           };
 
         darwin.zsh = baseZshConfig;
 
         homeManager.zsh =
-          { lib, pkgs, config, ... }:
+          {
+            lib,
+            pkgs,
+            config,
+            ...
+          }:
           {
             home.packages = with pkgs; [
               jq
+              yq
               wget
               nmap
               iperf3
@@ -94,6 +99,9 @@ _: {
               btop = {
                 enable = true;
                 package = pkgs.unstable.btop;
+                settings = {
+                  disks_filter = "exclude=/mnt/mars/backup /mnt/mars/benchmark /mnt/mars/datasets /mnt/mars/home /mnt/mars/media /mnt/mars/photos /mnt/mars/university";
+                };
               };
             };
           };

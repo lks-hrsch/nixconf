@@ -20,7 +20,7 @@
               home = {
                 inherit (config.flake.users.owner) username;
                 homeDirectory = lib.mkForce config.flake.users.owner.home.nixos;
-                stateVersion = "25.05";
+                stateVersion = "25.11";
               };
             }
           )

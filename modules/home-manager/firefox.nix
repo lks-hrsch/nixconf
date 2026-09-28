@@ -135,6 +135,7 @@
               youtube-shorts-block
               web-clipper-obsidian
               onepassword-password-manager
+              bitwarden
             ];
           };
         };

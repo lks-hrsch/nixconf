@@ -8,7 +8,6 @@
       home-manager = {
         sharedModules = [
           inputs.sops-nix.homeManagerModules.sops
-          inputs.mac-app-util.homeManagerModules.default
           inputs.stylix.homeModules.stylix
         ];
         useGlobalPkgs = true;
@@ -21,7 +20,7 @@
               home = {
                 inherit (config.flake.users.owner) username;
                 homeDirectory = lib.mkForce config.flake.users.owner.home.darwin;
-                stateVersion = "25.05";
+                stateVersion = "25.11";
               };
             }
           )

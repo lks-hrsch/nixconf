@@ -8,24 +8,8 @@ _: {
     let
       secretPath = name: config.sops.secrets."opencode/provider/${name}".path;
 
-      superpowers = pkgs.fetchFromGitHub {
-        owner = "obra";
-        repo = "superpowers";
-        rev = "3dcbd5c4b48e02263fbf4a3c01e3fe4f81d584d9"; # v6.2.0
-        hash = "sha256-F5LEk0yNWbMpan1vZSFZM76XSpsFGvA7h8q6Idrvenk=";
-      };
-      ponytail = pkgs.fetchFromGitHub {
-        owner = "DietrichGebert";
-        repo = "ponytail";
-        rev = "16f29800fd2681bdf24f3eb4ccffe38be3baec6b"; # v4.8.4 + 53
-        hash = "sha256-Y7d4s7uqjH6IbEXhqAiQ+yaxr6iiGcv2X64LuMtG1T8=";
-      };
-      caveman = pkgs.fetchFromGitHub {
-        owner = "JuliusBrussee";
-        repo = "caveman";
-        rev = "fcf7663366c217dc8f334a11028de52ed950ceab"; # v1.10.0
-        hash = "sha256-3lPEPb+hzomLLz4xfU7wQS++10gXP0UbXHXq/yluAGM=";
-      };
+      inherit (import ../../overlays/claude-plugin-sources.nix pkgs) superpowers ponytail caveman;
+
       makeModel = name: context: output: {
         "name" = name;
         "limit" = {
@@ -53,8 +37,8 @@ _: {
           "skills"."paths" = [ "${caveman}/skills" ];
           "plugin" = [
             # Retained existing version-pinned OpenCode npm plugins.
-            "opencode-with-claude@1.6.14"
-            "@tarquinen/opencode-dcp@3.1.14"
+            "opencode-with-claude@1.10.1"
+            "@tarquinen/opencode-dcp@3.1.15"
             # New native integrations are store-backed and installer-free.
             "${superpowers}/.opencode/plugins/superpowers.js"
             "${ponytail}/.opencode/plugins/ponytail.mjs"

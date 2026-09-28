@@ -1,14 +1,26 @@
-_:
-{
+_: {
   flake.modules.nixos.alloy =
     {
       config,
       lib,
-      pkgs,
       ...
     }:
     let
       cfg = config.alloy;
+
+      # Shared by every host importing this module: same Loki basic-auth
+      # secrets, same sops file, one canonical path regardless of which
+      # host's directory depth it used to be interpolated from.
+      monitoringSecret =
+        extra:
+        {
+          sopsFile = ../../secrets/secrets-mars-deimos.yaml;
+          owner = "apps";
+          group = "apps";
+          mode = "0400";
+          restartUnits = [ "alloy.service" ];
+        }
+        // extra;
 
       alloyConfig = ''
         // ---------- Sources ----------
@@ -25,24 +37,37 @@ _:
         }
 
         // Rules-only relabel block: forward_to is empty by design;
-        // loki.source.journal consumes the rules directly.
+        // loki.source.journal consumes the rules directly. __journal_*
+        // fields only exist at this relabeling stage, so the Podman-origin
+        // drop must happen here rather than in loki.process below.
         loki.relabel "journal_units" {
           forward_to = []
+      ''
+      + lib.optionalString cfg.collectPodman ''
+        rule {
+          // conmon writes CONTAINER_ID_FULL to the journal for every
+          // container log line (journald log driver); Alloy exposes it
+          // as __journal_<lowercased field name>. Only safe to drop when
+          // collectPodman is true: without the Podman-socket collector
+          // below to catch them, dropping these here would silently
+          // discard container logs instead of deduping them, so this
+          // whole rule is conditional on the same flag that gates that
+          // collector.
+          source_labels = ["__journal_container_id_full"]
+          regex         = ".+"
+          action        = "drop"
+        }
+      ''
+      + ''
           rule {
             source_labels = ["__journal__systemd_unit"]
             target_label  = "unit"
           }
         }
 
-        // Drop journal entries that came from Podman containers (they are
-        // collected with richer metadata via the Podman socket below) and
-        // drop Alloy's own output to avoid feedback loops.
+        // Drop Alloy's own output to avoid feedback loops.
         loki.process "host_journal" {
           forward_to = [loki.write.alloy.receiver]
-          stage.match {
-            selector = "{__journal__podman_container_id=~\".+\"}"
-            action   = "drop"
-          }
           stage.match {
             selector = "{unit=\"alloy.service\"}"
             action   = "drop"
@@ -121,15 +146,6 @@ _:
           description = "Loki push URL (HTTPS, basic auth).";
         };
 
-        basicAuthEnvFile = lib.mkOption {
-          type = lib.types.path;
-          description = ''
-            Path to an env file (typically a SOPS template) that defines
-            ALLOY_LOKI_USER and ALLOY_LOKI_PASS. Loaded by systemd via
-            EnvironmentFile and read by Alloy via sys.env().
-          '';
-        };
-
         collectPodman = lib.mkOption {
           type = lib.types.bool;
           default = true;
@@ -141,18 +157,41 @@ _:
       };
 
       config = lib.mkIf cfg.enable {
+        sops = {
+          secrets = {
+            "monitoring/loki_basic_auth_user" = monitoringSecret {
+              key = "monitoring/loki/basic_auth_user";
+            };
+            "monitoring/loki_basic_auth_pass" = monitoringSecret {
+              key = "monitoring/loki/basic_auth_password";
+            };
+          };
+
+          templates."alloy/loki-auth.env" = {
+            owner = "apps";
+            group = "apps";
+            mode = "0400";
+            content = ''
+              ALLOY_LOKI_USER=${config.sops.placeholder."monitoring/loki_basic_auth_user"}
+              ALLOY_LOKI_PASS=${config.sops.placeholder."monitoring/loki_basic_auth_pass"}
+            '';
+          };
+        };
+
         services.alloy = {
           enable = true;
           extraFlags = [ "--stability.level=public-preview" ];
+          environmentFile = config.sops.templates."alloy/loki-auth.env".path;
         };
 
+        # configPath defaults to /etc/alloy and auto-derives reloadTriggers
+        # (SIGHUP) from every *.alloy file placed here — a hand-rolled
+        # restartTriggers would instead force a full restart on every change.
         environment.etc."alloy/config.alloy".text = alloyConfig;
 
-        systemd.services.alloy = {
-          serviceConfig.EnvironmentFile = cfg.basicAuthEnvFile;
-          serviceConfig.SupplementaryGroups = lib.mkIf cfg.collectPodman [ "podman" ];
-          restartTriggers = [ alloyConfig ];
-        };
+        systemd.services.alloy.serviceConfig.SupplementaryGroups = lib.mkIf cfg.collectPodman [
+          "podman"
+        ];
       };
     };
 }

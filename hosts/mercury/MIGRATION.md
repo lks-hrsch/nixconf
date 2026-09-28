@@ -4,8 +4,14 @@ Concise operator runbook for migrating mercury to the NixOS host definition in t
 
 ## Status
 
+Mercury is live in production (Traefik, Authelia, LLDAP, crowdsec, mealie,
+vaultwarden, searxng, netbird all running, deployed via
+`hosts/mercury/README.md`'s operational contract) — this migration is done.
+Kept as historical install reference; the checklist below is not re-verified
+against current secrets/LDAP state.
+
 - [x] Step 1 backup completed (stacks, docker inventory, volume archives, wg0.conf)
-- [ ] Migration install not yet completed
+- [x] Migration install completed
 
 ---
 
@@ -132,7 +138,7 @@ When `wg0` is healthy, switch to SSH over `10.10.1.1`.
 - Recommended bind DN: `uid=admin-authelia,ou=people,dc=lukashirsch,dc=de`.
 
 **Authelia OIDC Secret Management:**
-The OIDC keys and hashes are managed via SOPS in [secrets/stacks-mercury.yaml](secrets/stacks-mercury.yaml).
+The OIDC keys and hashes are managed via SOPS in [secrets/stacks-mercury.yaml](../../secrets/stacks-mercury.yaml).
 
 *Optional generation with Authelia CLI:*
 
@@ -155,7 +161,19 @@ authelia crypto hash generate pbkdf2 --variant sha512 --iterations 310000 --pass
 
 ## 7. Hardening and Maintenance
 
-1. Move remaining WireGuard keys to SOPS.
-2. Pin image versions (replace `latest` tags).
+1. ~~Move remaining WireGuard keys to SOPS.~~ Done — `vpn.nix` reads the wg0
+   private key and all preshared keys from sops.
+2. Pin image versions (replace `latest` tags). Pinned: traefik, crowdsec,
+   blocky, authelia, vaultwarden, mealie, mosquitto (`2.1-alpine`, minor
+   float). Still floating: searxng (`latest`), lldap (`stable`),
+   simple-ical-server (`latest`), and the three NetBird images:
+   - `netbird-server`, `netbird-dashboard`, and `netbird-proxy`
+     (`hosts/mercury/stacks/netbird.nix`) are still unpinned. `netbird-server`'s
+     OCI `org.opencontainers.image.version` label (`24.04`) is not a real
+     Docker Hub tag (confirmed 404), and `netbird-proxy` has no version label
+     at all — so the running versions can't be reliably read from the
+     container metadata the way the other services' were. Check the NetBird
+     admin UI's version display instead, then pin all three together
+     (upstream requires matching management/proxy versions).
 3. Optionally add Authelia forward-auth for Vaultwarden.
 4. Restrict SSH to VPN paths only.

@@ -1,20 +1,17 @@
-_: {
+{ config, ... }:
+let
+  inherit (config.flake.users.owner) username;
+in
+{
   flake = {
     modules = {
       nixos.podman =
+        { pkgs, ... }:
         {
-          pkgs,
-          ...
-        }:
-        {
-          # podman
           # https://mynixos.com/nixpkgs/options/virtualisation.podman
           # https://nixos.wiki/wiki/Podman
-          # Useful other development tools
-          environment.systemPackages = with pkgs; [
-            podman
-            podman-compose
-          ];
+          # virtualisation.podman.enable already installs the podman package itself.
+          environment.systemPackages = [ pkgs.podman-compose ];
 
           virtualisation = {
             containers = {
@@ -34,6 +31,12 @@ _: {
               autoUpdate.enable = true;
             };
           };
+
+          # dockerSocket.enable creates this group; membership is required to connect.
+          users.users.${username}.extraGroups = [ "podman" ];
+          # Pinned (not dynamic) so containers can join it by number via addGroups —
+          # podman resolves group names inside the container's /etc/group, not the host's.
+          users.groups.podman.gid = 569;
         };
 
       darwin.podman = _: {
@@ -62,18 +65,11 @@ _: {
       };
 
       homeManager.podman =
-        {
-          pkgs,
-          lib,
-          ...
-        }:
+        { pkgs, ... }:
         {
           home.packages = with pkgs; [
             kubectl
             minikube
-
-            argocd
-            kubeseal
           ];
 
           programs.k9s.enable = true;
