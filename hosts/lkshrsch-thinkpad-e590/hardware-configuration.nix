@@ -61,9 +61,6 @@
         tctiEnvironment.enable = true;
       };
 
-      # The cryptdata (SATA) crypttab entry belongs here — removed with the
-      # rest of the SATA config, see _sata-disabled.nix. Restore both together.
-
       services = {
         logind.settings.Login.HandleLidSwitch = "suspend";
         power-profiles-daemon.enable = true;

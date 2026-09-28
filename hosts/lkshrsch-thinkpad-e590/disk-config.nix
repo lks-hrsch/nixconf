@@ -106,8 +106,8 @@ _: {
             };
           };
 
-          # SATA SSD disabled — see _sata-disabled.nix. Until it is fixed,
-          # Documents/Downloads/Obsidian.nosync are plain dirs under /home.
+          # SATA SSD is not managed by disko: plain ext4 scratch space,
+          # mounted by sata-scratchpad.nix.
         };
       };
     };
