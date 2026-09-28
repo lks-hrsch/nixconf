@@ -194,8 +194,8 @@ already in the declarative `u2f-mappings` authfile. Confirm the machine is on th
 over SSH before continuing.
 
 Then place the **user** copy of the age key. `modules/sops.nix` reads two
-separate paths — `/etc/sops/age/keys.txt` for the system (line 16) and
-`~/.config/sops/age/keys.txt` for home-manager (line 36). `--extra-files` can
+separate paths — `/etc/sops/age/keys.txt` for the system and
+`~/.config/sops/age/keys.txt` for home-manager. `--extra-files` can
 only stage the first: it runs before `/home/lkshrsch` exists, so the user copy
 has to be made after first boot, or `home-manager-lkshrsch.service` fails
 activation with `sops-install-secrets: cannot read keyfile`.
