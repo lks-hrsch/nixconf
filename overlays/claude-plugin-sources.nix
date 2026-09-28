@@ -5,8 +5,8 @@ pkgs: {
   superpowers = pkgs.fetchFromGitHub {
     owner = "obra";
     repo = "superpowers";
-    rev = "b36e0829c6d0140e93cfef2ca599b1b07d4a7797"; # v6.3.0
-    hash = "sha256-EsGNO0dULWf5Bx6bGrCv2kI2Z8aKH0kRvGiuN23wChQ=";
+    rev = "8ca22dba9a94f28898bbce59f2537ff4d87c747d"; # v6.4.2
+    hash = "sha256-BWPiXoXV+jePP+wn/Z+Af4iehIL7oei00plaWaTzq8s=";
   };
   # DietrichGebert/ponytail — repo root is both the marketplace and the plugin
   ponytail = pkgs.fetchFromGitHub {
@@ -20,7 +20,7 @@ pkgs: {
   caveman = pkgs.fetchFromGitHub {
     owner = "JuliusBrussee";
     repo = "caveman";
-    rev = "b82c0ad42c2bedc1f2cd78e414dadfaffbaaeec3"; # v2.6.0
-    hash = "sha256-tEQDv0sIsCzdzaq/tdUSN8nb2xmQJkmjPtq8wKChqvQ=";
+    rev = "8b0c1d3699b8d83e87fe4605b378da20c41555e0"; # v2.7.0
+    hash = "sha256-dsGzPscjy7FfaovfYML2q+RmuBJwwEJ9sjeHi+Niv6Y=";
   };
 }

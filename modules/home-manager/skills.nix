@@ -21,8 +21,8 @@ _: {
       mattpocockSkills = {
         owner = "mattpocock";
         repo = "skills";
-        rev = "801dca688564c529fa84f247f64472520d9ebe28";
-        hash = "sha256-nIA5wobtzjSoOe6ZgRiiUoLxkISEG9/Omk2OXg13twI=";
+        rev = "c55ee46073ed923f86ce59a5eb3b6d895095d1b7";
+        hash = "sha256-L3CpIT2DeI+fUFl9fcygojtQo2DzEen69rMD1XqR1vM=";
       };
 
       # name -> GitHub source pin + subdir containing SKILL.md
@@ -31,24 +31,17 @@ _: {
           # companion skill to the @bitbonsai/mcpvault MCP server (mcp.nix)
           owner = "bitbonsai";
           repo = "mcpvault";
-          rev = "ed18307c205c4c8bedc242601304fc4c50f63918";
-          hash = "sha256-3jAb7lWZAK0eEfL4nfYeP+KMnmS3dCfn/JKU0hJ8bf8=";
+          rev = "c5abeda9bed11864079f70ae7f33d134e294aad2";
+          hash = "sha256-K7MCnTBOtNYzJT1zz4v3H9y+N2lE1+S2xi8BNUXDEl0=";
           subdir = "skills/obsidian";
         };
         context7-mcp = {
           # companion skill to the context7 MCP server (mcp.nix)
           owner = "upstash";
           repo = "context7";
-          rev = "b1fb8b523263143db858d09698f9c67e3be79e33";
-          hash = "sha256-7bqUsYnpceA9GG/t/p24Y8c47YPHwYiYlJQ2Xqs/FzQ=";
+          rev = "e275a848a420e0d11c2822f61201ee005bfd1133";
+          hash = "sha256-K7zDZAIzkepCVzB18LIuqDRTrFk3Schpk8oQEQQb/ZU=";
           subdir = "skills/context7-mcp";
-        };
-        find-skills = {
-          owner = "vercel-labs";
-          repo = "skills";
-          rev = "2adcfe5a4cce0ce5f4d5547a997b2a161ec5d127";
-          hash = "sha256-176EeM1VhNSBH1cYUUy3oLST21PbV0v+tCNglfM9+6Y=";
-          subdir = "skills/find-skills";
         };
         grill-me = mattpocockSkills // {
           subdir = "skills/productivity/grill-me";
