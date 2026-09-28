@@ -157,8 +157,14 @@ password for the `nixos` user on the ISO and note its IP.
 # Recovery passphrase — used for both LUKS containers at install time
 (umask 077; printf '%s' 'YOUR-RECOVERY-PASSPHRASE' > /tmp/cryptroot.key)
 
-mkdir -p ~/e590-extra/etc/sops/age
+mkdir -p ~/e590-extra/etc/sops/age ~/e590-extra/var/lib/sbctl
 install -m 600 ~/.config/sops/age/keys.txt ~/e590-extra/etc/sops/age/keys.txt
+
+# Secure Boot key bundle. lanzaboote is enabled from the very first build and
+# refuses to install without its pkiBundle (/var/lib/sbctl), so stage it here.
+(umask 077; nix shell nixpkgs#sbctl -c sbctl create-keys \
+  --export ~/e590-extra/var/lib/sbctl/keys \
+  --database-path ~/e590-extra/var/lib/sbctl/GUID)
 
 nix run github:nix-community/nixos-anywhere -- \
   --flake .#lkshrsch-thinkpad-e590 \
@@ -170,6 +176,9 @@ nix run github:nix-community/nixos-anywhere -- \
 
 `--phases disko,install` deliberately omits `reboot`, leaving the new system
 mounted at `/mnt` for step 4.
+
+Delete `~/e590-extra` once the install succeeds: it holds the age key and the
+Secure Boot private keys, and the laptop now has its own copies.
 
 `facter.json` is already committed from the first hardware scan — no need to
 regenerate it. 1Password's SSH agent refuses automated signing, so this
@@ -239,19 +248,9 @@ Note this is about SSH *out of* the laptop. Incoming sshd is
 
 ### 6. Secure Boot keys (on the laptop)
 
-`sbctl` is in `environment.systemPackages` (`hardware-configuration.nix`), but
-on a fresh install that package is not on the machine yet — the deploy that
-brings it is the same one that enables lanzaboote, and lanzaboote refuses to
-build a signed generation without an existing key bundle. Break the cycle with
-a throwaway shell:
-
-```bash
-sudo nix shell nixpkgs#sbctl -c sbctl create-keys   # creates /var/lib/sbctl
-```
-
-Then enable `inputs.lanzaboote.nixosModules.lanzaboote` in
-`hardware-configuration.nix` — the import, `boot.loader.systemd-boot.enable =
-false`, and the `boot.lanzaboote` block — and deploy. Verify before rebooting:
+The key bundle staged in step 3 is already at `/var/lib/sbctl`, and lanzaboote
+signed the installed generation with it. Nothing to create or enable here;
+verify:
 
 ```bash
 sudo sbctl verify          # ESP is umask=0077, so every check here needs sudo
@@ -265,7 +264,8 @@ Upstream's getting-started guide shows the same `✗` line as expected output.
 Don't delete `/boot/EFI/nixos`: those are lanzaboote's own content-addressed
 kernel and initrd, not systemd-boot leftovers.
 
-Stale Type #1 entries in `/boot/loader/entries/` *are* leftovers, though, and
+If this disk ever booted via systemd-boot (an older install), stale Type #1
+entries in `/boot/loader/entries/` *are* leftovers, though, and
 point at kernel paths that no longer exist. Nothing regenerates them once
 `systemd-boot.enable = false`, and under Secure Boot they'd be dud menu
 entries. Delete them; the UKIs are Type #2 and auto-discovered from the
@@ -399,16 +399,20 @@ After install, on the laptop:
   and PAM enrollments are tracked separately and both must be revoked.
 - **Lost all YubiKeys**: boot to the recovery passphrase prompt for
   `cryptroot` (always a valid key slot); TPM2 still unlocks `cryptswap`.
-- **`sbctl` after a BIOS reset clears Secure Boot keys**: redo step 6 from
-  `sudo sbctl create-keys` — no reinstall needed, the enrolled LUKS slots are
-  untouched.
+- **`sbctl` after a BIOS reset clears Secure Boot keys**: redo step 6's
+  enrollment (Setup Mode, then `sudo sbctl enroll-keys --microsoft`). The keys
+  in `/var/lib/sbctl` are unchanged, no reinstall needed, and the enrolled LUKS
+  slots are untouched.
 - **RAM upgrade to 32 GB**: no config change needed — the 48G swap partition
   already covers hibernating at 32G RAM with headroom.
 
 ### Faster reinstalls
 
 A full reinstall re-uploads the whole closure. To reuse what is already on
-`@nix`, boot the ISO and run disko in `mount` mode instead of `disko` mode:
+`@nix`, boot the ISO and run disko in `mount` mode instead of `disko` mode.
+Stage only the age key in `~/e590-extra` for this: `/var/lib/sbctl` survives on
+`@root`, and freshly generated keys would overwrite the ones already enrolled
+in firmware.
 
 ```bash
 # disko's mount mode does NOT open cryptroot — do it by hand first

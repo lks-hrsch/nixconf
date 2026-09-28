@@ -44,8 +44,8 @@
           efi.canTouchEfiVariables = true;
         };
 
-        # pkiBundle must already exist on the target (`sbctl create-keys`,
-        # README step 6) or the generation builds unsigned.
+        # pkiBundle must exist before the first build or lanzaboote refuses to
+        # install; README step 3 stages it via nixos-anywhere --extra-files.
         lanzaboote = {
           enable = true;
           pkiBundle = "/var/lib/sbctl";
