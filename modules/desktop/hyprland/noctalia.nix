@@ -337,63 +337,67 @@ in
               visible = true;
             };
 
-            widget = {
-              # Login boxes — positions are monitor-geometry-specific
-              "lockscreen-login-box@${primary}" = {
-                box_height = 0.0;
-                box_width = 0.0;
-                cx = 1280.0;
-                cy = 1317.0;
-                output = primary;
-                rotation = 0.0;
-                type = "login_box";
-              };
-            }
-            // lib.optionalAttrs (secondary != null) {
-              "lockscreen-login-box@${secondary}" = {
-                box_height = 0.0;
-                box_width = 0.0;
-                cx = 540.0;
-                cy = 1797.0;
-                output = secondary;
-                rotation = 0.0;
-                type = "login_box";
-              };
-            }
-            // {
-              "lockscreen-widget-0000000000000001" = {
-                box_height = 176.0;
-                box_width = 512.0;
-                cx = 1280.0;
-                cy = 1168.0;
-                output = primary;
-                rotation = 0.0;
-                type = "media_player";
-                settings = {
-                  hide_when_no_media = true;
-                  layout = "horizontal";
+            # Per-host overrides (osConfig.desktop.lockscreen, modules/desktop/base.nix)
+            # merge over these 2560x1440-primary defaults.
+            widget = lib.recursiveUpdate (
+              {
+                # Login boxes — positions are monitor-geometry-specific
+                "lockscreen-login-box@${primary}" = {
+                  box_height = 0.0;
+                  box_width = 0.0;
+                  cx = 1280.0;
+                  cy = 1317.0;
+                  output = primary;
+                  rotation = 0.0;
+                  type = "login_box";
                 };
-              };
-              "lockscreen-widget-0000000000000002" = {
-                box_height = 176.0;
-                box_width = 512.0;
-                cx = 1840.0;
-                cy = 256.0;
-                output = primary;
-                rotation = 0.0;
-                type = "weather";
-              };
-              "lockscreen-widget-0000000000000003" = {
-                box_height = 176.0;
-                box_width = 512.0;
-                cx = 1296.0;
-                cy = 256.0;
-                output = primary;
-                rotation = 0.0;
-                type = "clock";
-                settings.clock_style = "digital";
-              };
-            };
+              }
+              // lib.optionalAttrs (secondary != null) {
+                "lockscreen-login-box@${secondary}" = {
+                  box_height = 0.0;
+                  box_width = 0.0;
+                  cx = 540.0;
+                  cy = 1797.0;
+                  output = secondary;
+                  rotation = 0.0;
+                  type = "login_box";
+                };
+              }
+              // {
+                "lockscreen-widget-0000000000000001" = {
+                  box_height = 176.0;
+                  box_width = 512.0;
+                  cx = 1280.0;
+                  cy = 1168.0;
+                  output = primary;
+                  rotation = 0.0;
+                  type = "media_player";
+                  settings = {
+                    hide_when_no_media = true;
+                    layout = "horizontal";
+                  };
+                };
+                "lockscreen-widget-0000000000000002" = {
+                  box_height = 176.0;
+                  box_width = 512.0;
+                  cx = 1840.0;
+                  cy = 256.0;
+                  output = primary;
+                  rotation = 0.0;
+                  type = "weather";
+                };
+                "lockscreen-widget-0000000000000003" = {
+                  box_height = 176.0;
+                  box_width = 512.0;
+                  cx = 1296.0;
+                  cy = 256.0;
+                  output = primary;
+                  rotation = 0.0;
+                  type = "clock";
+                  settings.clock_style = "digital";
+                };
+              }
+            ) osConfig.desktop.lockscreen;
           };
 
           # ── Dock (disabled) ──────────────────────────────────────────────────

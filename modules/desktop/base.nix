@@ -28,6 +28,19 @@
         '';
       };
 
+      options.desktop.lockscreen = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+        description = ''
+          Per-host overrides for noctalia's lockscreen_widgets.widget. The
+          defaults are positioned for a 2560x1440 primary output; hosts with
+          another resolution move the widgets here.
+        '';
+        example = lib.literalExpression ''
+          { "lockscreen-login-box@eDP-1" = { cx = 960.0; cy = 957.0; }; }
+        '';
+      };
+
       config = {
         i18n.inputMethod = {
           enable = true;

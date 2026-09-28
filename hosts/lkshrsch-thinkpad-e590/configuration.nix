@@ -62,6 +62,25 @@
           "clock"
         ];
       };
+      # 1920x1080 panel: keep the defaults' offsets from centre / bottom edge.
+      desktop.lockscreen = {
+        "lockscreen-login-box@eDP-1" = {
+          cx = 960.0;
+          cy = 957.0;
+        };
+        "lockscreen-widget-0000000000000001" = {
+          cx = 960.0;
+          cy = 808.0;
+        }; # media
+        "lockscreen-widget-0000000000000002" = {
+          cx = 1520.0;
+          cy = 192.0;
+        }; # weather
+        "lockscreen-widget-0000000000000003" = {
+          cx = 976.0;
+          cy = 192.0;
+        }; # clock
+      };
 
       services.fwupd.enable = true;
 
