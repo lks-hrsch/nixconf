@@ -83,9 +83,10 @@ UEFI firmware (Secure Boot ON)
 `cryptroot` and `cryptswap` deliberately use **different** factors, not the same
 key: LUKS keyslots are alternatives (any one unlocks), not a conjunction — there
 is no "TPM2 *and* FIDO2" mode in systemd or cryptsetup. Putting root behind
-FIDO2 matters because greetd autologins straight to the desktop
-(see [Access model](#access-model)); TPM2-only root would make a stolen laptop
-self-boot into a live session. FIDO2 is enrolled **without** a client PIN
+FIDO2 means a stolen laptop cannot self-boot with `/` already decrypted, which
+a TPM2-only root would allow; the greeter's password + touch gate
+(see [Access model](#access-model)) is then a second layer, not the only one.
+FIDO2 is enrolled **without** a client PIN
 (`--fido2-with-client-pin=no`), so unlocking root is possession + touch, not a
 true two-factor — see the security note in step 8.
 
@@ -102,8 +103,11 @@ image undecryptable on resume.
 Read this before installing — it is easy to end up with a machine you cannot
 administer.
 
-- greetd uses `initial_session` (`modules/desktop/hyprland/base.nix`), i.e.
-  **autologin** as `lkshrsch`. Reaching the desktop needs no password.
+- greetd runs the noctalia greeter as `default_session`
+  (`modules/desktop/hyprland/noctalia-greeter.nix`); there is no autologin.
+  Its PAM stack has `pam_u2f` as `required` (`modules/nixos/yubikey.nix`), so
+  reaching the desktop needs a registered YubiKey touch **and** the password.
+  The lockscreen and TTY logins go through PAM `login`, wired the same way.
 - `sudo` **does** need one (`security.sudo.wheelNeedsPassword = true`) — but
   `security.pam.services.sudo.u2f.enable` (`modules/nixos/yubikey.nix`) puts
   `pam_u2f` ahead of the password check as `sufficient`, so a registered
@@ -118,7 +122,7 @@ administer.
 
 Therefore step 4 of the runbook — setting passwords inside `nixos-enter`
 before the first reboot — is not optional. Skip it and the only route to root
-is reinstalling. `/etc/shadow` lives on the persistent `@root`, so this is a
+is reinstalling (the greeter can't log you in either). `/etc/shadow` lives on the persistent `@root`, so this is a
 genuine one-time step.
 
 ## First-install runbook
@@ -184,8 +188,9 @@ sudo reboot
 
 ### 5. First boot
 
-Unlock with the recovery passphrase from step 3. greetd autologins into
-Hyprland. Confirm the machine is on the network (`ip -br addr`) and reachable
+Unlock with the recovery passphrase from step 3. Log in at the greeter:
+touch a registered YubiKey, then enter the step-4 password. Both keys are
+already in the declarative `u2f-mappings` authfile. Confirm the machine is on the network (`ip -br addr`) and reachable
 over SSH before continuing.
 
 Then place the **user** copy of the age key. `modules/sops.nix` reads two
@@ -327,9 +332,9 @@ sudo systemd-cryptenroll --fido2-device=auto \
 
 > **Security note.** `--fido2-with-client-pin=no` means unlocking `cryptroot`
 > needs only possession of a YubiKey plus a touch — one factor, not two.
-> Combined with greetd's autologin, whoever has the laptop *and* a key reaches
-> a live desktop with no further prompt. This is a deliberate trade for a
-> touch-only boot (no PIN to type before the desktop even loads); flip
+> Whoever has the laptop *and* a key gets past disk encryption; the greeter
+> still asks for the password. This is a deliberate trade for a touch-only
+> boot (no PIN to type at the LUKS prompt); flip
 > `--fido2-with-client-pin=yes` and re-enroll if that trade should be undone.
 
 If this machine already has a TPM2 slot on `cryptroot` from an earlier install
@@ -431,9 +436,10 @@ Without the manual `cryptsetup open`, disko fails with
 `pam_gnome_keyring` derives the keyring's encryption key from the user's
 **login password** — FIDO2/U2F supplies no password, so no PAM configuration
 can make a YubiKey unlock it. This is a design limit of gnome-keyring, not a
-config gap. With greetd autologin (unchanged by this work), the keyring
-already gets no password today and prompts on first secret use; the YubiKey
-work does not change that. A workaround exists — program a YubiKey OTP slot as
+config gap. In practice this no longer bites: the greeter asks for the
+password (`pam_u2f` is `required` there, not `sufficient`, precisely so
+`pam_unix` and `pam_gnome_keyring` still run), and that password unlocks the
+keyring at login. It would only matter for a touch-only login. A workaround exists — program a YubiKey OTP slot as
 a static password and use that string as the keyring password — but it is not
 configured here: the password becomes a fixed string typed as keystrokes, and
 changing it means reprogramming the token.
