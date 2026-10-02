@@ -3,7 +3,7 @@ _: {
   # decoding, OpenAI-compatible API on 0.0.0.0:8080 (LAN). Tuned for this
   # 16 GB M1: Metal offload, 131k ctx (f16 KV ~2 GB), 2 slots.
   configurations.darwin."lkshrsch-mb-pro-m1".module =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     let
       # Pinned to the latest upstream release (newer than nixpkgs) for Gemma 4
       # MTP support and speculative-decoding fixes. To bump: update
@@ -45,42 +45,42 @@ _: {
         "$sfw" --unblockapp "${llama}/bin/llama-server" >/dev/null
       '';
 
-      # Daemon, not agent — see meridian.nix for the rationale.
+      # Daemon, not agent; `command` for wait4path — see meridian.nix for both.
       launchd.daemons.llama-cpp = {
+        command = lib.escapeShellArgs [
+          "${llama}/bin/llama-server"
+          "-m"
+          "${baseModel}"
+          "-md"
+          "${drafterModel}"
+          "--spec-type"
+          "draft-mtp"
+          "--spec-draft-n-max"
+          "1"
+          "-ngl"
+          "99"
+          "-fa"
+          "on"
+          "-c"
+          "131072"
+          "--parallel"
+          "2"
+          # Gemma 4 recommended sampling; per-request params override.
+          "--temp"
+          "1.0"
+          "--top-p"
+          "0.95"
+          "--top-k"
+          "64"
+          "--jinja"
+          "--host"
+          "0.0.0.0"
+          "--port"
+          "8080"
+        ];
         serviceConfig = {
           UserName = "lkshrsch";
           GroupName = "staff";
-          ProgramArguments = [
-            "${llama}/bin/llama-server"
-            "-m"
-            "${baseModel}"
-            "-md"
-            "${drafterModel}"
-            "--spec-type"
-            "draft-mtp"
-            "--spec-draft-n-max"
-            "1"
-            "-ngl"
-            "99"
-            "-fa"
-            "on"
-            "-c"
-            "131072"
-            "--parallel"
-            "2"
-            # Gemma 4 recommended sampling; per-request params override.
-            "--temp"
-            "1.0"
-            "--top-p"
-            "0.95"
-            "--top-k"
-            "64"
-            "--jinja"
-            "--host"
-            "0.0.0.0"
-            "--port"
-            "8080"
-          ];
           KeepAlive = true;
           RunAtLoad = true;
           StandardOutPath = "/Users/lkshrsch/Library/Logs/llama-cpp.log";

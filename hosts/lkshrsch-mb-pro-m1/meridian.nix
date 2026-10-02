@@ -60,9 +60,11 @@
       # Daemon, not agent: nix-darwin loads agents as root into the system
       # domain anyway; a UserName daemon runs there as lkshrsch and starts
       # at boot without a login (headless clamshell server).
+      # `command` (not ProgramArguments) so nix-darwin prepends wait4path:
+      # at boot launchd can spawn before the /nix volume mounts (EX_CONFIG).
       launchd.daemons.meridian = {
+        command = "${start}";
         serviceConfig = {
-          ProgramArguments = [ "${start}" ];
           UserName = "lkshrsch";
           GroupName = "staff";
           EnvironmentVariables = {
