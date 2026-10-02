@@ -1,10 +1,8 @@
 _: {
-  flake.modules.darwin.homebrew = _: {
-    # issues in newer macOS versions with mas package use brew version
-    # https://github.com/mas-cli/mas/issues/1029
-    # environment.systemPackages = with pkgs; [
-    #   mas # https://github.com/mas-cli/mas
-    # ];
+  flake.modules.darwin.homebrew = { lib, ... }: {
+    # nix-darwin's set-environment overrides path_helper, so /etc/paths.d/homebrew
+    # never applies. Appended so nix-provided binaries still win.
+    environment.systemPath = lib.mkAfter [ "/opt/homebrew/bin" ];
 
     # Homebrew configuration
     homebrew = {

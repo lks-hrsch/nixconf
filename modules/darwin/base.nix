@@ -73,6 +73,19 @@ in
                   expose-group-apps = true;
                   launchanim = false;
                   mru-spaces = false;
+                  show-recents = true;
+                  tilesize = 36;
+                  magnification = false;
+                  persistent-apps = [
+                    { app = "/System/Applications/Apps.app"; }
+                    { app = "/Applications/Safari.app"; }
+                    { app = "/Applications/Firefox.app"; }
+                    { app = "/System/Applications/Mail.app"; }
+                    { app = "/System/Applications/Siri AI.app"; }
+                    { app = "/Applications/Claude.app"; }
+                    { app = "/System/Applications/Utilities/Activity Monitor.app"; }
+                    { app = "/System/Applications/System Settings.app"; }
+                  ];
                 };
                 finder = {
                   AppleShowAllFiles = true;
