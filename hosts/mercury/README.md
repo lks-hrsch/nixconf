@@ -34,7 +34,7 @@ Notes:
 
 | Network | Purpose | Members |
 | --- | --- | --- |
-| proxy | Ingress/routing plane | Traefik, Authelia, LLDAP UI, NetBird server/dashboard/proxy, Vaultwarden, SearXNG, ical-feuerwehr, Mosquitto (ldr-connect) |
+| proxy | Ingress/routing plane | Traefik, Authelia, LLDAP UI, NetBird server/dashboard/proxy, Vaultwarden, SearXNG, ical-feuerwehr, Mosquitto (ldr-connect), Gatus |
 | id | Identity-only traffic | LLDAP, Authelia |
 | netbird | NetBird internal traffic | NetBird server, NetBird dashboard, NetBird proxy, CrowdSec |
 
@@ -51,6 +51,7 @@ Notes:
 | SearXNG | Metasearch engine | Public via Traefik on 443 (Authelia forward-auth) |
 | Mosquitto (ldr-connect) | MQTT broker for ldr-connect | MQTTS via Traefik TCP/SNI on 8883 |
 | ical-feuerwehr | Calendar feed (simple-ical-server) | Public via Traefik on 443 |
+| Gatus | Uptime dashboard (checks mercury + deimos over wg0, OIDC via Authelia) | `gatus.mercury.lukashirsch.de` via Traefik |
 | CrowdSec | IP-reputation engine; LAPI for the NetBird proxy bouncer | Internal only (netbird network) |
 
 ## Current Routing Notes
@@ -137,6 +138,7 @@ nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@m
 
 High-level, newest first. Details live in `git log -- hosts/mercury`.
 
+- 2026-10-04: **Gatus added** (`stacks/monitoring.nix`); shared module `modules/nixos/gatus.nix`.
 - 2026-10-04: NetBird images pinned; CrowdSec WAL enabled.
 - 2026-10-04: **Mealie moved to deimos** (`mealie.deimos.mars.lukashirsch.de`).
   Old `mealie.mercury` route dropped; Authelia OIDC redirect URI updated.
