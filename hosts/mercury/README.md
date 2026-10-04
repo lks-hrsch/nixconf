@@ -34,7 +34,7 @@ Notes:
 
 | Network | Purpose | Members |
 | --- | --- | --- |
-| proxy | Ingress/routing plane | Traefik, Authelia, LLDAP UI, NetBird server/dashboard/proxy, Vaultwarden, SearXNG, Mealie, ical-feuerwehr, Mosquitto (ldr-connect) |
+| proxy | Ingress/routing plane | Traefik, Authelia, LLDAP UI, NetBird server/dashboard/proxy, Vaultwarden, SearXNG, ical-feuerwehr, Mosquitto (ldr-connect) |
 | id | Identity-only traffic | LLDAP, Authelia |
 | netbird | NetBird internal traffic | NetBird server, NetBird dashboard, NetBird proxy, CrowdSec |
 
@@ -50,7 +50,6 @@ Notes:
 | Vaultwarden | Password manager | Public via Traefik on 443 |
 | SearXNG | Metasearch engine | Public via Traefik on 443 (Authelia forward-auth) |
 | Mosquitto (ldr-connect) | MQTT broker for ldr-connect | MQTTS via Traefik TCP/SNI on 8883 |
-| Mealie | Recipe manager (OIDC via Authelia) | Public via Traefik on 443 |
 | ical-feuerwehr | Calendar feed (simple-ical-server) | Public via Traefik on 443 |
 | CrowdSec | IP-reputation engine; LAPI for the NetBird proxy bouncer | Internal only (netbird network) |
 
@@ -86,7 +85,6 @@ Internet
       -> vaultwarden.*.lukashirsch.de (Vaultwarden, public)
       -> searxng.mercury.lukashirsch.de (SearXNG, Authelia forward-auth)
       -> lldap.mercury.lukashirsch.de (LLDAP UI)
-      -> mealie.mercury.lukashirsch.de (Mealie)
       -> calendar.ffw-freitelsdorf.*.lukashirsch.de (ical-feuerwehr)
 
 Identity plane
@@ -134,3 +132,18 @@ From macOS (builds on mercury):
 ```bash
 nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@mercury.lukashirsch.de --target-host root@mercury.lukashirsch.de
 ```
+
+## Changelog
+
+High-level, newest first. Details live in `git log -- hosts/mercury`.
+
+- 2026-10-04: NetBird images pinned; CrowdSec WAL enabled.
+- 2026-10-04: **Mealie moved to deimos** (`mealie.deimos.mars.lukashirsch.de`).
+  Old `mealie.mercury` route dropped; Authelia OIDC redirect URI updated.
+  Mercury keeps only the identity/edge workloads.
+- 2026-09-28: Authelia OIDC clients remember consent; refresh-token lifespan
+  extended.
+- 2026-08/09: Repo moved to the Dendritic layout; shared modules refactored.
+- 2026-04-09: Mercury declared as a flake-parts host (Traefik, Authelia,
+  LLDAP, CrowdSec, Vaultwarden, SearXNG, NetBird, ical-feuerwehr, ldr-connect
+  broker).
