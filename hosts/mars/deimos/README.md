@@ -70,6 +70,13 @@ nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --target-host root@1
 
 State below lives in web UIs or on disk, not in Nix.
 
+### Grafana service account (Claude MCP)
+
+The repo-level `.mcp.json` runs `grafana/mcp-grafana` read-only. Create
+`Administration → Service accounts → claude-mcp` (role **Viewer**), add a
+token, and store it in `secrets/secrets.yaml` as `mcp/grafana/token`
+(`mcp/grafana/url` = Grafana base URL).
+
 ### Arr instances (shared by Muxarr, Reclaimerr, Houndarr)
 
 Connect all six using media-network DNS names and **internal** ports (not the

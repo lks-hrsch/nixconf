@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "grafana": {
+      "command": "sh",
+      "args": [
+        "-c",
+        "s=$HOME/.config/sops-nix/secrets/mcp/grafana; export GRAFANA_URL=$(cat \"$s/url\") GRAFANA_SERVICE_ACCOUNT_TOKEN=$(cat \"$s/token\"); exec podman run --rm -i --pull=missing -e GRAFANA_URL -e GRAFANA_SERVICE_ACCOUNT_TOKEN docker.io/grafana/mcp-grafana:2.0.0 -t stdio --disable-write --usage-stats=disabled --enabled-tools search,datasource,loki,influxdb,dashboard,folder,navigation,alerting,annotations"
+      ]
+    }
+  }
+}

@@ -63,6 +63,9 @@ _: {
                 "opencode/provider/workstation-nixos/api-key" = { };
 
                 "mcp/tavily/api-key" = { };
+
+                "mcp/grafana/url" = { };
+                "mcp/grafana/token" = { };
               };
             };
 
