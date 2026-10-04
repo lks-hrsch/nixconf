@@ -81,6 +81,10 @@ in
       };
 
       settings = {
+        # /metrics is registered before the security gate (unauthenticated), so
+        # Traefik must not route it; Prometheus scrapes the container directly.
+        metrics = true;
+
         storage = {
           type = "sqlite";
           path = "/data/data.db";
@@ -131,6 +135,12 @@ in
           default = "root";
           description = "User name owning the secret and data dir.";
         };
+        metricsPublish = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = null;
+          example = "10.10.1.1:8081";
+          description = "host:port to publish the container's 8080 on for off-host Prometheus scrapes.";
+        };
         uid = lib.mkOption {
           type = lib.types.str;
           default = "0";
@@ -170,6 +180,7 @@ in
             environmentFiles = [ config.sops.templates."gatus.env".path ];
             networks = [ networks.proxy.ref ];
             networkAliases = [ "gatus" ];
+            publishPorts = lib.optional (cfg.metricsPublish != null) "${cfg.metricsPublish}:8080/tcp";
             volumes = [
               "/etc/localtime:/etc/localtime:ro"
               "${gatusConfig}:/config/config.yaml:ro"
@@ -177,7 +188,7 @@ in
             ];
             podmanArgs = [
               "--label=traefik.enable=true"
-              "--label=traefik.http.routers.gatus.rule=Host(`${cfg.fqdn}`)"
+              "--label=traefik.http.routers.gatus.rule=Host(`${cfg.fqdn}`) && !Path(`/metrics`)"
               "--label=traefik.http.routers.gatus.entrypoints=websecure"
               "--label=traefik.http.routers.gatus.tls=true"
               "--label=traefik.http.routers.gatus.tls.certresolver=letsencrypt"

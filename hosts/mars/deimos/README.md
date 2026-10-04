@@ -41,7 +41,7 @@ container (see `learned-facts.md`).
 | `stacks/immich.nix` | Immich (server, ML, Valkey, Postgres), Immich Power Tools |
 | `stacks/ai.nix` | Open WebUI, LiteLLM |
 | `stacks/mealie.nix` | Mealie (recipes, OIDC via Authelia) |
-| `stacks/monitoring.nix` | Grafana, Loki, InfluxDB, Scrutiny |
+| `stacks/monitoring.nix` | Grafana, Loki, Prometheus (pull jobs + remote-write receiver at `prometheus.deimos…`, basic auth shared with Loki), InfluxDB, Scrutiny |
 | `stacks/monitoring.nix` (Gatus part) | Gatus uptime dashboard (`gatus.deimos…`, OIDC via Authelia); checks in `gatusChecks.deimos`, container in `modules/nixos/gatus.nix` |
 | `stacks/smarthome.nix` | ESPHome, Mosquitto, Zigbee2MQTT |
 | `stacks/omada.nix` | Omada controller |
@@ -183,6 +183,7 @@ note when `systemctl --failed` is clean.
 
 High-level, newest first. Details live in `git log -- hosts/mars/deimos`.
 
+- 2026-10-04: **Metrics pipeline**: Alloy pushes node metrics (all Alloy hosts) to Prometheus; Prometheus scrapes Traefik, blocky (`:4000`), Grafana, Loki, InfluxDB, Gatus and mercury's Authelia/NetBird/CrowdSec over wg0; Grafana dashboards Node Exporter Full (1860), Traefik (17346), Blocky (13768), Gatus.
 - 2026-10-04: **Gatus added** (`stacks/monitoring.nix`), cross-watching mercury.
 - 2026-10-04: **Mealie moved here from mercury** (`stacks/mealie.nix`).
 - 2026-09: Muxarr, Reclaimerr and Houndarr added to the media stack;

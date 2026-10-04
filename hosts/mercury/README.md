@@ -138,6 +138,7 @@ nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@m
 
 High-level, newest first. Details live in `git log -- hosts/mercury`.
 
+- 2026-10-04: **Metrics published on wg0 only** (`10.10.1.1`) for Prometheus on deimos: Traefik `:8082`, blocky `:4000`, Authelia `:9959`, NetBird `:9090`, CrowdSec `:6060`, Gatus `:8081`. Host metrics are pushed by Alloy.
 - 2026-10-04: **Gatus added** (`stacks/monitoring.nix`); shared module `modules/nixos/gatus.nix`.
 - 2026-10-04: NetBird images pinned; CrowdSec WAL enabled.
 - 2026-10-04: **Mealie moved to deimos** (`mealie.deimos.mars.lukashirsch.de`).

@@ -128,6 +128,37 @@ _: {
             }
           }
         }
+
+        // ---------- Host metrics (pushed to Prometheus on deimos) ----------
+
+        prometheus.exporter.unix "host" {
+          disable_collectors = [${lib.concatMapStringsSep ", " (c: ''"${c}"'') cfg.disabledCollectors}]
+        }
+
+        prometheus.scrape "node" {
+          targets         = prometheus.exporter.unix.host.targets
+          job_name        = "node"
+          scrape_interval = "30s"
+          forward_to      = [prometheus.relabel.host.receiver]
+        }
+
+        prometheus.relabel "host" {
+          forward_to = [prometheus.remote_write.deimos.receiver]
+          rule {
+            target_label = "instance"
+            replacement  = "${cfg.hostLabel}"
+          }
+        }
+
+        prometheus.remote_write "deimos" {
+          endpoint {
+            url = "${cfg.metricsEndpoint}"
+            basic_auth {
+              username = sys.env("ALLOY_LOKI_USER")
+              password = sys.env("ALLOY_LOKI_PASS")
+            }
+          }
+        }
       '';
     in
     {
@@ -144,6 +175,22 @@ _: {
           type = lib.types.str;
           default = "https://loki.deimos.mars.lukashirsch.de/loki/api/v1/push";
           description = "Loki push URL (HTTPS, basic auth).";
+        };
+
+        metricsEndpoint = lib.mkOption {
+          type = lib.types.str;
+          default = "https://prometheus.deimos.mars.lukashirsch.de/api/v1/write";
+          description = "Prometheus remote-write URL (HTTPS, basic auth shared with Loki).";
+        };
+
+        disabledCollectors = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          example = [
+            "hwmon"
+            "zfs"
+          ];
+          description = "node_exporter collectors to disable (e.g. host-wide ones inside an LXC).";
         };
 
         collectPodman = lib.mkOption {
