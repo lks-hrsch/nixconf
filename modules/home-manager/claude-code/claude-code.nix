@@ -11,20 +11,20 @@ _: {
         text = builtins.readFile ./statusline-command.sh;
         executable = true;
       };
-      # anthropics/claude-plugins-official — pinned to latest main as of 2026-09-28
+      # anthropics/claude-plugins-official — pinned to latest main as of 2026-10-04
       official = pkgs.fetchFromGitHub {
         owner = "anthropics";
         repo = "claude-plugins-official";
-        rev = "fa59bc9037741ecfa131aa27938272605710d7b2";
-        hash = "sha256-3vqb/valY5deB8JT0ckbzTZ1Anqy9aqXvkKWWfg86yQ=";
+        rev = "d182ca456ca09d31d139f7d3818d1d333b103cce";
+        hash = "sha256-LQ78jO8fzutmPJSsc3XeA+KqEP8wOrhH8AQaDCr/Pd8=";
       };
       inherit (import ../../../overlays/claude-plugin-sources.nix pkgs) superpowers ponytail caveman;
 
       claude-mem = pkgs.fetchFromGitHub {
         owner = "thedotmack";
         repo = "claude-mem";
-        rev = "57c38303734482a596b3e2a052b969b30584be0d"; # v13.28.0
-        hash = "sha256-+8qVMzjXYTy3AwguFyKk3DsIN97hYtHHaoaqjKAYiVQ=";
+        rev = "94cb08b87271d0a5ee3ab6b241e62727abae7b4b"; # v13.29.0
+        hash = "sha256-D2qgQQ3ln1I6XXNptG0dDGSjhICXhFZcP3JPBgDqYhE=";
       };
       # openai/codex-plugin-cc — "codex" plugin in the "openai-codex" marketplace
       codex-plugin-cc = pkgs.fetchFromGitHub {

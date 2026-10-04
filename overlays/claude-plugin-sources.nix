@@ -12,8 +12,8 @@ pkgs: {
   ponytail = pkgs.fetchFromGitHub {
     owner = "DietrichGebert";
     repo = "ponytail";
-    rev = "1d95ff7d39de12d87014ea40d4e22201bddc501b"; # v4.10.0
-    hash = "sha256-PES5XrSYx0VBXWVHEDRykGy0SAmJfV/luzy8Gfg0aAQ=";
+    rev = "ef8ca48fed2321ab6668b2a954f23b1af97d7f6d"; # v4.10.3
+    hash = "sha256-aypYnQf+zkKGj+dfs+qFKTFIvaick9p0XJNtPkSwIB0=";
   };
   # JuliusBrussee/caveman — repo root is both marketplace and plugin. v2.0.0 added a
   # BSL-1.1 component (self-host free, resale licensed); /caveman itself stays MIT — fine for personal use.

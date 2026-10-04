@@ -9,12 +9,12 @@ _: {
       # MTP support and speculative-decoding fixes. To bump: update
       # version/rev/hash/npmDepsHash.
       llama = pkgs.unstable.llama-cpp.overrideAttrs (_old: {
-        version = "10299"; # nixpkgs stores version without "b"; tag = "b${version}"
+        version = "11396"; # nixpkgs stores version without "b"; tag = "b${version}"
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          rev = "e40bf886420d9449cee9aab8a417081cde4620d1"; # release b10299
-          hash = "sha256-j3wAW7HAzM6uOC96HgG+sXP8tR2I2zXiz+AQkTzIe7Y=";
+          rev = "2e7c58c5477478c8cf6e199cfaa5dcd5a4319c81"; # release b11396
+          hash = "sha256-A/lOQruMnQtWeD/1yTLADbHGYr8sy2JIlgoS4C3T0CU=";
         };
         # The bundled web UI's package-lock.json differs from the nixpkgs pin.
         npmDepsHash = "sha256-FHvd2bMvBc9EXrJEzu8EN78oUVSLcOKYCc0232V+L4A=";

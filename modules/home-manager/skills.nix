@@ -21,8 +21,8 @@ _: {
       mattpocockSkills = {
         owner = "mattpocock";
         repo = "skills";
-        rev = "c55ee46073ed923f86ce59a5eb3b6d895095d1b7";
-        hash = "sha256-L3CpIT2DeI+fUFl9fcygojtQo2DzEen69rMD1XqR1vM=";
+        rev = "24fe0ef7737efae15c87225755e9f6f5965e4888";
+        hash = "sha256-/mAmj7QFdyOWhLmy3Rt2/Hfsh5qwirTRax7hmQffFdo=";
       };
 
       # name -> GitHub source pin + subdir containing SKILL.md
@@ -39,8 +39,8 @@ _: {
           # companion skill to the context7 MCP server (mcp.nix)
           owner = "upstash";
           repo = "context7";
-          rev = "e275a848a420e0d11c2822f61201ee005bfd1133";
-          hash = "sha256-K7zDZAIzkepCVzB18LIuqDRTrFk3Schpk8oQEQQb/ZU=";
+          rev = "bfa02ea67b5707fe0e0a673faa49d0f50b28c80b";
+          hash = "sha256-5gckAd+rfGafB9KZPCS1jJqXjA2vF0VXoGHJngDFtUQ=";
           subdir = "skills/context7-mcp";
         };
         grill-me = mattpocockSkills // {
