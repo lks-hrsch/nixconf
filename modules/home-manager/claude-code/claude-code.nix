@@ -128,7 +128,13 @@ _: {
             outputStyle = "Concise";
             skillListingBudgetFraction = 0.05;
             model = "opusplan";
-            effortLevel = "high";
+            # Top-level effortLevel only applies to legacy/custom models (gateway aliases);
+            effortLevel = "xhigh";
+            modelSettings = {
+              "claude-opus-5-5".effortLevel = "high";
+              "claude-sonnet-5-5".effortLevel = "high";
+            };
+            spinnerTipsEnabled = false;
             cleanupPeriodDays = 30;
             permissions = {
               allow = [
@@ -148,8 +154,6 @@ _: {
                 "Bash(echo:*)"
                 "Bash(printf:*)"
                 # text transforms (stdin/pipeline, not file reading)
-                "Bash(sort:*)"
-                "Bash(uniq:*)"
                 "Bash(cut:*)"
                 "Bash(tr:*)"
                 # system info
@@ -158,30 +162,95 @@ _: {
                 # git read-only (structure/history, no file content)
                 "Bash(git log:*)"
                 "Bash(git status:*)"
-                "Bash(git branch:*)"
-                "Bash(git remote:*)"
+                "Bash(git branch)"
+                "Bash(git branch -a)"
+                "Bash(git branch --list *)"
+                "Bash(git remote -v)"
+                "Bash(git remote get-url *)"
+                "Bash(git diff *)"
+                "Bash(git show *)"
+                "Bash(git blame *)"
                 "Bash(git ls-files:*)"
                 "Bash(git stash list:*)"
                 "Bash(git rev-parse:*)"
                 # nix read-only
                 "Bash(nix flake show:*)"
                 "Bash(nix path-info:*)"
+                "Bash(nix eval *)"
+                "Bash(nix flake check *)"
+                "Bash(nix flake metadata *)"
+                "Bash(nix search *)"
+                "Bash(nix log *)"
+                # search / json
+                "Bash(rg *)"
+                "Bash(jq *)"
                 # web
+                "WebSearch"
                 "WebFetch(domain:github.com)"
                 "WebFetch(domain:raw.githubusercontent.com)"
                 "WebFetch(domain:nix.dev)"
                 "WebFetch(domain:mynixos.com)"
                 "WebFetch(domain:wiki.nixos.org)"
                 # mcp
-                "mcp__plugin_claude-code-home-manager_context7__resolve-library-id"
-                "mcp__plugin_claude-code-home-manager_context7__query-docs"
-                "mcp__plugin_claude-code-home-manager_nixos__nix"
-                "mcp__plugin_claude-code-home-manager_nixos__nix_versions"
-                "mcp__plugin_claude-code-home-manager_grep-app__searchGitHub"
-                "mcp__plugin_claude-code-home-manager_obsidian__read_note"
-                "mcp__plugin_claude-code-home-manager_obsidian__read_multiple_notes"
+                "mcp__plugin_claude-code-home-manager_context7__*"
+                "mcp__plugin_claude-code-home-manager_nixos__*"
+                "mcp__plugin_claude-code-home-manager_grep-app__*"
+                "mcp__plugin_claude-code-home-manager_websearch__*"
+                # obsidian: named read tools only (mcpvault is unpinned, a new write tool must not be auto-allowed)
+                "mcp__plugin_claude-code-home-manager_obsidian__read_*"
+                "mcp__plugin_claude-code-home-manager_obsidian__list_*"
+                "mcp__plugin_claude-code-home-manager_obsidian__get_*"
                 "mcp__plugin_claude-code-home-manager_obsidian__search_notes"
-                "mcp__plugin_claude-code-home-manager_obsidian__list_directory"
+                "mcp__grafana__*"
+                "mcp__plugin_claude-mem_mcp-search__search"
+                "mcp__plugin_claude-mem_mcp-search__timeline"
+                "mcp__plugin_claude-mem_mcp-search__get_observations"
+                "mcp__plugin_claude-mem_mcp-search__smart_*"
+              ];
+              # Text-match guardrails against mistakes, not a security boundary (/bin/rm, bash -c bypass Bash rules).
+              # Use Edit(...) for path rules: Write(...) path rules are ignored.
+              deny = [
+                # credentials (a Read deny also blocks Edit and cat/head/sed on the path)
+                "Read(~/.ssh/**)"
+                "Read(~/.gnupg/**)"
+                "Read(~/.config/sops/**)"
+                "Read(~/.config/op/**)"
+                "Read(~/.config/gh/**)"
+                "Read(~/.aws/**)"
+                "Read(~/.kube/**)"
+                "Read(~/.netrc)"
+                "Read(~/.git-credentials)"
+                "Read(**/.env)"
+                "Read(**/.env.*)"
+                "Read(**/*.pem)"
+                "Read(**/*.key)"
+                "Read(**/.git/git-crypt/**)"
+                # never deploy (see repo CLAUDE.md)
+                "Bash(nixos-rebuild switch*)"
+                "Bash(nixos-rebuild boot*)"
+                "Bash(nixos-rebuild test*)"
+                "Bash(darwin-rebuild switch*)"
+                "Bash(darwin-rebuild activate*)"
+                "Bash(./rebuild-*)"
+                "Bash(sudo *)"
+                # secret decryption
+                "Bash(sops -d*)"
+                "Bash(sops --decrypt*)"
+                "Bash(sops decrypt*)"
+                "Bash(git-crypt unlock*)"
+                "Bash(git-crypt export-key*)"
+                "Bash(op *)"
+                "Bash(gpg --export-secret*)"
+                "Bash(age -d*)"
+                "Bash(security find-*-password*)"
+                # destructive git / pipe-to-shell
+                "Bash(git push --force*)"
+                "Bash(git push -f*)"
+                "Bash(git reset --hard*)"
+                "Bash(git clean -f*)"
+                "Bash(git filter-branch*)"
+                "Bash(curl * | sh*)"
+                "Bash(curl * | bash*)"
               ];
               defaultMode = "default";
             };
