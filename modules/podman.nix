@@ -65,7 +65,7 @@ in
       };
 
       homeManager.podman =
-        { pkgs, ... }:
+        { pkgs, lib, ... }:
         {
           home.packages = with pkgs; [
             kubectl
@@ -73,6 +73,21 @@ in
           ];
 
           programs.k9s.enable = true;
+
+          # applehv (vfkit) is the only podman machine provider with Rosetta; libkrun hard-codes it off.
+          # Changing provider/rosetta only applies to a machine created afterwards (podman machine rm + init).
+          xdg.configFile."containers/containers.conf" = lib.mkIf pkgs.stdenv.isDarwin {
+            text = ''
+              [engine]
+              # pin compose to podman-compose: otherwise `podman compose` prefers the
+              # docker-compose binary on PATH, which would drive the Docker daemon
+              compose_providers = ["/opt/homebrew/bin/podman-compose"]
+
+              [machine]
+              provider = "applehv"
+              rosetta = true
+            '';
+          };
         };
     };
   };
