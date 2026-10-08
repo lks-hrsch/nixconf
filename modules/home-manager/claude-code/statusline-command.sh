@@ -25,7 +25,17 @@ lines_del=$(echo "$input" | jq -r '.cost.total_lines_removed // 0')
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // ""')
 FIVE_HR=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
 SEVEN_DAY=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+FIVE_HR_RESET=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty | floor')
 
+# Color a rate-limit percentage by how close the window is to exhaustion.
+quota_color() {
+  if [ "$1" -ge 80 ]; then printf '%s' "$RED"
+  elif [ "$1" -ge 50 ]; then printf '%s' "$YELLOW"
+  else printf '%s' "$GREEN"; fi
+}
+
+# Epoch seconds -> HH:MM. BSD/macOS date uses -r, GNU date uses -d.
+clock_time() { date -r "$1" +%H:%M 2>/dev/null || date -d "@$1" +%H:%M; }
 
 
 # ── Git info ──
@@ -102,7 +112,24 @@ if [ -f "$pony_flag" ]; then
   fi
 fi
 
-# ── Single line ──
+# ── Rate limits (second line): 5h with reset time + time left, 7d ──
+quota=""
+if [ -n "$FIVE_HR" ]; then
+  five_int=$(printf '%.0f' "$FIVE_HR")
+  quota="5h: $(quota_color "$five_int")${five_int}%${RESET}"
+  # Reset time is only useful once some of the window is actually spent.
+  if [ -n "$FIVE_HR_RESET" ] && [ "$five_int" -gt 0 ]; then
+    remaining=$(( FIVE_HR_RESET - $(date +%s) ))
+    [ "$remaining" -lt 0 ] && remaining=0
+    quota="${quota} ${DIM}→ $(clock_time "$FIVE_HR_RESET") ($(( remaining / 3600 ))h$(printf '%02d' $(( remaining % 3600 / 60 )))m left)${RESET}"
+  fi
+fi
+if [ -n "$SEVEN_DAY" ]; then
+  seven_int=$(printf '%.0f' "$SEVEN_DAY")
+  quota="${quota:+$quota ${DIM}|${RESET} }7d: $(quota_color "$seven_int")${seven_int}%${RESET}"
+fi
+
+# ── Line 1: session; line 2: rate limits (omitted without quota data) ──
 out=""
 [ -n "$pony" ] && out="$pony"
 [ -n "$repo" ] && out="${out:+$out }${BOLD}${YELLOW}${repo}${RESET}"
@@ -111,7 +138,7 @@ out="${out:+$out ${DIM}|${RESET} }${ctx_part}"
 out="${out} ${DIM}|${RESET} ${cost_part}"
 out="${out} ${DIM}|${RESET} ${velocity}"
 out="${out} ${DIM}|${RESET} ${MAGENTA}🤖 ${model}${RESET}"
-[ -n "$FIVE_HR" ] && out="${out} ${DIM}|${RESET} 5h: $(printf '%.0f' "$FIVE_HR")%"
-[ -n "$SEVEN_DAY" ] && out="${out} ${DIM}|${RESET} 7d: $(printf '%.0f' "$SEVEN_DAY")%"
 
 printf '%b' "$out"
+[ -n "$quota" ] && printf '\n%b' "$quota"
+exit 0
