@@ -5,22 +5,22 @@ pkgs: {
   superpowers = pkgs.fetchFromGitHub {
     owner = "obra";
     repo = "superpowers";
-    rev = "8ca22dba9a94f28898bbce59f2537ff4d87c747d"; # v6.4.2
-    hash = "sha256-BWPiXoXV+jePP+wn/Z+Af4iehIL7oei00plaWaTzq8s=";
+    rev = "bb92a77741419a4ab5f06e711a283343f1ada0c3"; # v7.0.0
+    hash = "sha256-UCVI+T7j1Xh1LDkrvnJduis7eHFqrizCyGTWAGW5d6U=";
   };
   # DietrichGebert/ponytail — repo root is both the marketplace and the plugin
   ponytail = pkgs.fetchFromGitHub {
     owner = "DietrichGebert";
     repo = "ponytail";
-    rev = "ef8ca48fed2321ab6668b2a954f23b1af97d7f6d"; # v4.10.3
-    hash = "sha256-aypYnQf+zkKGj+dfs+qFKTFIvaick9p0XJNtPkSwIB0=";
+    rev = "16352ac229eb08a9598dcae48fe9f2b342567d86"; # v5.3.2
+    hash = "sha256-IJlhfkdXI6pMZZCZO7XBRg88LBiNfzc5Gnm4ofGybL8=";
   };
   # JuliusBrussee/caveman — repo root is both marketplace and plugin. v2.0.0 added a
   # BSL-1.1 component (self-host free, resale licensed); /caveman itself stays MIT — fine for personal use.
   caveman = pkgs.fetchFromGitHub {
     owner = "JuliusBrussee";
     repo = "caveman";
-    rev = "8b0c1d3699b8d83e87fe4605b378da20c41555e0"; # v2.7.0
-    hash = "sha256-dsGzPscjy7FfaovfYML2q+RmuBJwwEJ9sjeHi+Niv6Y=";
+    rev = "d262ab3882952a59312ff3537cd86d894523c5ab"; # v4.0.1
+    hash = "sha256-2xZHdWkWJrPAJ8++qW0Xmb3eORZ41e+GsZjIphqTtlI=";
   };
 }
