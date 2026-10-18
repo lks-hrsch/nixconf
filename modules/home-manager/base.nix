@@ -13,7 +13,6 @@
     {
       imports = with config.flake.modules.homeManager; [
         claude-code
-        codex
         git
         gpg
         latex

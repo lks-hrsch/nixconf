@@ -23,15 +23,8 @@ _: {
       claude-mem = pkgs.fetchFromGitHub {
         owner = "thedotmack";
         repo = "claude-mem";
-        rev = "94cb08b87271d0a5ee3ab6b241e62727abae7b4b"; # v13.29.0
-        hash = "sha256-D2qgQQ3ln1I6XXNptG0dDGSjhICXhFZcP3JPBgDqYhE=";
-      };
-      # openai/codex-plugin-cc — "codex" plugin in the "openai-codex" marketplace
-      codex-plugin-cc = pkgs.fetchFromGitHub {
-        owner = "openai";
-        repo = "codex-plugin-cc";
-        rev = "db52e28f4d9ded852ab3942cea316258ae4ef346"; # v1.0.6
-        hash = "sha256-S/R4kHTcIHBcG0TRX063C7ILXZZm0oMqunchPGg6ToU=";
+        rev = "88ebc949f90af6509d780f9975661e4fae18efe2"; # v14.0.1
+        hash = "sha256-x7Y/hYY/ZpNFkWn7qz9/47jregyN9kP7coshTOcNZQ4=";
       };
     in
     {
@@ -99,7 +92,6 @@ _: {
           marketplaces = {
             inherit superpowers;
             inherit claude-mem;
-            openai-codex = codex-plugin-cc;
             inherit ponytail;
             inherit caveman;
           };
@@ -117,8 +109,6 @@ _: {
             superpowers
             # claude-mem
             "${claude-mem}/plugin"
-            # openai codex plugin — /codex:* review & delegate commands
-            "${codex-plugin-cc}/plugins/codex"
             # ponytail — lazy-senior-dev ruleset; /ponytail{,-review,-audit,-debt,-gain,-help}
             ponytail
             # caveman — ultra-compressed prose mode; /caveman, active by default
