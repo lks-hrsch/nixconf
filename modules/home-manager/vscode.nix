@@ -3,40 +3,41 @@
   flake.modules.homeManager.vscode =
     { pkgs, lib, ... }:
     let
-      marketplace = pkgs.vscode-marketplace-release;
+      # resolves each id to the newest marketplace release whose engine range accepts our VS Code build
+      extensionsFor = pkgs.nix4vscode.forVscodeVersion pkgs.unstable.vscode.version;
 
       # extensions for all profiles
-      # if they are not working properly append pkgs.unstable.vscode-extensions. in front of the extension id
-      defaultExtensions = with marketplace; [
-        pkief.material-icon-theme
-        christian-kohler.path-intellisense
-        ms-vscode-remote.remote-containers
-        ms-vscode-remote.remote-ssh
-        ms-vscode-remote.remote-ssh-edit
+      # to pin a specific version append it to the id, e.g. "publisher.name.1.2.3"
+      defaultExtensions = [
+        "pkief.material-icon-theme"
+        "christian-kohler.path-intellisense"
+        "ms-vscode-remote.remote-containers"
+        "ms-vscode-remote.remote-ssh"
+        "ms-vscode-remote.remote-ssh-edit"
 
         # some useful tools
-        tomoki1207.pdf # PDF viewer
-        davidanson.vscode-markdownlint
-        tamasfe.even-better-toml
-        ms-azuretools.vscode-containers
-        mermaidchart.vscode-mermaid-chart
+        "tomoki1207.pdf" # PDF viewer
+        "davidanson.vscode-markdownlint"
+        "tamasfe.even-better-toml"
+        "ms-azuretools.vscode-containers"
+        "mermaidchart.vscode-mermaid-chart"
 
         # git
-        mhutchie.git-graph
-        donjayamanne.githistory
+        "mhutchie.git-graph"
+        "donjayamanne.githistory"
 
-        github.vscode-pull-request-github
-        github.vscode-github-actions
+        "github.vscode-pull-request-github"
+        "github.vscode-github-actions"
 
         # AI Tools
-        anthropic.claude-code
-        sst-dev.opencode
+        "anthropic.claude-code"
+        "sst-dev.opencode"
 
         # nix extensions
-        jnoortheen.nix-ide
+        "jnoortheen.nix-ide"
 
         # yaml
-        redhat.vscode-yaml
+        "redhat.vscode-yaml"
       ];
 
       # settings for all profiles
@@ -125,53 +126,44 @@
 
           profiles = {
             default = {
-              extensions = defaultExtensions;
+              extensions = extensionsFor defaultExtensions;
               userSettings = defaultSettings;
               enableMcpIntegration = true;
             };
 
             "${config.flake.users.owner.username}" = {
-              extensions =
+              extensions = extensionsFor (
                 defaultExtensions
-                ++ (with marketplace; [
+                ++ [
                   # Add additional extensions specific to the owner profile here
                   # C/C++ extensions
-                  llvm-vs-code-extensions.vscode-clangd
+                  "llvm-vs-code-extensions.vscode-clangd"
                   # vadimcn.vscode-lldb
 
                   # Rust extensions
-                  rust-lang.rust-analyzer
-                  tauri-apps.tauri-vscode
+                  "rust-lang.rust-analyzer"
+                  "tauri-apps.tauri-vscode"
 
                   # python extensions
-                  ms-python.python
-                  ms-python.vscode-pylance
-                  ms-python.debugpy
-                  meta.pyrefly
-                  charliermarsh.ruff
-                  ms-toolsai.jupyter
-                  ms-toolsai.jupyter-keymap
-                  ms-toolsai.jupyter-renderers
-                  ms-toolsai.vscode-jupyter-slideshow
-                  ms-toolsai.vscode-jupyter-cell-tags
-                  ms-toolsai.vscode-jupyter-powertoys
+                  "ms-python.python"
+                  "ms-python.vscode-pylance"
+                  "ms-python.debugpy"
+                  "meta.pyrefly"
+                  "charliermarsh.ruff"
+                  "ms-toolsai.jupyter"
+                  "ms-toolsai.jupyter-keymap"
+                  "ms-toolsai.jupyter-renderers"
+                  "ms-toolsai.vscode-jupyter-slideshow"
+                  "ms-toolsai.vscode-jupyter-cell-tags"
+                  "ms-toolsai.vscode-jupyter-powertoys"
 
                   # web development
-                  ms-vscode.vscode-typescript-next
-                  bradlc.vscode-tailwindcss
-                  biomejs.biome
-                  # ms-playwright.playwright
-                ])
-                ++ [
-                  (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-                    mktplcRef = {
-                      publisher = "ms-playwright";
-                      name = "playwright";
-                      version = "1.1.19";
-                      sha256 = "1xppas4qla2bsppb89ks4mnrby2g3gra4irabnimkcmaz4m3wr9p";
-                    };
-                  })
-                ];
+                  "ms-vscode.vscode-typescript-next"
+                  "bradlc.vscode-tailwindcss"
+                  "biomejs.biome"
+                  "ms-playwright.playwright"
+                ]
+              );
               userSettings = defaultSettings // {
                 # Add additional settings specific to the owner profile here
                 "playwright.pickLocatorCopyToClipboard" = true;

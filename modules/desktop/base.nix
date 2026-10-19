@@ -67,7 +67,7 @@
 
         nixpkgs.overlays = [
           config.repo.overlays.firefox-addons
-          config.repo.overlays.nix-vscode-extensions
+          config.repo.overlays.nix4vscode
         ];
 
         nix.settings = {

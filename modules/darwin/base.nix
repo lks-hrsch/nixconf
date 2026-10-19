@@ -37,7 +37,7 @@ in
               overlays = [
                 overlays.unstable
                 overlays.firefox-addons
-                overlays.nix-vscode-extensions
+                overlays.nix4vscode
               ];
             };
 
