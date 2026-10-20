@@ -1,6 +1,8 @@
 _: {
   # Self-hosted GitHub Actions runners for Xcode/tvOS builds. One runner per
-  # repo (a runner registers to exactly one repo), all as `_github-runner`.
+  # repo (a runner registers to exactly one repo), each with its own macOS
+  # user: separate keychains (concurrent fastlane setup_ci jobs would clobber
+  # a shared keychain search list) and no access to the other's credentials.
   #
   # Hand-rolled instead of nix-darwin's services.github-runners: that module
   # asserts nix.enable, which base.nix turns off for Determinate Nix.
@@ -20,35 +22,53 @@ _: {
     let
       xcodeVersion = "27.1";
       xcode = "/Applications/Xcode-${xcodeVersion}.app";
-      user = "_github-runner";
       root = "/var/lib/github-runners";
+      logRoot = "/var/log/github-runners";
       labels = "self-hosted,macOS,ARM64,xcode-${xcodeVersion},tvos,ios";
 
-      # name -> repo URL. Each gets state in ${root}/<name> and a sops token
-      # at github-runner/<name>.
+      # name -> repo URL and uid (also the gid). Each runner gets user and
+      # group `_github-runner-<name>`, home/state ${root}/<name>, and a sops token at
+      # github-runner/<name>.
       runners = {
-        ci-streamyfin = "https://github.com/lks-hrsch/streamyfin";
-        ci-ldr-connect = "https://github.com/lks-hrsch/ldr-connect";
+        ci-streamyfin = {
+          url = "https://github.com/lks-hrsch/streamyfin";
+          uid = 534;
+        };
+        ci-ldr-connect = {
+          url = "https://github.com/lks-hrsch/ldr-connect";
+          uid = 535;
+        };
       };
 
+      userOf = name: "_github-runner-${name}";
       tokenFile = name: config.sops.secrets."github-runner/${name}".path;
       forRunners = f: lib.mapAttrs' f runners;
     in
     {
-      users.users.${user} = {
-        uid = 533;
-        gid = 533;
-        home = root;
-        createHome = false;
-        shell = "/bin/bash";
-        description = "GitHub Runner service user";
-      };
-      users.groups.${user} = {
-        gid = 533;
-        description = "GitHub Runner service user group";
-      };
-      users.knownUsers = [ user ];
-      users.knownGroups = [ user ];
+      users.users = forRunners (
+        name: r:
+        lib.nameValuePair (userOf name) {
+          inherit (r) uid;
+          gid = r.uid;
+          # Must match the service's HOME: macOS keeps the keychain search
+          # list under the recorded home, not $HOME.
+          home = "${root}/${name}";
+          createHome = false;
+          shell = "/bin/bash";
+          description = "GitHub Runner ${name}";
+        }
+      );
+      users.groups = forRunners (
+        name: r:
+        lib.nameValuePair (userOf name) {
+          gid = r.uid;
+          description = "GitHub Runner ${name}";
+        }
+      );
+      # _github-runner was the old shared user; listed but undefined, so
+      # nix-darwin deletes its record (dscl -delete, home left alone).
+      users.knownUsers = [ "_github-runner" ] ++ map userOf (lib.attrNames runners);
+      users.knownGroups = [ "_github-runner" ] ++ map userOf (lib.attrNames runners);
 
       # Registration tokens expire after 1h but are only needed for the first
       # registration; credentials then live in ${root}/<name>/.runner.
@@ -58,13 +78,13 @@ _: {
         lib.nameValuePair "github-runner/${name}" {
           sopsFile = ../../secrets/secrets-lkshrsch-mb-pro-m1.yaml;
           key = "github-runner/${name}";
-          owner = user;
+          owner = userOf name;
           mode = "0400";
         }
       );
 
       launchd.daemons = forRunners (
-        name: url:
+        name: r:
         let
           stateDir = "${root}/${name}";
           workDir = "${root}/_work/${name}";
@@ -99,7 +119,7 @@ _: {
                 *) auth=--token ;;
               esac
               ${pkgs.github-runner}/bin/config.sh --unattended --disableupdate \
-                --url ${lib.escapeShellArg url} \
+                --url ${lib.escapeShellArg r.url} \
                 --name ${name} \
                 --work ${workDir} \
                 --labels ${labels} \
@@ -108,40 +128,52 @@ _: {
             exec ${pkgs.github-runner}/bin/Runner.Listener run --startuptype service
           '';
           serviceConfig = {
-            UserName = user;
-            GroupName = user;
+            UserName = userOf name;
+            GroupName = userOf name;
+            # Own security session: without it a daemon has no user keychain
+            # search list and signing falls back to the read-only System.keychain.
+            SessionCreate = true;
             KeepAlive = true;
             RunAtLoad = true;
             ThrottleInterval = 30;
             ProcessType = "Interactive";
             WorkingDirectory = stateDir;
             WatchPaths = [ (tokenFile name) ];
-            StandardOutPath = "/var/log/github-runners/${name}.log";
-            StandardErrorPath = "/var/log/github-runners/${name}.err.log";
+            StandardOutPath = "${logRoot}/${name}/stdout.log";
+            StandardErrorPath = "${logRoot}/${name}/stderr.log";
           };
         }
       );
 
-      # Dirs must exist, owned by the runner, before launchd starts it.
-      system.activationScripts.launchd.text =
-        let
-          dirs = lib.concatStringsSep " " (
-            [
+      # Dirs must exist, owned by their runner, before launchd starts it.
+      # chown -R only when ownership is off (migration from _github-runner);
+      # DerivedData under the home makes a blanket chown -R slow.
+      system.activationScripts.launchd.text = lib.mkBefore (
+        ''
+          mkdir -p ${root} ${root}/_work ${logRoot}
+          chown root:wheel ${root} ${root}/_work ${logRoot}
+          chmod 0755 ${root} ${root}/_work ${logRoot}
+        ''
+        + lib.concatMapStrings (
+          name:
+          let
+            u = userOf name;
+            dirs = lib.concatMapStringsSep " " (d: "${d}/${name}") [
               root
               "${root}/_work"
-              "/var/log/github-runners"
-            ]
-            ++ lib.concatMap (name: [
-              "${root}/${name}"
-              "${root}/_work/${name}"
-            ]) (lib.attrNames runners)
-          );
-        in
-        lib.mkBefore ''
-          mkdir -p ${dirs}
-          chmod 0750 ${dirs}
-          chown ${user}:${user} ${dirs}
-        '';
+              logRoot
+            ];
+          in
+          ''
+            mkdir -p ${dirs} ${root}/${name}/Library/Preferences ${root}/${name}/Library/Keychains
+            for d in ${dirs}; do
+              [ "$(/usr/bin/stat -f %Su "$d")" = ${u} ] || chown -R ${u}:${u} "$d"
+            done
+            chown ${u}:${u} ${root}/${name}/Library ${root}/${name}/Library/Preferences ${root}/${name}/Library/Keychains
+            chmod 0700 ${dirs}
+          ''
+        ) (lib.attrNames runners)
+      );
 
       # Runs as root. Every step is guarded: a failing command here aborts
       # the rest of activation (home-manager, sops).
