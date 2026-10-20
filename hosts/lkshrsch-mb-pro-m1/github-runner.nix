@@ -88,29 +88,26 @@ _: {
         let
           stateDir = "${root}/${name}";
           workDir = "${root}/_work/${name}";
-        in
-        lib.nameValuePair "github-runner-${name}" {
-          environment = {
-            HOME = stateDir;
-            RUNNER_ROOT = stateDir;
-          };
-          # xcodebuild/xcrun live in /usr/bin; nix from the Determinate profile.
-          path = with pkgs; [
-            bash
-            coreutils
-            git
-            gnutar
-            gzip
-            "/nix/var/nix/profiles/default/bin"
-            "/usr/bin"
-            "/bin"
-            "/usr/sbin"
-            "/sbin"
-          ];
+          # Env lives in the script: sudo resets the daemon's environment.
           # Same flow as the nix-darwin module: register once, then listen.
           # A missing token (sops not ready at boot) exits; KeepAlive retries.
-          script = ''
+          runner = pkgs.writeShellScript "github-runner-${name}" ''
             set -euo pipefail
+            # xcodebuild/xcrun live in /usr/bin; nix from the Determinate profile.
+            export PATH=${
+              lib.makeBinPath (
+                with pkgs;
+                [
+                  bash
+                  coreutils
+                  git
+                  gnutar
+                  gzip
+                ]
+              )
+            }:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin
+            export HOME=${stateDir} RUNNER_ROOT=${stateDir}
+            cd ${stateDir}
             find ${workDir} -mindepth 1 -delete
             if [ ! -f "$RUNNER_ROOT/.runner" ]; then
               token=$(<"${tokenFile name}")
@@ -127,17 +124,21 @@ _: {
             fi
             exec ${pkgs.github-runner}/bin/Runner.Listener run --startuptype service
           '';
+        in
+        lib.nameValuePair "github-runner-${name}" {
+          # codesign can't use a keychain's private key from the system launchd
+          # domain (managername "System"), even unlocked with a partition list;
+          # it works in the user's own domain (tested: "Background", SIGN OK).
+          # So the daemon runs as root only to enter that domain via `asuser`
+          # (exec, so launchd still tracks the runner), then drops to the user.
+          command = "/bin/launchctl asuser ${toString r.uid} /usr/bin/sudo -u ${userOf name} -H ${runner}";
           serviceConfig = {
-            UserName = userOf name;
-            GroupName = userOf name;
-            # Own security session: without it a daemon has no user keychain
-            # search list and signing falls back to the read-only System.keychain.
+            # Own security (audit) session, as in the passing test, not root's.
             SessionCreate = true;
             KeepAlive = true;
             RunAtLoad = true;
             ThrottleInterval = 30;
             ProcessType = "Interactive";
-            WorkingDirectory = stateDir;
             WatchPaths = [ (tokenFile name) ];
             StandardOutPath = "${logRoot}/${name}/stdout.log";
             StandardErrorPath = "${logRoot}/${name}/stderr.log";
