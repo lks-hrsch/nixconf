@@ -4,6 +4,17 @@ _: {
     # never applies. Appended so nix-provided binaries still win.
     environment.systemPath = lib.mkAfter [ "/opt/homebrew/bin" ];
 
+    # `brew cleanup` exits 1 until the Xcode license is accepted, aborting the
+    # rest of activation. Accept it before the bundle; a freshly installed or
+    # upgraded Xcode still fails once and heals on the next rebuild.
+    system.activationScripts.homebrew.text = lib.mkBefore ''
+      for x in /Applications/Xcode*.app; do
+        [ -d "$x" ] || continue
+        DEVELOPER_DIR="$x/Contents/Developer" /usr/bin/xcodebuild -license accept \
+          || echo "warning: Xcode license accept failed for $x" >&2
+      done
+    '';
+
     # Homebrew configuration
     homebrew = {
       enable = true;
@@ -67,6 +78,9 @@ _: {
         # Random useful apps
         "AusweisApp" = 948660805;
         "Yubico Authenticator" = 1497506650;
+
+        # Development
+        "Xcode" = 497799835;
       };
     };
   };
