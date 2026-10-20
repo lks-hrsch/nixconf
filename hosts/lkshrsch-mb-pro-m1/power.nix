@@ -32,12 +32,13 @@ _: {
     # arbitrary name would be silently dropped. postActivation runs as root.
     system.activationScripts.postActivation.text = ''
       echo "configuring headless power policy via pmset..." >&2
-      /usr/bin/pmset -a disablesleep 1   # master veto: lid-close no longer sleeps the Mac
-      /usr/bin/pmset -a sleep 0          # no idle system sleep
-      /usr/bin/pmset -a disksleep 0      # don't spin down disk
-      /usr/bin/pmset -a ttyskeepawake 1  # stay awake while an ssh/tty session is active
-      /usr/bin/pmset -a womp 1           # wake on Ethernet magic packet (safety net)
-      /usr/bin/pmset -a tcpkeepalive 1   # keep TCP alive (irrelevant once never sleeping, but safe)
+      /usr/bin/pmset -a disablesleep 1 2>/dev/null || echo "pmset: disablesleep failed, lid-close will still sleep the Mac" >&2
+      /usr/bin/pmset -a sleep 0 2>/dev/null || echo "pmset: sleep 0 failed, idle system sleep stays on" >&2
+      /usr/bin/pmset -a disksleep 0 2>/dev/null || echo "pmset: disksleep 0 failed, disk may spin down" >&2
+      /usr/bin/pmset -a ttyskeepawake 1 2>/dev/null || echo "pmset: ttyskeepawake failed, ssh/tty sessions won't keep the Mac awake" >&2
+      /usr/bin/pmset -a womp 1 2>/dev/null || echo "pmset: womp failed, no wake on Ethernet magic packet" >&2
+      /usr/bin/pmset -a tcpkeepalive 1 2>/dev/null || echo "pmset: tcpkeepalive failed, TCP not kept alive" >&2
+      /usr/bin/pmset -a autorestart 1 2>/dev/null || echo "pmset: autorestart unsupported, no boot after power loss" >&2
       # NOTE: displaysleep intentionally left untouched — the screen should still sleep.
     '';
 
