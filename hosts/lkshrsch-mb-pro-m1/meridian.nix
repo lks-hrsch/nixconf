@@ -21,6 +21,12 @@
       tokenPath = config.sops.secrets."meridian/oauth-token".path;
 
       start = pkgs.writeShellScript "meridian-start" ''
+        # At boot launchd can start us before sops-install-secrets has
+        # populated /run/secrets; running with an empty token yields empty
+        # responses. Exit instead so KeepAlive retries once secrets exist.
+        for f in "${keyPath}" "${tokenPath}"; do
+          [ -s "$f" ] || { echo "meridian: $f missing, retrying" >&2; exit 1; }
+        done
         export MERIDIAN_API_KEY="$(cat "${keyPath}")"
         export CLAUDE_CODE_OAUTH_TOKEN="$(cat "${tokenPath}")"
         # Isolated config dir with no .credentials.json — the SDK must not
