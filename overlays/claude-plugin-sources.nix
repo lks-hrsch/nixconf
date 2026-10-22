@@ -5,8 +5,8 @@ pkgs: {
   superpowers = pkgs.fetchFromGitHub {
     owner = "obra";
     repo = "superpowers";
-    rev = "bb92a77741419a4ab5f06e711a283343f1ada0c3"; # v7.0.0
-    hash = "sha256-UCVI+T7j1Xh1LDkrvnJduis7eHFqrizCyGTWAGW5d6U=";
+    rev = "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b"; # v7.0.1
+    hash = "sha256-9+69YEdjdaDu5sWTyAbufSVcZgGD7h6wAq4nUVY2syE=";
   };
   # DietrichGebert/ponytail — repo root is both the marketplace and the plugin
   ponytail = pkgs.fetchFromGitHub {
