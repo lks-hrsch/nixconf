@@ -34,8 +34,8 @@ _: {
           # companion skill to the context7 MCP server (mcp.nix)
           owner = "upstash";
           repo = "context7";
-          rev = "e0041949fdb3b49b304d98715dde35be51b7c3d1"; # ctx7@0.8.0
-          hash = "sha256-oIqqAtRGs77g1Q+Thz1/r+qGMr+xn+7O65ESqXByWh0=";
+          rev = "58194009e925230037dbf92dcbd65c8a6f68803c"; # ctx7@0.8.2
+          hash = "sha256-OPvv8IRNP7pjftNhoQ4M7HDr7qn3GryB5pfW8DeLZls=";
           subdir = "skills/context7-mcp";
         };
         grill-me = mattpocockSkills // {
