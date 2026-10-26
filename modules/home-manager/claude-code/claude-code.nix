@@ -50,6 +50,10 @@ _: {
           fi
         '';
 
+        # Mirrors settings.env below for processes outliving the session that spawned them: the
+        # claude-mem worker keeps the env of whichever session started it, and its observer needs this.
+        sessionVariables.CLAUDE_CODE_CERT_STORE = "bundled";
+
         packages = with pkgs; [
           nodejs_24
           bun
@@ -82,9 +86,6 @@ _: {
       };
 
       programs = {
-        # graphify skill CLI: PyPI package `graphifyy`, command `graphify`
-        uv.tool.packages = [ "graphifyy" ];
-
         claude-code = {
           enable = true;
           enableMcpIntegration = true;
@@ -117,7 +118,7 @@ _: {
           settings = {
             outputStyle = "Concise";
             skillListingBudgetFraction = 0.05;
-            model = "opusplan";
+            model = "opus";
             # Top-level effortLevel only applies to legacy/custom models (gateway aliases);
             effortLevel = "xhigh";
             modelSettings = {
@@ -126,6 +127,11 @@ _: {
             };
             spinnerTipsEnabled = false;
             cleanupPeriodDays = 30;
+            # Claude Code's macOS system-store lookup fails on this machine (no TLS interception;
+            # Apple curl + bundled store verify fine). Remove once the bug is fixed.
+            env = {
+              CLAUDE_CODE_CERT_STORE = "bundled";
+            };
             permissions = {
               allow = [
                 # file metadata (no content)
@@ -242,7 +248,7 @@ _: {
                 "Bash(curl * | sh*)"
                 "Bash(curl * | bash*)"
               ];
-              defaultMode = "default";
+              defaultMode = "auto";
             };
             statusLine = {
               type = "command";

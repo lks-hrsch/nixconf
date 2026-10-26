@@ -90,9 +90,41 @@ _: {
           }
         }/${s.subdir}"
       ) skills;
+
+      # graphify ships one SKILL.md per agent (skill.md, skill-opencode.md) plus per-agent references/,
+      # so postFetch reshapes the repo into the layout `graphify install --platform <agent>` writes
+      # (minus its .graphify_version stamp). Bump the version with its hash: it also pins the CLI below.
+      graphifyVersion = "0.9.95";
+      graphify = pkgs.fetchFromGitHub {
+        name = "graphify-skills-${graphifyVersion}";
+        owner = "Graphify-Labs";
+        repo = "graphify";
+        rev = "v${graphifyVersion}";
+        hash = "sha256-VrThsgDi0hBdzS4nJeOJI15YUmymZ8PUfxZ4wvhPTi4=";
+        postFetch = ''
+          tmp=$(mktemp -d)
+          for agent in claude opencode; do
+            mkdir $tmp/$agent
+            mv $out/graphify/skills/$agent/references $tmp/$agent/references
+          done
+          mv $out/graphify/skill.md $tmp/claude/SKILL.md
+          mv $out/graphify/skill-opencode.md $tmp/opencode/SKILL.md
+          rm -rf $out
+          mv $tmp $out
+        '';
+      };
     in
     {
-      programs.claude-code.skills = skillPaths;
-      programs.opencode.skills = skillPaths;
+      programs = {
+        claude-code.skills = skillPaths // {
+          graphify = "${graphify}/claude";
+        };
+        opencode.skills = skillPaths // {
+          graphify = "${graphify}/opencode";
+        };
+        # graphify CLI the skill drives: PyPI package `graphifyy`, command `graphify`.
+        # programs.uv.tool comes from overlays/uv-module.nix, imported by claude-code.nix.
+        uv.tool.packages = [ "graphifyy==${graphifyVersion}" ];
+      };
     };
 }
