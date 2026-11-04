@@ -25,55 +25,56 @@ _: {
         hash = "sha256-3vhd77xfZjKUYJsIwPFevIZPUAzUgZXr0RYj5NQrBwk=";
       };
 
+      mattpocock =
+        category: names:
+        lib.genAttrs names (name: mattpocockSkills // { subdir = "skills/${category}/${name}"; });
+
       # name -> GitHub source pin + subdir containing SKILL.md
-      skills = {
-        code-review = mattpocockSkills // {
-          subdir = "skills/engineering/code-review";
+      skills =
+        # Left out, superpowers owns these phases: diagnosing-bugs, implement, implement-spec, tdd,
+        # to-spec, to-tickets.
+        mattpocock "engineering" [
+          "ask-matt"
+          "code-review"
+          "codebase-design"
+          "domain-modeling"
+          "grill-with-docs"
+          "improve-codebase-architecture"
+          "pr"
+          "prototype"
+          "research"
+          "retro"
+          "setup-matt-pocock-skills"
+          "triage"
+          "wayfinder"
+          "wizard"
+        ]
+        // mattpocock "productivity" [
+          "grill-me"
+          "grilling"
+          "handoff"
+          "teach"
+          "to-questionnaire"
+          "wait-what"
+          "writing-for-agents"
+        ]
+        // {
+          # companion skills to the MCP servers in mcp.nix
+          context7-mcp = {
+            owner = "upstash";
+            repo = "context7";
+            rev = "a138857cc23f0abaf214b72b15d974e61598369b"; # ctx7@0.9.0
+            hash = "sha256-TLRU0Tqe3Rnwp9T2fTvKbSk/nnBvy+vk5311lhOS76o=";
+            subdir = "skills/context7-mcp";
+          };
+          obsidian = {
+            owner = "bitbonsai";
+            repo = "mcpvault";
+            rev = "1c68c8af745fd4e88c67aac2f34947c8bea6ce49";
+            hash = "sha256-WvNylKxZwqRVmwXUI1WTYryJHLDkzb7RLOVn+8qsYLI=";
+            subdir = "skills/obsidian";
+          };
         };
-        context7-mcp = {
-          # companion skill to the context7 MCP server (mcp.nix)
-          owner = "upstash";
-          repo = "context7";
-          rev = "a138857cc23f0abaf214b72b15d974e61598369b"; # ctx7@0.9.0
-          hash = "sha256-TLRU0Tqe3Rnwp9T2fTvKbSk/nnBvy+vk5311lhOS76o=";
-          subdir = "skills/context7-mcp";
-        };
-        grill-me = mattpocockSkills // {
-          subdir = "skills/productivity/grill-me";
-        };
-        grill-with-docs = mattpocockSkills // {
-          subdir = "skills/engineering/grill-with-docs";
-        };
-        grilling = mattpocockSkills // {
-          subdir = "skills/productivity/grilling";
-        };
-        handoff = mattpocockSkills // {
-          subdir = "skills/productivity/handoff";
-        };
-        improve-codebase-architecture = mattpocockSkills // {
-          subdir = "skills/engineering/improve-codebase-architecture";
-        };
-        obsidian = {
-          # companion skill to the @bitbonsai/mcpvault MCP server (mcp.nix)
-          owner = "bitbonsai";
-          repo = "mcpvault";
-          rev = "1c68c8af745fd4e88c67aac2f34947c8bea6ce49";
-          hash = "sha256-WvNylKxZwqRVmwXUI1WTYryJHLDkzb7RLOVn+8qsYLI=";
-          subdir = "skills/obsidian";
-        };
-        pr = mattpocockSkills // {
-          subdir = "skills/engineering/pr";
-        };
-        research = mattpocockSkills // {
-          subdir = "skills/engineering/research";
-        };
-        tdd = mattpocockSkills // {
-          subdir = "skills/engineering/tdd";
-        };
-        writing-for-agents = mattpocockSkills // {
-          subdir = "skills/productivity/writing-for-agents";
-        };
-      };
 
       # name -> store path of the skill's directory (containing SKILL.md). Identical
       # pins share one fetchFromGitHub derivation, so a repo is fetched only once.
