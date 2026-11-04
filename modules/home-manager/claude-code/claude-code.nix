@@ -52,7 +52,11 @@ _: {
 
         # Mirrors settings.env below for processes outliving the session that spawned them: the
         # claude-mem worker keeps the env of whichever session started it, and its observer needs this.
-        sessionVariables.CLAUDE_CODE_CERT_STORE = "bundled";
+        sessionVariables = {
+          CLAUDE_CODE_CERT_STORE = "bundled";
+          CLAUDE_MEM_TELEMETRY = "0";
+          CLAUDE_MEM_DELIVERABLES_ENABLED = "false";
+        };
 
         packages = with pkgs; [
           nodejs_24
@@ -131,6 +135,10 @@ _: {
             # Apple curl + bundled store verify fine). Remove once the bug is fixed.
             env = {
               CLAUDE_CODE_CERT_STORE = "bundled";
+              # Not global DO_NOT_TRACK: it costs the security-guidance plugin its sign-in.
+              CLAUDE_MEM_TELEMETRY = "0";
+              # The v15.3.0 Stop hook copies written files to ~/.claude-mem/deliverables, *.key included.
+              CLAUDE_MEM_DELIVERABLES_ENABLED = "false";
             };
             permissions = {
               allow = [
