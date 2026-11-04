@@ -12,19 +12,19 @@ _: {
       # MTP support and speculative-decoding fixes. To bump: update
       # version/rev/hash/npmDepsHash.
       llama = pkgs.unstable.llama-cpp.overrideAttrs (_old: {
-        version = "11750"; # nixpkgs stores version without "b"; tag = "b${version}"
+        version = "0.8.0"; # nixpkgs stores version without "v"; tag = "v${version}"
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          rev = "dd002b91f583af0b80140f9a140dc04856bfc2e0"; # release b11750
-          hash = "sha256-gqy4kRQIBbsx7eSNyLwou0X9viHdLuHFF2JBA+ZGiP4=";
+          rev = "8642541b255bfb5dc39cd351a178be09013a55d6"; # release v0.8.0
+          hash = "sha256-WQAtD8Hos6fEtgPQId7nZiLGyP4asAMKJYEXZid1nqc=";
         };
         # nixpkgs' backport patch is already upstream at this rev.
         patches = [ ];
         # Upstream's test-download-model needs network; sandbox has none.
         doCheck = false;
         # The bundled web UI's package-lock.json differs from the nixpkgs pin.
-        npmDepsHash = "sha256-hqYzdp1FwPhYkBP278fQXgY9NCKB6Q3P6Gko7BfP0m0=";
+        npmDepsHash = "sha256-XLtEZsSFdk+2SyfXzBp8HQ2e27PQPpDCn1YjePU1/9w=";
       });
       hf = "https://huggingface.co";
 
