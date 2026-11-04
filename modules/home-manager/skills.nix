@@ -94,13 +94,13 @@ _: {
       # graphify ships one SKILL.md per agent (skill.md, skill-opencode.md) plus per-agent references/,
       # so postFetch reshapes the repo into the layout `graphify install --platform <agent>` writes
       # (minus its .graphify_version stamp). Bump the version with its hash: it also pins the CLI below.
-      graphifyVersion = "0.9.95";
+      graphifyVersion = "0.9.102";
       graphify = pkgs.fetchFromGitHub {
         name = "graphify-skills-${graphifyVersion}";
         owner = "Graphify-Labs";
         repo = "graphify";
         rev = "v${graphifyVersion}";
-        hash = "sha256-VrThsgDi0hBdzS4nJeOJI15YUmymZ8PUfxZ4wvhPTi4=";
+        hash = "sha256-qI4NDTtrBQyGhWjdrCqaqkI40u7pFkDLLcv7nCFSUN0=";
         postFetch = ''
           tmp=$(mktemp -d)
           for agent in claude opencode; do
