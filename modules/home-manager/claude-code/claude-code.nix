@@ -60,7 +60,8 @@ _: {
 
         packages = with pkgs; [
           nodejs_24
-          bun
+          # claude-mem compiles its launcher with this: macOS 27 kills binaries from Bun older than 1.4.1.
+          unstable.bun
           # for the security-guidance and claude-security plugin hooks
           (unstable.python3.withPackages (ps: [ ps.claude-agent-sdk ]))
         ];
