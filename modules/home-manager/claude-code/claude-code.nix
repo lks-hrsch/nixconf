@@ -102,15 +102,9 @@ _: {
             inherit caveman;
           };
           plugins = [
-            "${official}/plugins/code-review"
-            "${official}/plugins/code-simplifier"
             "${official}/plugins/claude-md-management"
             "${official}/plugins/claude-security"
             "${official}/plugins/security-guidance"
-            "${official}/plugins/pyright-lsp"
-            "${official}/plugins/rust-analyzer-lsp"
-            "${official}/plugins/swift-lsp"
-            "${official}/plugins/typescript-lsp"
             # superpowers is an external plugin referenced by the official marketplace
             superpowers
             # claude-mem
@@ -124,6 +118,8 @@ _: {
             outputStyle = "Concise";
             skillListingBudgetFraction = 0.05;
             model = "opus";
+            # Mainly for subagents, which now default to Sonnet. Gateway models have no advisor rank, so it stays off there.
+            advisorModel = "opus";
             # Top-level effortLevel only applies to legacy/custom models (gateway aliases);
             effortLevel = "xhigh";
             modelSettings = {
@@ -136,6 +132,8 @@ _: {
             # Apple curl + bundled store verify fine). Remove once the bug is fixed.
             env = {
               CLAUDE_CODE_CERT_STORE = "bundled";
+              # Subagents without an explicit model; a per-call model still wins.
+              CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
               # Not global DO_NOT_TRACK: it costs the security-guidance plugin its sign-in.
               CLAUDE_MEM_TELEMETRY = "0";
               # The v15.3.0 Stop hook copies written files to ~/.claude-mem/deliverables, *.key included.
