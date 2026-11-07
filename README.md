@@ -58,10 +58,12 @@ build a nixos on darwin:
 <!-- https://github.com/NixOS/nixpkgs/issues/439945 -->
 
 ``` bash
-nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@10.10.1.1 --target-host root@10.10.1.1 --option sandbox false
+# build on deimos because of memory problems on the VPS
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@10.10.1.18 --target-host root@10.10.1.1 --use-substitutes --option sandbox false
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@192.168.1.13 --target-host root@10.10.1.1 --use-substitutes --option sandbox false
 
-nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@10.10.1.18 --target-host root@10.10.1.18 --option sandbox false
-nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@192.168.1.13 --target-host root@192.168.1.13 --option sandbox false
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@10.10.1.18 --target-host root@10.10.1.18 --use-substitutes --option sandbox false
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@192.168.1.13 --target-host root@192.168.1.13 --use-substitutes --option sandbox false
 ```
 
 ## working with git-crypt
