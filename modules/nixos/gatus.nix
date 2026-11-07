@@ -174,7 +174,7 @@ in
 
         virtualisation.quadlet.containers.gatus = {
           containerConfig = {
-            image = "ghcr.io/twin/gatus:v5.37.0";
+            image = "ghcr.io/twin/gatus:v5.38.0";
             autoUpdate = "registry";
             user = cfg.uid;
             environmentFiles = [ config.sops.templates."gatus.env".path ];

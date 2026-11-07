@@ -37,7 +37,7 @@ container (see `learned-facts.md`).
 | `stacks/traefik.nix` | Traefik (+ `proxy` network) |
 | `stacks/blocky.nix` | Blocky DNS |
 | `stacks/ddns-updater.nix` | DDNS updater |
-| `stacks/media.nix` | Jellyfin, Seerr, Jellystat, Prowlarr, SABnzbd, Sonarr and Radarr (original / german / anime), Recyclarr, Muxarr, Reclaimerr, Houndarr, FlareSolverr, Gluetun (VPN egress) |
+| `stacks/media.nix` | Jellyfin, Seerr, Tracearr (app, TimescaleDB, Redis), Prowlarr, SABnzbd, Sonarr and Radarr (original / german / anime), Recyclarr, Muxarr, Reclaimerr, Houndarr, FlareSolverr, Gluetun (VPN egress) |
 | `stacks/immich.nix` | Immich (server, ML, Valkey, Postgres), Immich Power Tools |
 | `stacks/ai.nix` | Open WebUI, LiteLLM |
 | `stacks/mealie.nix` | Mealie (recipes, OIDC via Authelia) |
@@ -150,6 +150,39 @@ before upgrades.
 4. Deletion is opt-in twice (cleanup deletion **and** the
    delete-cleanup-candidates task). Review candidates before enabling either.
 
+### Tracearr
+
+Playback history and stats for Jellyfin. Own stack with its own TimescaleDB
+and Redis (`tracearr`, `tracearr-db`, `tracearr-redis` on the `tracearr`
+network; the app also joins `proxy`, not `media`). Data:
+`/mnt/nvme-pool/apps/tracearr/` (`postgres`, `redis`, `backup`,
+`image-cache`). LAN, wg0 and NetBird only: do not register it as a NetBird
+proxy service. Secrets live under `tracearr/` in
+`secrets/stacks-mars-deimos.yaml`; SSO is an Authelia client on mercury
+(`client_secret_post`).
+
+1. Create the owner straight after deploy: until the owner exists, anyone who
+   can reach the hostname can become owner (OIDC or `/sign-up/email`).
+   **Create Account** with your LLDAP email and a strong local password, kept
+   as break-glass. Then test the Authelia button. If Create Account is
+   refused, someone got there first: stop the stack and wipe
+   `/mnt/nvme-pool/apps/tracearr/postgres/`.
+2. Create a Jellyfin API key (`Dashboard → API Keys`, name `tracearr-trial`) and add
+   the server at `http://jellyfin:8096`. Leave Public address blank.
+3. Link your account on the server's **Your account** line.
+4. Enable daily backups under `Settings → Backup`; the repo has no DB dump
+   tooling for deimos. Back up before moving to a new minor tag by hand.
+5. Optional: add Traefik (`172.30.0.100`) under Jellyfin `Dashboard →
+   Networking → Known proxies`, or Tracearr records the proxy as every client.
+   Lockout risk: Jellyfin runs in allowlist mode and then filters on the
+   forwarded client address, so a LAN (`192.168.1.x`), wg0 (`10.10.1.x`) or
+   NetBird (`10.10.10.x`) client missing from the allowlist is rejected. Check
+   that Jellyfin's `Networking` settings cover all three ranges first, and do
+   it when nothing is playing, since it needs a Jellyfin restart. The gain is
+   small, as client IPs here are private anyway.
+
+Trial guardrails: no automation with Terminate Stream, no SSE plugin.
+
 ### Houndarr
 
 Drip-feeds missing/cutoff-unmet searches to the arrs so indexer API caps are
@@ -183,6 +216,7 @@ note when `systemctl --failed` is clean.
 
 High-level, newest first. Details live in `git log -- hosts/mars/deimos`.
 
+- 2026-11: Tracearr replaced Jellystat (`stacks/media.nix`). Old data stays in `/mnt/nvme-pool/apps/jellystat/` until deleted by hand.
 - 2026-10-04: **Metrics pipeline**: Alloy pushes node metrics (all Alloy hosts) to Prometheus; Prometheus scrapes Traefik, blocky (`:4000`), Grafana, Loki, InfluxDB, Gatus and mercury's Authelia/NetBird/CrowdSec over wg0; Grafana dashboards Node Exporter Full (1860), Traefik (17346), Blocky (13768), Gatus.
 - 2026-10-04: **Gatus added** (`stacks/monitoring.nix`), cross-watching mercury.
 - 2026-10-04: **Mealie moved here from mercury** (`stacks/mealie.nix`).
