@@ -153,8 +153,8 @@ before upgrades.
 ### Tracearr
 
 Playback history and stats for Jellyfin. Own stack with its own TimescaleDB
-and Redis (`tracearr`, `tracearr-db`, `tracearr-redis` on the `tracearr`
-network; the app also joins `proxy`, not `media`). Data:
+and Redis (`tracearr`, `tracearr-db`, `tracearr-redis`, all on the `media`
+network; the app also joins `proxy`). Data:
 `/mnt/nvme-pool/apps/tracearr/` (`postgres`, `redis`, `backup`,
 `image-cache`). LAN, wg0 and NetBird only: do not register it as a NetBird
 proxy service. Secrets live under `tracearr/` in
