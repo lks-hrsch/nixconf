@@ -37,7 +37,7 @@ container (see `learned-facts.md`).
 | `stacks/traefik.nix` | Traefik (+ `proxy` network) |
 | `stacks/blocky.nix` | Blocky DNS |
 | `stacks/ddns-updater.nix` | DDNS updater |
-| `stacks/media.nix` | Jellyfin, Seerr, Tracearr (app, TimescaleDB, Redis), Prowlarr, SABnzbd, Sonarr and Radarr (original / german / anime), Recyclarr, Muxarr, Reclaimerr, Houndarr, FlareSolverr, Gluetun (VPN egress) |
+| `stacks/media.nix` | Jellyfin, Seerr, Tracearr (app, TimescaleDB, Redis), Prowlarr, SABnzbd, Sonarr, Radarr and Bazarr (original / german / anime), Lingarr, Recyclarr, Muxarr, Reclaimerr, Houndarr, FlareSolverr, Gluetun (VPN egress) |
 | `stacks/immich.nix` | Immich (server, ML, Valkey, Postgres), Immich Power Tools |
 | `stacks/ai.nix` | Open WebUI, LiteLLM |
 | `stacks/mealie.nix` | Mealie (recipes, OIDC via Authelia) |
@@ -201,6 +201,24 @@ secret). First boot may run DB migrations for several minutes.
    days. Leave the *upgrade* pass off: it re-searches items already at cutoff.
 5. Sonarr: use `Season-context search` while backfilling, episode mode after.
    To go faster, widen the time window rather than raising hourly caps.
+
+### Bazarr and Lingarr
+
+Three Bazarr instances, `bazarr-{german,original,anime}`, at
+`https://bazarr-<v>.deimos.mars.lukashirsch.de`. Each is paired with its
+`sonarr-<v>` / `radarr-<v>` and configured by hand in the UI; nothing is
+seeded from Nix. Config: `/mnt/nvme-pool/apps/bazarr/configuration-<v>`.
+
+Lingarr is internal only (`http://lingarr:9876` on `media`). It translates via
+LiteLLM `claude-haiku` with the key `lingarr/litellm_api_key`. One-time
+onboarding, until which every endpoint returns 403:
+
+    podman exec bazarr-german curl -fsS -X POST -H 'Content-Type: application/json' -d '{"enableUserAuth":"false"}' http://lingarr:9876/api/auth/onboarding
+
+Warning: with Bazarr's translation fallback on, turn **Upgrade previously
+downloaded subtitles** off on that instance. The upgrade job re-enters the
+fallback and can replace real German subtitles with translations (Bazarr
+1.6.3-beta.28, `subtitles/download.py`).
 
 ### Known cosmetic failure: `systemd-tmpfiles-clean`
 
