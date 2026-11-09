@@ -43,20 +43,12 @@ in
         # https://github.com/podman-desktop/podman-desktop/issues/13922
 
         homebrew = {
-          taps = [
-            # Trust the tap (Homebrew 6.0); note it doesn't cover krunkit's transitive same-tap deps — see HOMEBREW_NO_REQUIRE_TAP_TRUST in darwin/homebrew.nix.
-            {
-              name = "libkrun/krun";
-              trusted = true;
-            }
-          ];
           brews = [
             "helm"
             "docker"
             "docker-compose"
             "podman"
             "podman-compose"
-            "libkrun/krun/krunkit"
           ];
           casks = [
             "podman-desktop"

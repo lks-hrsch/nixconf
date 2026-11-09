@@ -95,8 +95,39 @@
         "chat.tools.compressOutput.enabled" = true;
 
         "claudeCode.hideOnboarding" = true;
-        "claudeCode.useTerminal" = true;
+        # Claude runs in Ghostty/tmux (connect with /ide); the extension uses its own panel, never the integrated terminal
+        "claudeCode.useTerminal" = false;
+
+        # terminals open in Ghostty, not the integrated terminal
+        "terminal.explorerKind" = "external";
+        "terminal.sourceControlRepositoriesKind" = "external";
+        "terminal.external.osxExec" = "Ghostty.app";
+        "terminal.external.linuxExec" = "ghostty";
+        "terminal.integrated.hideOnStartup" = "always";
+        "terminal.integrated.enablePersistentSessions" = false;
       };
+
+      # terminal shortcuts open Ghostty in the workspace folder
+      defaultKeybindings =
+        lib.concatMap
+          (key: [
+            {
+              inherit key;
+              command = "-workbench.action.terminal.toggleTerminal";
+            }
+            {
+              inherit key;
+              command = "-workbench.action.terminal.new";
+            }
+            {
+              inherit key;
+              command = "workbench.action.terminal.openNativeConsole";
+            }
+          ])
+          [
+            "ctrl+`"
+            "ctrl+shift+`"
+          ];
     in
     {
       home.packages = with pkgs; [
@@ -108,7 +139,6 @@
         nodejs_24
 
         # for Python
-        unstable.pyrefly
         unstable.ruff
 
         # for YAML
@@ -128,6 +158,7 @@
             default = {
               extensions = extensionsFor defaultExtensions;
               userSettings = defaultSettings;
+              keybindings = defaultKeybindings;
               enableMcpIntegration = true;
             };
 
@@ -148,7 +179,6 @@
                   "ms-python.python"
                   "ms-python.vscode-pylance"
                   "ms-python.debugpy"
-                  "meta.pyrefly"
                   "charliermarsh.ruff"
                   "ms-toolsai.jupyter"
                   "ms-toolsai.jupyter-keymap"
@@ -175,6 +205,7 @@
                   "convertFormatString" = true;
                 };
               };
+              keybindings = defaultKeybindings;
               enableMcpIntegration = true;
             };
           };

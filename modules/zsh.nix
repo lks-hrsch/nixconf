@@ -90,11 +90,6 @@ _: {
                 nix-direnv.enable = true;
               };
 
-              tmux = {
-                enable = true;
-                clock24 = true;
-              };
-
               fastfetch.enable = true;
               btop = {
                 enable = true;

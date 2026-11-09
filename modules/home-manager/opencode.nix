@@ -57,16 +57,6 @@ _: {
           "model" = "github-copilot/gpt-5.6-terra";
           "small_model" = "github-copilot/gpt-5.6-luna";
           "lsp" = {
-            "pyrefly" = {
-              "command" = [
-                "pyrefly"
-                "lsp"
-              ];
-              "extensions" = [
-                ".py"
-                ".pyi"
-              ];
-            };
             "ruff" = {
               "command" = [
                 "ruff"

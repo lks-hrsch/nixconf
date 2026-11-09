@@ -23,6 +23,7 @@
         sops
         ssh
         stylix
+        tmux
         uv
         zsh
       ];
