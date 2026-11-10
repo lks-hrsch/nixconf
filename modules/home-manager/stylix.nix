@@ -3,6 +3,7 @@ _: {
     {
       pkgs,
       config,
+      lib,
       ...
     }:
     let
@@ -85,6 +86,9 @@ _: {
         # Icon packages
         adwaita-icon-theme
       ];
+
+      # Stylix pins light adw-gtk3 regardless of polarity; its message-dialog buttons hardcode dark text.
+      gtk.theme.name = lib.mkForce "adw-gtk3-dark";
 
       stylix = {
         enable = true;
