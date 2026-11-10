@@ -94,7 +94,9 @@ _: {
         claude-code = {
           enable = true;
           enableMcpIntegration = true;
-          package = pkgs.unstable.claude-code;
+          # wrapper prefixes LD_LIBRARY_PATH with alsa-lib, inherited by every shell it spawns;
+          # stable alsa-lib keeps stable binaries (ffmpeg) off unstable's newer glibc
+          package = pkgs.unstable.claude-code.override { inherit (pkgs) alsa-lib; };
           marketplaces = {
             inherit superpowers;
             inherit claude-mem;

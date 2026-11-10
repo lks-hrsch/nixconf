@@ -26,12 +26,6 @@ _: {
           export MOZ_USE_XINPUT2="1"
           export MOZ_DISABLE_RDD_SANDBOX="1"
           export MOZ_DRM_DEVICE="/dev/dri/renderD128"
-
-          ##### CMake / Ninja tool-chain ###########################################
-          export CMAKE_C_COMPILER="$HOME/.nix-profile/bin/clang"
-          export CMAKE_CXX_COMPILER="$HOME/.nix-profile/bin/clang++"
-          export CMAKE_MAKE_PROGRAM="${lib.getExe pkgs.ninja}"
-          export CMAKE_GENERATOR="Ninja"
         ''
         + lib.optionalString isNvidia ''
 
@@ -44,7 +38,6 @@ _: {
           ##### CUDA & linker flags ###############################################
           export CUDA_PATH="${pkgs.cudatoolkit}"
           export LDFLAGS="-L/lib -L${osConfig.hardware.nvidia.package}/lib"
-          export LD_LIBRARY_PATH="${osConfig.hardware.nvidia.package}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
         ''
         + lib.optionalString (!isNvidia) ''
 
