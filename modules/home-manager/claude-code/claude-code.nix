@@ -126,7 +126,9 @@ _: {
             effortLevel = "xhigh";
             modelSettings = {
               "claude-opus-5-5".effortLevel = "high";
-              "claude-sonnet-5-5".effortLevel = "high";
+              "claude-sonnet-5-5".effortLevel = "xhigh";
+              "claude-fable-5-1".effortLevel = "high";
+              "claude-fable-5-2".effortLevel = "high";
             };
             spinnerTipsEnabled = false;
             cleanupPeriodDays = 30;
