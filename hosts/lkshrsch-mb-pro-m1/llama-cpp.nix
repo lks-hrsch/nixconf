@@ -8,24 +8,9 @@ _: {
   configurations.darwin."lkshrsch-mb-pro-m1".module =
     { lib, pkgs, ... }:
     let
-      # Pinned to the latest upstream release (newer than nixpkgs) for Gemma 4
-      # MTP support and speculative-decoding fixes. To bump: update
-      # version/rev/hash/npmDepsHash.
-      llama = pkgs.unstable.llama-cpp.overrideAttrs (_old: {
-        version = "0.8.0"; # nixpkgs stores version without "v"; tag = "v${version}"
-        src = pkgs.fetchFromGitHub {
-          owner = "ggml-org";
-          repo = "llama.cpp";
-          rev = "8642541b255bfb5dc39cd351a178be09013a55d6"; # release v0.8.0
-          hash = "sha256-WQAtD8Hos6fEtgPQId7nZiLGyP4asAMKJYEXZid1nqc=";
-        };
-        # nixpkgs' backport patch is already upstream at this rev.
-        patches = [ ];
-        # Upstream's test-download-model needs network; sandbox has none.
-        doCheck = false;
-        # The bundled web UI's package-lock.json differs from the nixpkgs pin.
-        npmDepsHash = "sha256-XLtEZsSFdk+2SyfXzBp8HQ2e27PQPpDCn1YjePU1/9w=";
-      });
+      # nixpkgs-unstable ships 0.9.0 (Gemma 4 MTP, draft-mtp). If Gemma/MTP fixes land upstream
+      # before nixpkgs, pin again with overrideAttrs (version/src/npmDepsHash).
+      llama = pkgs.unstable.llama-cpp;
       hf = "https://huggingface.co";
 
       # unsloth UD-Q4_K_XL: QAT-faithful, unlike Google's own qat-q4_0 GGUF
