@@ -63,8 +63,8 @@ _: {
           context7-mcp = {
             owner = "upstash";
             repo = "context7";
-            rev = "a138857cc23f0abaf214b72b15d974e61598369b"; # ctx7@0.9.0
-            hash = "sha256-TLRU0Tqe3Rnwp9T2fTvKbSk/nnBvy+vk5311lhOS76o=";
+            rev = "6e68ffcbad0e23cf4fa8c11795ce9e551aeef19b"; # ctx7@0.11.0
+            hash = "sha256-Gre/wozYT2daksy3Va065vXGucIwWWkIvJ4JUg3RpoI=";
             subdir = "skills/context7-mcp";
           };
           obsidian = {
@@ -95,13 +95,13 @@ _: {
       # graphify ships one SKILL.md per agent (skill.md, skill-opencode.md) plus per-agent references/,
       # so postFetch reshapes the repo into the layout `graphify install --platform <agent>` writes
       # (minus its .graphify_version stamp). Bump the version with its hash: it also pins the CLI below.
-      graphifyVersion = "0.9.102";
+      graphifyVersion = "0.9.107";
       graphify = pkgs.fetchFromGitHub {
         name = "graphify-skills-${graphifyVersion}";
         owner = "Graphify-Labs";
         repo = "graphify";
         rev = "v${graphifyVersion}";
-        hash = "sha256-qI4NDTtrBQyGhWjdrCqaqkI40u7pFkDLLcv7nCFSUN0=";
+        hash = "sha256-Gcm0+PvvaYtsJ+UChtTvdOXzr3GJKKaVB3qkbpIJH7k=";
         postFetch = ''
           tmp=$(mktemp -d)
           for agent in claude opencode; do

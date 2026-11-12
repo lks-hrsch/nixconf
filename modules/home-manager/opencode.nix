@@ -32,16 +32,7 @@ _: {
       programs.opencode = {
         enable = true;
         enableMcpIntegration = true;
-        # shortcut: bun 1.4.4 made node_modules libc-dependent and nixpkgs' hash is stale, drop once NixOS/nixpkgs#582675 reaches nixpkgs-unstable.
-        package = pkgs.unstable.opencode.overrideAttrs (old: {
-          node_modules = old.node_modules.overrideAttrs {
-            outputHash =
-              if pkgs.stdenv.hostPlatform.isDarwin then
-                "sha256-dIveiaiPFGSItwLyeMuPDxTE9gpvvnlTCB/+nG24qCc="
-              else
-                "sha256-prx9dX7kUvs/E3zopkaPk5LXh3xJAy5sZeum/W8L7cA=";
-          };
-        });
+        package = pkgs.unstable.opencode;
         settings = {
           "skills"."paths" = [ "${caveman}/skills" ];
           "plugin" = [

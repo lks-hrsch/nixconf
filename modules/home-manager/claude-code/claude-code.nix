@@ -11,20 +11,20 @@ _: {
         text = builtins.readFile ./statusline-command.sh;
         executable = true;
       };
-      # anthropics/claude-plugins-official — pinned to latest main as of 2026-11-04
+      # anthropics/claude-plugins-official — pinned to latest main as of 2026-11-12
       official = pkgs.fetchFromGitHub {
         owner = "anthropics";
         repo = "claude-plugins-official";
-        rev = "fa4eb54397ee2faccb6940512a19c017cb1337f3";
-        hash = "sha256-FqB+THQsn//s7PIFITa/k9RWOsYytrH50scCuuLgsYw=";
+        rev = "e0ab6e51219eef74e417a0e1d89e5d53e5e763d4";
+        hash = "sha256-7ddCmC7xM5NWxD4rfxUeUCzfK4H6lCgGmKG1l9hkppc=";
       };
       inherit (import ../../../overlays/claude-plugin-sources.nix pkgs) superpowers ponytail caveman;
 
       claude-mem = pkgs.fetchFromGitHub {
         owner = "thedotmack";
         repo = "claude-mem";
-        rev = "d0968e5d136abc34dcfe1b78acf3726fa84978d8"; # v15.9.0
-        hash = "sha256-XvkStT/7Gz+ajwRC98aRm9utc5sgkYDpWyxge74/HLA=";
+        rev = "2bb98bd08a73c3c4be18cc797ed7c2a43ed2d97b"; # v15.18.1
+        hash = "sha256-t3DKrdfoijLIJ5nvQ4lSlJ7fRuFYu+WJErxqdROoH/0=";
       };
     in
     {
@@ -56,6 +56,7 @@ _: {
           CLAUDE_CODE_CERT_STORE = "bundled";
           CLAUDE_MEM_TELEMETRY = "0";
           CLAUDE_MEM_DELIVERABLES_ENABLED = "false";
+          CLAUDE_MEM_AUTO_UPDATE = "false";
         };
 
         packages = with pkgs; [
@@ -66,7 +67,6 @@ _: {
           (unstable.python3.withPackages (ps: [ ps.claude-agent-sdk ]))
         ];
 
-        # CLAUDE_MEM_MODEL=general is set by the gateway aliases and resolved via LiteLLM at runtime.
         file = {
           ".claude/statusline-command.sh" = statusline;
 
@@ -78,8 +78,13 @@ _: {
           # ~/.claude-work: CLAUDE_CONFIG_DIR for claude-work/-collana/-develappers — mirrors the
           # base setup so those sessions get the same settings, statusline and skills.
           ".claude-work/statusline-command.sh" = statusline;
+          # Same settings, but work runs Sonnet with an Opus advisor.
           ".claude-work/settings.json".source =
-            config.home.file."${config.programs.claude-code.configDir}/settings.json".source;
+            pkgs.runCommand "claude-work-settings.json" { nativeBuildInputs = [ pkgs.jq ]; }
+              ''
+                jq '.model = "sonnet" | .advisorModel = "opus"' \
+                  ${config.home.file."${config.programs.claude-code.configDir}/settings.json".source} > $out
+              '';
         }
         // lib.mapAttrs' (
           name: src:
@@ -120,8 +125,9 @@ _: {
             outputStyle = "Concise";
             skillListingBudgetFraction = 0.05;
             model = "opus";
-            # Mainly for subagents, which now default to Sonnet. Gateway models have no advisor rank, so it stays off there.
-            advisorModel = "opus";
+            # Fable advises Opus sessions and Sonnet subagents; ~/.claude-work/settings.json overrides it.
+            # Gateway models have no advisor rank, so it stays off there.
+            advisorModel = "fable";
             # Top-level effortLevel only applies to legacy/custom models (gateway aliases);
             effortLevel = "xhigh";
             modelSettings = {
@@ -136,12 +142,10 @@ _: {
             # Apple curl + bundled store verify fine). Remove once the bug is fixed.
             env = {
               CLAUDE_CODE_CERT_STORE = "bundled";
-              # Subagents without an explicit model; a per-call model still wins.
-              CLAUDE_CODE_SUBAGENT_MODEL = "sonnet";
-              # Not global DO_NOT_TRACK: it costs the security-guidance plugin its sign-in.
-              CLAUDE_MEM_TELEMETRY = "0";
-              # The v15.3.0 Stop hook copies written files to ~/.claude-mem/deliverables, *.key included.
-              CLAUDE_MEM_DELIVERABLES_ENABLED = "false";
+              CLAUDE_CODE_SUBAGENT_MODEL = "sonnet"; # Subagents without an explicit model; a per-call model still wins.
+              CLAUDE_MEM_TELEMETRY = "0"; # Not global DO_NOT_TRACK: it costs the security-guidance plugin its sign-in.
+              CLAUDE_MEM_DELIVERABLES_ENABLED = "false"; # The v15.3.0 Stop hook copies written files to ~/.claude-mem/deliverables, *.key included.
+              CLAUDE_MEM_AUTO_UPDATE = "false"; # v15.14.0 auto-update rewrites ~/.claude/plugins behind the Nix pin.
             };
             permissions = {
               allow = [
@@ -280,9 +284,9 @@ _: {
           in
           {
             claude-work = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" claude";
-            claude-collana-private = "DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
-            claude-collana = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general CLAUDE_MEM_MODEL=general claude --model coding";
-            claude-develappers = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_SONNET_MODEL=develappers-coding-low-think ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding CLAUDE_MEM_MODEL=develappers-coding claude --model develappers-coding";
+            claude-collana-private = "DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general claude --model coding";
+            claude-collana = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "collana/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "collana/auth-token"})\" ANTHROPIC_MODEL=coding ANTHROPIC_CUSTOM_MODEL_OPTION=general ANTHROPIC_DEFAULT_HAIKU_MODEL=coding ANTHROPIC_DEFAULT_SONNET_MODEL=coding ANTHROPIC_DEFAULT_OPUS_MODEL=general claude --model coding";
+            claude-develappers = "CLAUDE_CONFIG_DIR=\"$HOME/.claude-work\" DISABLE_INTERLEAVED_THINKING=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 ANTHROPIC_BASE_URL=\"$(cat ${secretPath "develappers/base-url"})\" ANTHROPIC_AUTH_TOKEN=\"$(cat ${secretPath "develappers/auth-token"})\" ANTHROPIC_MODEL=develappers-coding ANTHROPIC_CUSTOM_MODEL_OPTION=gemma-4-fast ANTHROPIC_DEFAULT_HAIKU_MODEL=gemma-4-fast ANTHROPIC_DEFAULT_SONNET_MODEL=develappers-coding-low-think ANTHROPIC_DEFAULT_OPUS_MODEL=develappers-coding claude --model develappers-coding";
           };
       };
     };

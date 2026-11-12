@@ -15,12 +15,12 @@ pkgs: {
     rev = "7801d061243d7b753bad0e0b3c057cd250b11755"; # v5.3.3
     hash = "sha256-CY0EifTY0UVc6/FPGVJjEfYEf/8QLsINQmoYYKZYh98=";
   };
-  # JuliusBrussee/caveman — repo root is both marketplace and plugin. v2.0.0 added a
-  # BSL-1.1 component (self-host free, resale licensed); /caveman itself stays MIT — fine for personal use.
+  # JuliusBrussee/caveman — repo root is both marketplace and plugin. Apache-2.0 since 3.0.0
+  # (LICENSE-MIT covers pre-3.0.0 contributions); Caveman Cloud is separate and not in the repo.
   caveman = pkgs.fetchFromGitHub {
     owner = "JuliusBrussee";
     repo = "caveman";
-    rev = "d262ab3882952a59312ff3537cd86d894523c5ab"; # v4.0.1
-    hash = "sha256-2xZHdWkWJrPAJ8++qW0Xmb3eORZ41e+GsZjIphqTtlI=";
+    rev = "1e91f1306d602d4ca23618701b1185575ae1869b"; # v4.1.0
+    hash = "sha256-0QC776k5eDk2ME38O5k6R/NgX24/1Ikp10y2C2GrMMU=";
   };
 }
