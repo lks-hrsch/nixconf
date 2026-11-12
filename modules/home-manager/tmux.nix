@@ -19,7 +19,10 @@ _: {
           set -s extended-keys on
           set -g allow-passthrough on
           set -g set-clipboard on
+          set -g renumber-windows on
           bind C-l send-keys C-l
+          bind '"' split-window -v -c "#{pane_current_path}"
+          bind % split-window -h -c "#{pane_current_path}"
 
           # leading ' *': ps can print the state blank, which the upstream '^[^TXZ ]+' rejects
           is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^ *[^TXZ ]* +(\\S+\\/)?g?\\.?(view|l?n?vim?x?|fzf|claude)(diff)?(-wrapped)?$'"
