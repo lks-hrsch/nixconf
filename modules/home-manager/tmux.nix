@@ -5,7 +5,6 @@ _: {
     {
       programs.tmux = {
         enable = true;
-        prefix = "C-q";
         terminal = "tmux-256color";
         escapeTime = 10;
         historyLimit = 50000;
@@ -29,7 +28,8 @@ _: {
           bind-key -n C-k if-shell "$is_vim" "send-keys C-k" "select-pane -U"
           bind-key -n C-l if-shell "$is_vim" "send-keys C-l" "select-pane -R"
 
-          bind C split-window -h -c "#{pane_current_path}" "${config.home.profileDirectory}/bin/claude --ide"
+          # A (AI): not a default binding; C is the default customize-mode
+          bind A split-window -h -c "#{pane_current_path}" "${config.home.profileDirectory}/bin/claude --ide"
         '';
       };
     };
