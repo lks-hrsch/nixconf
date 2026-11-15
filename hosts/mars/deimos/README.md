@@ -79,8 +79,8 @@ token, and store it in `secrets/secrets.yaml` as `mcp/grafana/token`
 
 ### Arr instances (shared by Muxarr, Reclaimerr, Houndarr)
 
-Connect all six using media-network DNS names and **internal** ports (not the
-published 787x/898x host ports). API keys: each arr's
+Connect all six using media-network DNS names and **internal** ports (no host
+ports are published; browsers use `https://<name>.deimos.mars.lukashirsch.de`). API keys: each arr's
 `Settings → General → API Key`.
 
 - Sonarr: `http://sonarr-{anime,german,original}:30027`
