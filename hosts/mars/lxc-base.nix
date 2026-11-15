@@ -42,6 +42,22 @@ _: {
           };
         };
 
+        # Rootful Podman in these unprivileged LXCs keeps container network
+        # namespaces under /run/user/0/netns. Without linger, every root SSH
+        # login mounts a fresh tmpfs over /run/user/0 and hides them, so a
+        # container stopped during a deploy can't tear down its network and
+        # leaves stale netavark DNAT rules that shadow the new container's
+        # ports. Linger keeps one /run/user/0 mounted from boot, and the
+        # containers start after it. `wants`, not `requires`, so stopping the
+        # runtime dir never stops the containers.
+        users.users.root.linger = lib.mkIf config.virtualisation.podman.enable true;
+        systemd.services = lib.mkIf config.virtualisation.podman.enable (
+          lib.genAttrs (builtins.attrNames config.virtualisation.quadlet.containers) (_: {
+            after = [ "user-runtime-dir@0.service" ];
+            wants = [ "user-runtime-dir@0.service" ];
+          })
+        );
+
         system.stateVersion = "25.05";
       };
     };
