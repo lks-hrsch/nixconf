@@ -4,7 +4,8 @@
     { pkgs, lib, ... }:
     let
       # resolves each id to the newest marketplace release whose engine range accepts our VS Code build
-      extensionsFor = pkgs.nix4vscode.forVscodeVersion pkgs.unstable.vscode.version;
+      # pad: nix4vscode needs major.minor.patch, nixpkgs ships e.g. "1.146"
+      extensionsFor = pkgs.nix4vscode.forVscodeVersion (lib.versions.pad 3 pkgs.unstable.vscode.version);
 
       # extensions for all profiles
       # to pin a specific version append it to the id, e.g. "publisher.name.1.2.3"

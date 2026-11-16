@@ -4,6 +4,19 @@ _final: prev: {
     inherit (prev.stdenv.hostPlatform) system;
     inherit (prev) config;
     overlays = [
+      # claude-code from the upstream release manifest when it is newer than nixpkgs-unstable's.
+      # Bump: B=https://downloads.claude.ai/claude-code-releases; \
+      #   curl -fsSL "$B/$(curl -fsSL $B/latest)/manifest.zst.json" -o overlays/claude-code-manifest.json
+      (_: p: {
+        claude-code =
+          let
+            manifest = p.lib.importJSON ./claude-code-manifest.json;
+          in
+          if p.lib.versionOlder p.claude-code.version manifest.version then
+            p.claude-code.override { inherit manifest; }
+          else
+            p.claude-code;
+      })
       # 1Password for Safari (App Store, 8.12.44) migrated the shared vault data past the
       # nixpkgs-unstable app (8.12.42): "Your saved data appears to be newer than this version".
       # Drop once nixpkgs-unstable ships >= 8.12.44: `nix flake update nixpkgs-unstable`, rebuild.
