@@ -15,6 +15,7 @@ _: {
       '';
       mod = if isDarwin then "super" else "ctrl";
       fontKeys = [
+        "${mod}+equal=increase_font_size:1" # gb layout: + is Shift+=, so `${mod}++` alone never fires without Shift
         "${mod}++=increase_font_size:1"
         "${mod}+-=decrease_font_size:1"
         "${mod}+0=reset_font_size"

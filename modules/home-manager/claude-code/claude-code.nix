@@ -45,7 +45,7 @@ _: {
           settings="$HOME/.claude-mem/settings.json"
           if [ -f "$settings" ]; then
             run ${lib.getExe pkgs.jq} \
-              '.CLAUDE_MEM_PROVIDER = "claude" | .CLAUDE_MEM_CLAUDE_AUTH_METHOD = "gateway" | .CLAUDE_MEM_MODEL = "coding"' \
+              '.CLAUDE_MEM_PROVIDER = "claude" | .CLAUDE_MEM_CLAUDE_AUTH_METHOD = "gateway" | .CLAUDE_MEM_MODEL = "coding" | .CLAUDE_CODE_PATH = "${config.home.profileDirectory}/bin/claude"' \
               "$settings" > "$settings.tmp" && run mv "$settings.tmp" "$settings"
           fi
         '';
@@ -57,6 +57,8 @@ _: {
           CLAUDE_MEM_TELEMETRY = "0";
           CLAUDE_MEM_DELIVERABLES_ENABLED = "false";
           CLAUDE_MEM_AUTO_UPDATE = "false";
+          DISABLE_AUTOUPDATER = "1";
+          DISABLE_TELEMETRY = "1";
         };
 
         packages = with pkgs; [
@@ -149,6 +151,8 @@ _: {
               CLAUDE_MEM_DELIVERABLES_ENABLED = "false"; # The v15.3.0 Stop hook copies written files to ~/.claude-mem/deliverables, *.key included.
               CLAUDE_MEM_AUTO_UPDATE = "false"; # v15.14.0 auto-update rewrites ~/.claude/plugins behind the Nix pin.
               CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"; # Named subagents now launch as teammates.
+              DISABLE_AUTOUPDATER = "1";
+              DISABLE_TELEMETRY = "1"; # Also stops feature-flag fetching, which keeps Code Mode (CLAUDE_CODE_EXPERIMENTAL_CODE_MODE) unavailable.
             };
             permissions = {
               allow = [
