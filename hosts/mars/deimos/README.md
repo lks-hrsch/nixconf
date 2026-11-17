@@ -6,17 +6,55 @@ smart home, network controller).
 
 - NixOS (x86_64) in an Incus LXC (`marsLxcBase`), LAN IP `192.168.1.13`
 - wg0 backbone IP `10.10.1.18`, plus NetBird (`wt0`)
-- UI-only state and known quirks: see [Operational notes](#operational-notes)
+- UI-only state: see [Operational notes](#operational-notes); per-app setup
+  notes live in [`learned-facts.md`](../../../.claude/learned-facts.md)
+
+## Hardware
+
+deimos shares the `mars` host with [phobos](../phobos/README.md). Values from
+TrueNAS (`midclt call system.info`, `virt.instance.query`), 2026-11.
+
+| Component | Detail |
+| :--- | :--- |
+| Host OS | TrueNAS SCALE 25.10 (Incus instances) |
+| CPU | AMD Ryzen 7 7700X, 8 cores (SMT off) |
+| RAM | 64 GB DDR5 ECC (shared with ZFS ARC and phobos) |
+| iGPU | AMD Raphael (`0000:0b:00.0`), passed through to deimos |
+| Network | Mellanox ConnectX-3, 10 GbE fibre (`enp10s0`, bridged as `br1`) |
+| HBA | Broadcom / LSI SAS3416 (bulk HDDs) |
+| `pool` | RAIDZ2, 8 × 4 TB Toshiba MG04SCA40EE (SAS) |
+| `nvme-pool` | Mirror, Corsair Force MP510 960 GB + Samsung 970 EVO Plus 2 TB |
+| `boot-pool` | Mirror, Crucial BX500 240 GB + Samsung 850 EVO 250 GB |
+
+### Instance limits
+
+| Setting | Value |
+| :--- | :--- |
+| Memory | **18 GiB** hard limit (`memory.max`); all containers share it |
+| CPU | No limit; all 8 host cores |
+| Autostart | Off in TrueNAS |
+| Passthrough | iGPU (`/dev/dri`, hardware transcoding), USB ConBee II Zigbee stick |
+
+The 18 GiB cap covers every container on deimos together. When it is hit,
+the kernel OOM-kills processes inside deimos; the host's free RAM does not
+help.
 
 ## Storage
+
+Incus disk devices (TrueNAS → container, same path on both sides):
 
 | Path | Purpose |
 | :--- | :--- |
 | `/mnt/nvme-pool/apps/<app>` | Container state (SQLite, configs, DB dirs), owned by `apps` (568) |
-| `/mnt/pool/*` | Bulk HDD datasets: media libraries, photos |
+| `/mnt/pool/media` | Media libraries |
+| `/mnt/pool/photos` | Photo libraries (Immich, FileBrowser) |
+| `/mnt/pool/home` | Home datasets |
 
 The Incus disk devices must be recursive for child datasets to show up in the
-container (see `learned-facts.md`).
+container (see `learned-facts.md`). UIDs 508 (`omada`), 568 (`apps`), 1883
+(`mqtt`) and 3005 (`openvad`) are mapped 1:1 to the host (TrueNAS users with
+`userns_idmap: DIRECT`, applied to every instance on its next start); every
+other UID lands in the unprivileged range.
 
 ## Ingress and DNS
 
@@ -26,8 +64,8 @@ container (see `learned-facts.md`).
 - Hostnames follow `<app>.deimos.mars.lukashirsch.de`. Blocky on deimos and on
   mercury resolves them to `10.10.1.18` for VPN clients; `ddns-updater` keeps
   the public `mars` / `*.mars` records current.
-- SSO: apps with OIDC use Authelia on mercury. Jellyfin uses the Authelia
-  plugin instead (see [Jellyfin + Authelia](#jellyfin--authelia)).
+- SSO: apps with OIDC use Authelia on mercury. Jellyfin authenticates through
+  the Authelia HTTP API plugin instead of OIDC.
 - Firewall ports are listed in `stacks/default.nix`.
 
 ## Services
@@ -37,7 +75,7 @@ container (see `learned-facts.md`).
 | `stacks/traefik.nix` | Traefik (+ `proxy` network) |
 | `stacks/blocky.nix` | Blocky DNS |
 | `stacks/ddns-updater.nix` | DDNS updater |
-| `stacks/media.nix` | Jellyfin, Seerr, Tracearr (app, TimescaleDB, Redis), Prowlarr, SABnzbd, Sonarr, Radarr and Bazarr (original / german / anime), Lingarr, Recyclarr, Muxarr, Reclaimerr, Houndarr, FlareSolverr, Gluetun (VPN egress) |
+| `stacks/media.nix` | Jellyfin and the media automation stack (own `media` network, Gluetun VPN egress) |
 | `stacks/immich.nix` | Immich (server, ML, Valkey, Postgres), Immich Power Tools |
 | `stacks/ai.nix` | Open WebUI, LiteLLM |
 | `stacks/mealie.nix` | Mealie (recipes, OIDC via Authelia) |
@@ -57,6 +95,12 @@ shipping logs/metrics).
   `Restart = "always"`.
 - Secrets come from `secrets/stacks-mars-deimos.yaml` (sops-nix) and are
   rendered to env files by sops templates.
+- Hardware config comes from `facter.json` (`nixos-facter`, regenerated
+  2026-11-17). Regenerate with:
+
+  ```bash
+  ssh root@192.168.1.13 'nix run nixpkgs#nixos-facter -- -o /dev/stdout' > hosts/mars/deimos/facter.json
+  ```
 
 ## Deploy
 
@@ -68,7 +112,7 @@ nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --target-host root@1
 
 ## Operational notes
 
-State below lives in web UIs or on disk, not in Nix.
+State below lives in web UIs, on disk or in TrueNAS, not in Nix.
 
 ### Grafana service account (Claude MCP)
 
@@ -77,170 +121,30 @@ The repo-level `.mcp.json` runs `grafana/mcp-grafana` read-only. Create
 token, and store it in `secrets/secrets.yaml` as `mcp/grafana/token`
 (`mcp/grafana/url` = Grafana base URL).
 
-### Arr instances (shared by Muxarr, Reclaimerr, Houndarr)
+### Scrutiny collector on mars
 
-Connect all six using media-network DNS names and **internal** ports (no host
-ports are published; browsers use `https://<name>.deimos.mars.lukashirsch.de`). API keys: each arr's
-`Settings → General → API Key`.
-
-- Sonarr: `http://sonarr-{anime,german,original}:30027`
-- Radarr: `http://radarr-{anime,german,original}:30025`
-- Library paths are identical in every container: `/mnt/anime/{series,movies}`,
-  `/mnt/series/{german,original}`, `/mnt/movies/{german,original}`.
-
-### Recyclarr
-
-Image is `docker.io/recyclarr/recyclarr` (v8+; tags have no leading `v`). The
-upstream `config-templates` `v8` branch is empty, so includes fail with
-`Unable to find include template with name '…'`. Fix (applied 2026-06-17): pin
-`master` in `/mnt/nvme-pool/apps/recyclarr/configuration/settings.yml`:
-
-```yaml
-resource_providers:
-  - type: config-templates
-    name: official-config-templates
-    clone_url: https://github.com/recyclarr/config-templates.git
-    reference: master
-    replace_default: true
-```
-
-Re-check after a v9+ bump; drop the pin once the version branch is populated.
-
-### Jellyfin + Authelia
-
-`jellyfin-plugin-authelia` authenticates against Authelia's HTTP API, not
-OIDC, so no OIDC client is needed in `hosts/mercury/stacks/authelia.nix`.
-
-1. `Dashboard → Plugins → Catalog`: add the manifest
-   `https://raw.githubusercontent.com/nikarh/jellyfin-plugin-authelia/main/manifest.json`
-   and install "Authelia Authentication".
-2. In the plugin settings set the **Authelia Server URL**, the **Jellyfin
-   URL** (must match the `X-Original-URL` Authelia sees, otherwise auth fails
-   with correct credentials) and the admin group mapping.
-
-Authelia must keep a `one_factor` policy (plugin has no 2FA; use
-`jellyfin-sso-plugin` for that). Today `default_policy: one_factor` covers
-it; add an `access_control` rule for the Jellyfin domain only if the default
-is ever tightened to `deny`. A custom `server.endpoints.authz` block must
-keep `implementation: 'AuthRequest'`. Jellyfin 12 is supported since plugin
-1.0.17.
-
-### Muxarr
-
-Data: `/mnt/nvme-pool/apps/muxarr/data` (SQLite).
-
-1. Open `https://muxarr.deimos.mars.lukashirsch.de` and create the admin
-   user in the setup wizard.
-2. Connect the arrs and create one profile per library (see above).
-3. Add a webhook in each arr (`Settings → Connect → Webhook`) to
-   `http://muxarr:8183` (copy the exact URL Muxarr shows) so imports are
-   processed automatically.
-4. **Preview** planned track removals on a few files per library before
-   queueing bulk jobs: Muxarr rewrites files in place.
-
-### Reclaimerr
-
-Data: `/mnt/nvme-pool/apps/reclaimerr/data` (SQLite + generated
-`secrets.env`; sops env overrides the JWT/encryption secrets). Back it up
-before upgrades.
-
-1. Create the admin account on first visit.
-2. Connect Jellyfin at `http://jellyfin:8096` as main server, then the arrs.
-3. Set `Application URL` to `https://reclaimerr.deimos.mars.lukashirsch.de`.
-4. Deletion is opt-in twice (cleanup deletion **and** the
-   delete-cleanup-candidates task). Review candidates before enabling either.
-
-### Tracearr
-
-Playback history and stats for Jellyfin. Own stack with its own TimescaleDB
-and Redis (`tracearr`, `tracearr-db`, `tracearr-redis`, all on the `media`
-network; the app also joins `proxy`). Data:
-`/mnt/nvme-pool/apps/tracearr/` (`postgres`, `redis`, `backup`,
-`image-cache`). LAN, wg0 and NetBird only: do not register it as a NetBird
-proxy service. Secrets live under `tracearr/` in
-`secrets/stacks-mars-deimos.yaml`; SSO is an Authelia client on mercury
-(`client_secret_post`).
-
-1. Create the owner straight after deploy: until the owner exists, anyone who
-   can reach the hostname can become owner (OIDC or `/sign-up/email`).
-   **Create Account** with your LLDAP email and a strong local password, kept
-   as break-glass. Then test the Authelia button. If Create Account is
-   refused, someone got there first: stop the stack and wipe
-   `/mnt/nvme-pool/apps/tracearr/postgres/`.
-2. Create a Jellyfin API key (`Dashboard → API Keys`, name `tracearr-trial`) and add
-   the server at `http://jellyfin:8096`. Leave Public address blank.
-3. Link your account on the server's **Your account** line.
-4. Enable daily backups under `Settings → Backup`; the repo has no DB dump
-   tooling for deimos. Back up before moving to a new minor tag by hand.
-5. Optional: add Traefik (`172.30.0.100`) under Jellyfin `Dashboard →
-   Networking → Known proxies`, or Tracearr records the proxy as every client.
-   Lockout risk: Jellyfin runs in allowlist mode and then filters on the
-   forwarded client address, so a LAN (`192.168.1.x`), wg0 (`10.10.1.x`) or
-   NetBird (`10.10.10.x`) client missing from the allowlist is rejected. Check
-   that Jellyfin's `Networking` settings cover all three ranges first, and do
-   it when nothing is playing, since it needs a Jellyfin restart. The gain is
-   small, as client IPs here are private anyway.
-
-Trial guardrails: no automation with Terminate Stream, no SSE plugin.
-
-### Houndarr
-
-Drip-feeds missing/cutoff-unmet searches to the arrs so indexer API caps are
-not exhausted. Data: `/mnt/nvme-pool/apps/houndarr/data` (SQLite +
-`houndarr.masterkey`, which encrypts the stored arr API keys: treat backups as
-secret). First boot may run DB migrations for several minutes.
-
-1. `/setup` creates the single admin account (dead after first use).
-2. `Settings → Add Instance` for all six arrs.
-3. Phase 1 (missing only), per instance: `Batch Size 1`, `Hourly Cap 1`,
-   `Sleep 30` min, `Cooldown 30` days, `Post-Release Grace 12` h,
-   `Queue Limit 10`, window `02:00-06:00`, order `random`, cutoff and upgrade
-   passes off. Ceiling ≈ 24 API hits/day per shared indexer.
-4. Phase 2 (once the missing backlog stabilises; **still pending**): enable the
-   cutoff pass with `Cutoff Batch 1`, `Cutoff Cap 1`, `Cutoff Cooldown 45`
-   days. Leave the *upgrade* pass off: it re-searches items already at cutoff.
-5. Sonarr: use `Season-context search` while backfilling, episode mode after.
-   To go faster, widen the time window rather than raising hourly caps.
-
-### Bazarr and Lingarr
-
-Three Bazarr instances, `bazarr-{german,original,anime}`, at
-`https://bazarr-<v>.deimos.mars.lukashirsch.de`. Each is paired with its
-`sonarr-<v>` / `radarr-<v>` and configured by hand in the UI; nothing is
-seeded from Nix. Config: `/mnt/nvme-pool/apps/bazarr/configuration-<v>`.
-
-Lingarr is internal only (`http://lingarr:9876` on `media`). It translates via
-LiteLLM `claude-haiku` with the key `lingarr/litellm_api_key`. One-time
-onboarding, until which every endpoint returns 403:
-
-    podman exec bazarr-german curl -fsS -X POST -H 'Content-Type: application/json' -d '{"enableUserAuth":"false"}' http://lingarr:9876/api/auth/onboarding
-
-Warning: with Bazarr's translation fallback on, turn **Upgrade previously
-downloaded subtitles** off on that instance. The upgrade job re-enters the
-fallback and can replace real German subtitles with translations (Bazarr
-1.6.3-beta.28, `subtitles/download.py`).
-
-### Known cosmetic failure: `systemd-tmpfiles-clean`
-
-`systemctl --failed` shows `systemd-tmpfiles-clean.service` failing with
-`statx(/tmp) failed: Protocol driver not attached`
-([systemd#41227](https://github.com/systemd/systemd/issues/41227), systemd
-260.1 on `noatime` LXC roots; affects all Mars containers since 2026-06-17).
-No functional impact; `/tmp` cleanup is skipped. Goes away once the fix is
-backported to `nixos-26.05` and the containers are redeployed. Remove this
-note when `systemctl --failed` is clean.
+The SMART and ZFS collectors run on the `mars` host, not in this container:
+TrueNAS cron jobs 4 (`scrutiny-collector-metrics`) and 5
+(`scrutiny-collector-zfs`), daily at 00:15, binaries in
+`/mnt/nvme-pool/apps/scrutiny/bin/`. Both post to
+`https://scrutiny.deimos.mars.lukashirsch.de` with `--host-id mars`. If the
+Scrutiny URL or port changes, update both cron jobs in the TrueNAS UI
+(`System → Advanced → Cron Jobs`); they discard nothing now, so failures show
+in the job log.
 
 ## Changelog
 
 High-level, newest first. Details live in `git log -- hosts/mars/deimos`.
 
-- 2026-11: Tracearr replaced Jellystat (`stacks/media.nix`). Old data stays in `/mnt/nvme-pool/apps/jellystat/` until deleted by hand.
+- 2026-11-17: `facter.json` regenerated; wg0 secrets owned by root and
+  restart `wg-quick-wg0` on rotation.
+- 2026-11-15: Every web UI served through Traefik over HTTPS (no host ports);
+  Scrutiny collectors on mars repointed on 2026-11-17.
 - 2026-10-04: **Metrics pipeline**: Alloy pushes node metrics (all Alloy hosts) to Prometheus; Prometheus scrapes Traefik, blocky (`:4000`), Grafana, Loki, InfluxDB, Gatus and mercury's Authelia/NetBird/CrowdSec over wg0; Grafana dashboards Node Exporter Full (1860), Traefik (17346), Blocky (13768), Gatus.
 - 2026-10-04: **Gatus added** (`stacks/monitoring.nix`), cross-watching mercury.
 - 2026-10-04: **Mealie moved here from mercury** (`stacks/mealie.nix`).
-- 2026-09: Muxarr, Reclaimerr and Houndarr added to the media stack;
-  Jellyfin Authelia plugin documented.
-- 2026-06: Upgraded to NixOS 26.05; Recyclarr pinned to v8 config templates.
+- 2026-09: Media stack extended.
+- 2026-06: Upgraded to NixOS 26.05.
 - 2026-03: VPN configuration changed.
 - 2026-02: Omada controller added; WireGuard fixes; stack permissions fixed.
 - 2026-01: ddns-updater added; media stack improved; Tailscale removed in
