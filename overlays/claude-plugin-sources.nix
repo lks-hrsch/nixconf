@@ -20,7 +20,7 @@ pkgs: {
   caveman = pkgs.fetchFromGitHub {
     owner = "JuliusBrussee";
     repo = "caveman";
-    rev = "1e91f1306d602d4ca23618701b1185575ae1869b"; # v4.1.0
-    hash = "sha256-0QC776k5eDk2ME38O5k6R/NgX24/1Ikp10y2C2GrMMU=";
+    rev = "70f4f34e834893ea9af9f4fc6022266bd56d18b1"; # v4.2.0
+    hash = "sha256-hGYcJ7r2O/uEAmAfpox7Owht4LN8Rk2kn1y8BSMWpFk=";
   };
 }

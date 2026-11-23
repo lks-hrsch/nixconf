@@ -11,20 +11,20 @@ _: {
         text = builtins.readFile ./statusline-command.sh;
         executable = true;
       };
-      # anthropics/claude-plugins-official — pinned to latest main as of 2026-11-12
+      # anthropics/claude-plugins-official, pinned to latest main as of 2026-11-23
       official = pkgs.fetchFromGitHub {
         owner = "anthropics";
         repo = "claude-plugins-official";
-        rev = "e0ab6e51219eef74e417a0e1d89e5d53e5e763d4";
-        hash = "sha256-7ddCmC7xM5NWxD4rfxUeUCzfK4H6lCgGmKG1l9hkppc=";
+        rev = "73c8cf3ea7e296057b467990f2f5d61b4c922260";
+        hash = "sha256-tG21jUglH8pac5VSDZN7f68vCwThl3GkBOnxz9T9VyE=";
       };
       inherit (import ../../../overlays/claude-plugin-sources.nix pkgs) superpowers ponytail caveman;
 
       claude-mem = pkgs.fetchFromGitHub {
         owner = "thedotmack";
         repo = "claude-mem";
-        rev = "2bb98bd08a73c3c4be18cc797ed7c2a43ed2d97b"; # v15.18.1
-        hash = "sha256-t3DKrdfoijLIJ5nvQ4lSlJ7fRuFYu+WJErxqdROoH/0=";
+        rev = "febafe47c7db20dc4825f353231b56c62b3ab269"; # v16.1.0
+        hash = "sha256-qmJZy00HyGX+4HvfLWyPFgc32psH4Upwei/GeEOeLF8=";
       };
     in
     {

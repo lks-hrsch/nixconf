@@ -21,8 +21,8 @@ _: {
       mattpocockSkills = {
         owner = "mattpocock";
         repo = "skills";
-        rev = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d";
-        hash = "sha256-3vhd77xfZjKUYJsIwPFevIZPUAzUgZXr0RYj5NQrBwk=";
+        rev = "abeeaf95660ba9e8b7c753eb38f441ca707a8823";
+        hash = "sha256-fc5+qmchp1IQ/rQP1olWKC1eC4VdYhaB7YYzC3+JBe0=";
       };
 
       mattpocock =
@@ -63,15 +63,15 @@ _: {
           context7-mcp = {
             owner = "upstash";
             repo = "context7";
-            rev = "6e68ffcbad0e23cf4fa8c11795ce9e551aeef19b"; # ctx7@0.11.0
-            hash = "sha256-Gre/wozYT2daksy3Va065vXGucIwWWkIvJ4JUg3RpoI=";
+            rev = "c36522f3d4446288a272aedd727d665f7b8175f2"; # ctx7@0.12.2
+            hash = "sha256-5xcJ2MXa0K5PFWJpB6EooMFk3k+EpIslcFWu4WUQb38=";
             subdir = "skills/context7-mcp";
           };
           obsidian = {
             owner = "bitbonsai";
             repo = "mcpvault";
-            rev = "1c68c8af745fd4e88c67aac2f34947c8bea6ce49";
-            hash = "sha256-WvNylKxZwqRVmwXUI1WTYryJHLDkzb7RLOVn+8qsYLI=";
+            rev = "5d4e68550e9fe27fc24b9e16d96b8ff5b39355d7"; # v0.18.4
+            hash = "sha256-T+HlU151bA5Gf48v08qq6xsXJoSececlGPkywO/FluA=";
             subdir = "skills/obsidian";
           };
         };
@@ -95,13 +95,13 @@ _: {
       # graphify ships one SKILL.md per agent (skill.md, skill-opencode.md) plus per-agent references/,
       # so postFetch reshapes the repo into the layout `graphify install --platform <agent>` writes
       # (minus its .graphify_version stamp). Bump the version with its hash: it also pins the CLI below.
-      graphifyVersion = "0.9.107";
+      graphifyVersion = "0.9.118";
       graphify = pkgs.fetchFromGitHub {
         name = "graphify-skills-${graphifyVersion}";
         owner = "Graphify-Labs";
         repo = "graphify";
         rev = "v${graphifyVersion}";
-        hash = "sha256-Gcm0+PvvaYtsJ+UChtTvdOXzr3GJKKaVB3qkbpIJH7k=";
+        hash = "sha256-BYbDcEQGZGAlhaGnOZWwdGhu6GY8wo7cYzO+SVy5lHE=";
         postFetch = ''
           tmp=$(mktemp -d)
           for agent in claude opencode; do
