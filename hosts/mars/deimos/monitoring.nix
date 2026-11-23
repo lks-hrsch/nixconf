@@ -508,6 +508,7 @@ _: {
           dataDir = "/mnt/nvme-pool/apps/loki/data";
           configuration = {
             auth_enabled = false;
+            analytics.reporting_enabled = false; # no usage report to stats.grafana.org
             server = {
               http_listen_address = "127.0.0.1";
               http_listen_port = 3100;

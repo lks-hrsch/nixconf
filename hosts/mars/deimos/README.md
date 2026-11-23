@@ -83,7 +83,7 @@ other UID lands in the unprivileged range.
 | `stacks/blocky.nix` | Blocky DNS |
 | `stacks/ddns-updater.nix` | DDNS updater |
 | `stacks/media.nix` | Jellyfin and the media automation stack (own `media` network, Gluetun VPN egress) |
-| `stacks/immich.nix` | Immich (server, ML, Valkey, Postgres), Immich Power Tools |
+| `stacks/immich.nix` | Immich (server, ML, Valkey, Postgres) |
 | `stacks/ai.nix` | Open WebUI, LiteLLM |
 | `stacks/mealie.nix` | Mealie (recipes, OIDC via Authelia) |
 | `stacks/scrutiny.nix` | Scrutiny and its InfluxDB (also a Grafana datasource), own `monitoring` network |

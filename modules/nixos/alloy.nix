@@ -184,6 +184,8 @@ _: {
         services.alloy = {
           enable = true;
           environmentFile = config.sops.templates."alloy/loki-auth.env".path;
+          # No anonymous usage report to stats.grafana.org.
+          extraFlags = [ "--disable-reporting" ];
         };
 
         # configPath defaults to /etc/alloy and auto-derives reloadTriggers
