@@ -119,6 +119,7 @@ unmapped UID.
 
 High-level, newest first. Details live in `git log -- hosts/mars/phobos`.
 
+- 2026-11-23: Host and instance labels on logs, node and cAdvisor metrics are now the short `phobos` (were the FQDN). Alloy runs with `--disable-reporting` (no usage report to stats.grafana.org).
 - 2026-11: **Server role**: native Traefik dashboard and Gatus
   (`hosts/mars/phobos/traefik.nix`, `monitoring.nix`, `modules/nixos/server.nix`),
   secrets in `secrets/stacks-mars-phobos.yaml`, Alloy as root with container logs
