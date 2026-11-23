@@ -4,30 +4,37 @@
   inputs,
   ...
 }:
+let
+  top = config;
+in
 {
   flake.modules.nixos.base =
-    { lib, ... }:
+    { config, lib, ... }:
     {
       imports = [
-        config.flake.modules.nixos.boot
-        config.flake.modules.nixos.internationalisation
-        config.flake.modules.nixos.nixvim
-        config.flake.modules.nixos.sops
-        config.flake.modules.nixos.ssh
-        config.flake.modules.nixos.time
-        config.flake.modules.nixos.users
-        config.flake.modules.nixos.zsh
+        top.flake.modules.nixos.boot
+        top.flake.modules.nixos.internationalisation
+        top.flake.modules.nixos.lazygit
+        top.flake.modules.nixos.nixvim
+        top.flake.modules.nixos.sops
+        top.flake.modules.nixos.ssh
+        top.flake.modules.nixos.time
+        top.flake.modules.nixos.users
+        top.flake.modules.nixos.zsh
 
         inputs.nixvim.nixosModules.nixvim
         inputs.sops-nix.nixosModules.sops
         inputs.quadlet-nix.nixosModules.quadlet
       ];
 
+      # Set directly, never networking.domain: that would also add a resolv.conf search domain.
+      networking.fqdn = lib.mkDefault "${config.networking.hostName}.lukashirsch.de";
+
       nixpkgs = {
         hostPlatform = lib.mkDefault "x86_64-linux";
         config.allowUnfree = lib.mkDefault true;
         overlays = [
-          config.repo.overlays.unstable
+          top.repo.overlays.unstable
         ];
       };
 
