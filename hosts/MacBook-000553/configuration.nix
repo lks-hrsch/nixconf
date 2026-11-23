@@ -8,6 +8,7 @@
         podman
         netbird
         work
+        tether
       ];
 
       networking.hostName = "MacBook-000553";
