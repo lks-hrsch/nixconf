@@ -1,8 +1,9 @@
 # deimos
 
 deimos is the application LXC on the `mars` TrueNAS box. It runs most
-self-hosted workloads as Podman quadlets (media, photos, AI, monitoring,
-smart home, network controller).
+self-hosted workloads as Podman quadlets (media, photos, AI, smart home,
+network controller). Traefik, Grafana, Loki, Prometheus, graphite-exporter and
+Gatus run natively.
 
 - NixOS (x86_64) in an Incus LXC (`marsLxcBase`), LAN IP `192.168.1.13`
 - wg0 backbone IP `10.10.1.18`, plus NetBird (`wt0`)
@@ -58,9 +59,15 @@ other UID lands in the unprivileged range.
 
 ## Ingress and DNS
 
-- Traefik owns 80/443 and discovers containers via Podman labels on the
-  `proxy` network (`172.30.0.0/24`). Certificates: Let's Encrypt DNS-01 via
-  Cloudflare.
+- Traefik is a native NixOS service (`modules/nixos/traefik.nix`, part of the
+  server role `modules/nixos/server.nix`) and owns 80/443. It does no
+  container discovery: each feature file declares its routes in
+  `services.traefik.routes` next to its container, and every container on the
+  `proxy` network (`172.30.0.0/24`) has a pinned address, kept in a `let` of
+  that feature file and used for both the network pin and the route URL.
+  Nothing checks the pins for uniqueness. Traefik restarts on every route
+  change (no reload). Certificates: Let's Encrypt DNS-01 via Cloudflare, state
+  in `/var/lib/traefik`.
 - Hostnames follow `<app>.deimos.mars.lukashirsch.de`. Blocky on deimos and on
   mercury resolves them to `10.10.1.18` for VPN clients; `ddns-updater` keeps
   the public `mars` / `*.mars` records current.
@@ -72,27 +79,37 @@ other UID lands in the unprivileged range.
 
 | Stack file | Services |
 | :--- | :--- |
-| `stacks/traefik.nix` | Traefik (+ `proxy` network) |
+| `stacks/default.nix` | Firewall and the `proxy` network |
 | `stacks/blocky.nix` | Blocky DNS |
 | `stacks/ddns-updater.nix` | DDNS updater |
 | `stacks/media.nix` | Jellyfin and the media automation stack (own `media` network, Gluetun VPN egress) |
 | `stacks/immich.nix` | Immich (server, ML, Valkey, Postgres), Immich Power Tools |
 | `stacks/ai.nix` | Open WebUI, LiteLLM |
 | `stacks/mealie.nix` | Mealie (recipes, OIDC via Authelia) |
-| `stacks/monitoring.nix` | Grafana, Loki, Prometheus (pull jobs + remote-write receiver at `prometheus.deimos…`, basic auth shared with Loki), InfluxDB, Scrutiny |
-| `stacks/monitoring.nix` (Gatus part) | Gatus uptime dashboard (`gatus.deimos…`, OIDC via Authelia); checks in `gatusChecks.deimos`, container in `modules/nixos/gatus.nix` |
+| `stacks/scrutiny.nix` | Scrutiny and its InfluxDB (also a Grafana datasource), own `monitoring` network |
 | `stacks/smarthome.nix` | ESPHome, Mosquitto, Zigbee2MQTT |
-| `stacks/omada.nix` | Omada controller |
+| `stacks/omada.nix` | Omada controller and its Traefik route |
 | `stacks/syncthing.nix` | Syncthing |
 | `stacks/feuerwehr.nix` | FileBrowser (fire-brigade photos) |
 
-Other host modules: `vpn.nix` (wg0, NetBird), `monitoring.nix` (Alloy
-shipping logs/metrics).
+`stacks/` holds only Podman containers. Native services live in host modules:
+
+| Host file | Services |
+| :--- | :--- |
+| `traefik.nix` | Native Traefik host settings (shared module `modules/nixos/traefik.nix`, dashboard route from the server role), sops env file, `internal-ipallowlist` |
+| `monitoring.nix` | Native Grafana, Loki, Prometheus (remote-write receiver at `prometheus.deimos…`, basic auth shared with Loki, no pull jobs), graphite-exporter, the mars syslog listener and Gatus (`gatus.deimos…`, OIDC via Authelia, state in `/var/lib/gatus`). The scrapes of Grafana, Loki, Prometheus and graphite-exporter are one Alloy file (`alloy/monitoring.alloy`) |
+| `vpn.nix` | wg0, NetBird |
+
+Alloy (`modules/nixos/alloy.nix` plus the server role) pushes logs and metrics
+to Loki and Prometheus on this host; each service declares its scrape as an
+`/etc/alloy/<name>.alloy` file next to itself (Blocky in `stacks/blocky.nix`,
+InfluxDB in `stacks/scrutiny.nix`).
 
 ## Runtime policy
 
 - Quadlets via NixOS; containers use `autoUpdate = "registry"` and
-  `Restart = "always"`.
+  `Restart = "always"`. Traefik, Grafana, Loki, Prometheus, graphite-exporter
+  and Gatus are plain NixOS services, not quadlets.
 - Secrets come from `secrets/stacks-mars-deimos.yaml` (sops-nix) and are
   rendered to env files by sops templates.
 - Hardware config comes from `facter.json` (`nixos-facter`, regenerated
@@ -136,11 +153,13 @@ in the job log.
 
 High-level, newest first. Details live in `git log -- hosts/mars/deimos`.
 
+- 2026-11: **Observability cleanup** (server role `modules/nixos/server.nix`, shared by mercury, deimos and phobos; `modules/nixos/alloy.nix`). Alloy runs from `/etc/alloy/*.alloy` files on the upstream service, as root (state dir moves from `/var/lib/private/alloy` to `/var/lib/alloy`), reads container logs from the journal and scrapes cAdvisor. Prometheus keeps only its remote-write receiver: Alloy pushes every target with its former `job` and `instance`, and the node series carry `job="node"` (was `integrations/unix`, so re-pick the job in the Grafana node dashboard once). Traefik and Gatus listen on `127.0.0.1`. Routes moved to `services.traefik.routes`, the pinned IPs to per-file `let` bindings (no `proxyIps` registry), the Omada route to `stacks/omada.nix`. Its Gatus skips phobos's checks (phobos's skips deimos's), since they cannot reach each other over wg0.
+- 2026-11: **Native Traefik, Grafana, Loki, Prometheus, graphite-exporter and Gatus** (`modules/nixos/traefik.nix`, `modules/nixos/gatus.nix`, host files `traefik.nix` and `monitoring.nix`; `stacks/` keeps only containers, InfluxDB and Scrutiny in `stacks/scrutiny.nix`). Routes now live next to each container (`homelab.traefik.routes` then, `services.traefik.routes` now), and every `proxy` container has a pinned address. Gatus state and the ACME store were copied once to `/var/lib/gatus` and `/var/lib/traefik`; the one-time copy scripts are removed. The old container dirs (`/mnt/nvme-pool/apps/traefik`, `/mnt/nvme-pool/apps/gatus`) stay until deleted by hand.
 - 2026-11-17: `facter.json` regenerated; wg0 secrets owned by root and
   restart `wg-quick-wg0` on rotation.
 - 2026-11-15: Every web UI served through Traefik over HTTPS (no host ports);
   Scrutiny collectors on mars repointed on 2026-11-17.
-- 2026-10-04: **Metrics pipeline**: Alloy pushes node metrics (all Alloy hosts) to Prometheus; Prometheus scrapes Traefik, blocky (`:4000`), Grafana, Loki, InfluxDB, Gatus and mercury's Authelia/NetBird/CrowdSec over wg0; Grafana dashboards Node Exporter Full (1860), Traefik (17346), Blocky (13768), Gatus.
+- 2026-10-04: **Metrics pipeline**: Alloy pushes node metrics (all Alloy hosts) to Prometheus; Prometheus scrapes Traefik, blocky (`:4000`), Grafana, Loki, InfluxDB, Gatus and mercury's Authelia/NetBird/CrowdSec over wg0; Grafana dashboards Node Exporter Full (1860), Traefik (17346), Blocky (13768), Gatus. Pull replaced by push in the 2026-11 observability cleanup above.
 - 2026-10-04: **Gatus added** (`stacks/monitoring.nix`), cross-watching mercury.
 - 2026-10-04: **Mealie moved here from mercury** (`stacks/mealie.nix`).
 - 2026-09: Media stack extended.

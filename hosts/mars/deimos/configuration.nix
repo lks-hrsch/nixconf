@@ -10,7 +10,7 @@
         base
         podman
         netbird
-        alloy
+        server
         marsLxcBase
       ];
 

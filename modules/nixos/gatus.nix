@@ -1,7 +1,7 @@
 # Gatus uptime dashboard (OIDC via Authelia) on the upstream services.gatus.
 # One module, imported by the hosts that run an instance. The check lists are
 # contributed per host via `gatusChecks`, each next to the service it checks
-# (hosts/*/**/stacks/*.nix, which git-crypt covers), and the instance probes
+# (host files and stacks), and the instance probes
 # every host's checks, minus the `skip` pairs.
 # Deimos hostnames only resolve to wg0 IPs via blocky on mercury, so every
 # probe pins that resolver.
