@@ -11,7 +11,9 @@ _: {
     }:
     let
       cfg = config.services.alloy;
-      inherit (config.networking) fqdn;
+      # Short hostname, matching the instance label of every service scrape
+      # (gatus, traefik, blocky, ...) so host and service series join directly.
+      inherit (config.networking) hostName;
 
       # Shared by every host importing this module: same Loki basic-auth
       # secrets, same sops file, one canonical path regardless of which
@@ -56,7 +58,7 @@ _: {
           relabel_rules = loki.relabel.journal_units.rules
           forward_to    = [loki.process.host_journal.receiver]
           labels        = {
-            host = "${fqdn}",
+            host = "${hostName}",
             job  = "systemd",
           }
         }
@@ -107,7 +109,7 @@ _: {
           }
           rule {
             target_label = "instance"
-            replacement  = "${fqdn}"
+            replacement  = "${hostName}"
           }
         }
       '';

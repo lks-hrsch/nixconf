@@ -59,7 +59,7 @@ in
           }
           rule {
             target_label = "instance"
-            replacement  = "${config.networking.fqdn}"
+            replacement  = "${config.networking.hostName}"
           }
         }
       '';

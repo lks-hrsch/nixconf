@@ -82,10 +82,10 @@ group access is needed.
   this LXC, so `netbird-wt0-login` reads the sops file directly
   (`NB_SETUP_KEY_FILE`). A failed login unit is not restarted by a switch:
   `systemctl start netbird-wt0-login`.
-- Monitoring: Alloy pushes logs and metrics to deimos with host label
-  `phobos.mars.lukashirsch.de` (`networking.fqdn`), as root (server role),
+- Monitoring: Alloy pushes logs and metrics to deimos with host and
+  instance label `phobos` (`networking.hostName`), as root (server role),
   including container logs from the journal, cAdvisor and the Traefik and
-  Gatus scrapes (`instance="phobos"`). Collectors that report host-wide or bogus
+  Gatus scrapes. Collectors that report host-wide or bogus
   data inside an LXC are disabled (`services.alloy.disabledCollectors` in
   `hosts/mars/lxc-base.nix`).
 - Hardware config comes from `facter.json` (`nixos-facter`, generated
