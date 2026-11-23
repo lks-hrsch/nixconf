@@ -57,9 +57,9 @@ group access is needed.
 
 - The server role (`modules/nixos/server.nix`) provides Traefik, Gatus, the
   dashboard route and the Alloy container-log and cAdvisor parts;
-  `hosts/mars/phobos/stacks/server.nix` holds what is phobos-specific: the Cloudflare
-  DNS-01 sops env file, the allowlist and the Gatus checks. There is no
-  `monitoring.nix` host module anymore.
+  `hosts/mars/phobos/traefik.nix` holds what is phobos-specific for Traefik (the
+  Cloudflare DNS-01 sops env file, the allowlist), `monitoring.nix` the Gatus
+  secret file and its own check. Phobos has no `stacks/` (no containers).
 - Traefik opens 80/443 (LAN and wg0) and has no `proxy` network and no ACME
   seed, so it orders its two certificates (traefik and gatus hostnames) fresh
   at the first start (DNS-01, about 60 s each). Blocky on mercury and deimos
@@ -120,10 +120,10 @@ unmapped UID.
 High-level, newest first. Details live in `git log -- hosts/mars/phobos`.
 
 - 2026-11: **Server role**: native Traefik dashboard and Gatus
-  (`hosts/mars/phobos/stacks/server.nix`, `modules/nixos/server.nix`), secrets in
-  `secrets/stacks-mars-phobos.yaml`, Alloy as root with container logs and the
-  Traefik and Gatus scrapes. `monitoring.nix` is gone: Alloy is the shared
-  `modules/nixos/alloy.nix`, with its LXC collector list in `lxc-base.nix`.
+  (`hosts/mars/phobos/traefik.nix`, `monitoring.nix`, `modules/nixos/server.nix`),
+  secrets in `secrets/stacks-mars-phobos.yaml`, Alloy as root with container logs
+  and the Traefik and Gatus scrapes. Alloy is the shared `modules/nixos/alloy.nix`,
+  with its LXC collector list in `lxc-base.nix`.
   Deploy mercury first or together (Authelia redirect URI for the phobos Gatus).
 - 2026-11-17: `facter.json` added; `podman` and `alloy` imported; `openvad`
   user (UID 3005, DIRECT idmap). First deploy since 2025: it switched wg0

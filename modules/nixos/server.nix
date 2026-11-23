@@ -1,7 +1,7 @@
 # Server role (mercury, deimos, phobos): the native Traefik edge, Gatus,
 # container logs and Podman metrics. Alloy itself comes with `base`; the
-# host-specific parts (sops secrets, ACME seed, proxy network, middlewares)
-# stay in their stacks/*.nix (phobos: hosts/mars/phobos/stacks/server.nix).
+# host-specific parts (sops secrets, ACME seed, middlewares) stay in each
+# host's traefik.nix and monitoring.nix; the proxy network in stacks/default.nix.
 { config, ... }:
 let
   top = config;
