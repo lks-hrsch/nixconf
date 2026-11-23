@@ -26,6 +26,27 @@ _: {
         rev = "febafe47c7db20dc4825f353231b56c62b3ab269"; # v16.1.0
         hash = "sha256-qmJZy00HyGX+4HvfLWyPFgc32psH4Upwei/GeEOeLF8=";
       };
+      claude-mem-plugin = pkgs.stdenvNoCC.mkDerivation {
+        pname = "claude-mem-plugin";
+        version = "16.1.0";
+        src = "${claude-mem}/plugin";
+        nativeBuildInputs = [ pkgs.unstable.bun ];
+        nodeOs = pkgs.stdenv.hostPlatform.node.platform;
+        nodeCpu = pkgs.stdenv.hostPlatform.node.arch;
+        buildPhase = ''
+          export HOME=$TMPDIR
+          bun install --frozen-lockfile --production --ignore-scripts --no-progress --os=$nodeOs --cpu=$nodeCpu
+        '';
+        installPhase = "cp -r . $out";
+        dontFixup = true;
+        outputHashMode = "recursive";
+        outputHash =
+          {
+            aarch64-darwin = "sha256-Wrf22x3IMbYG0UCxz6hYKpEZ7ROjbmi9A3wf1HuvYxs=";
+            x86_64-linux = "sha256-KUZRfxHd1eD+R2Zcw8EnQMLCGWnvAUPrcLrB65Z33Nc=";
+          }
+          .${pkgs.stdenv.hostPlatform.system};
+      };
     in
     {
       imports = [ ../../../overlays/uv-module.nix ];
@@ -65,6 +86,8 @@ _: {
           nodejs_24
           # claude-mem compiles its launcher with this: macOS 27 kills binaries from Bun older than 1.4.1.
           unstable.bun
+          # claude-mem smart_outline/smart_search shell out to it (0.26 or newer)
+          unstable.tree-sitter
           # for the security-guidance and claude-security plugin hooks
           (unstable.python3.withPackages (ps: [ ps.claude-agent-sdk ]))
         ];
@@ -117,7 +140,7 @@ _: {
             # superpowers is an external plugin referenced by the official marketplace
             superpowers
             # claude-mem
-            "${claude-mem}/plugin"
+            claude-mem-plugin
             # ponytail — lazy-senior-dev ruleset; /ponytail{,-review,-audit,-debt,-gain,-help}
             ponytail
             # caveman — ultra-compressed prose mode; /caveman, active by default
