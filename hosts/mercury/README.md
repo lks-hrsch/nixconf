@@ -34,7 +34,7 @@ Notes:
 
 | Network | Purpose | Members |
 | --- | --- | --- |
-| proxy | Ingress/routing plane | Traefik, Authelia, LLDAP UI, NetBird server/dashboard/proxy, Vaultwarden, SearXNG, ical-feuerwehr, Mosquitto (ldr-connect), Gatus |
+| proxy | Ingress/routing plane (every member has a pinned address, kept in a `let` of its feature file and used for both the network pin and the route URL; native Traefik reaches them from the bridge address `172.30.0.1`) | Authelia, LLDAP UI, NetBird server/dashboard/proxy, Vaultwarden, SearXNG, ical-feuerwehr, Mosquitto (ldr-connect) |
 | id | Identity-only traffic | LLDAP, Authelia |
 | netbird | NetBird internal traffic | NetBird server, NetBird dashboard, NetBird proxy, CrowdSec |
 
@@ -42,7 +42,7 @@ Notes:
 
 | Service | Role | Exposure |
 | --- | --- | --- |
-| Traefik | Reverse proxy + TLS | Public 80/443 |
+| Traefik | Reverse proxy + TLS (native NixOS service, state in `/var/lib/traefik`) | Public 80/443 |
 | Blocky | DNS for VPN/internal clients | Private 53/tcp+udp |
 | LLDAP | LDAP directory | Internal; UI routed via Traefik host rule |
 | Authelia | Auth portal + OIDC provider | Routed via Traefik |
@@ -51,19 +51,28 @@ Notes:
 | SearXNG | Metasearch engine | Public via Traefik on 443 (Authelia forward-auth) |
 | Mosquitto (ldr-connect) | MQTT broker for ldr-connect | MQTTS via Traefik TCP/SNI on 8883 |
 | ical-feuerwehr | Calendar feed (simple-ical-server) | Public via Traefik on 443 |
-| Gatus | Uptime dashboard (checks mercury + deimos over wg0, OIDC via Authelia) | `gatus.mercury.lukashirsch.de` via Traefik |
+| Gatus | Uptime dashboard (native NixOS service as `apps`, state in `/var/lib/gatus`; checks mercury, deimos and phobos, OIDC via Authelia) | `gatus.mercury.lukashirsch.de` via Traefik, listens on `127.0.0.1:8081` |
+| Alloy | Pushes the journal (with container logs), host and cAdvisor metrics and the scrapes of Traefik, Blocky, Authelia, NetBird, CrowdSec and Gatus to Loki and Prometheus on deimos; runs as root (server role) | None (outbound only) |
 | CrowdSec | IP-reputation engine; LAPI for the NetBird proxy bouncer | Internal only (netbird network) |
 
 ## Current Routing Notes
 
+- Traefik is native (`modules/nixos/traefik.nix`): its config is built from Nix
+  and it does no container discovery. Each feature file declares its routes in
+  `services.traefik.routes` next to its container. Traefik restarts on every
+  route change (no reload).
+- `stacks/` holds only Podman containers. Native host settings live in
+  `traefik.nix` (entry points, ACME env, allowlist) and `monitoring.nix`
+  (Gatus); the `proxy` network is in `stacks/default.nix`.
 - LLDAP uses host-based routing on lldap.mercury.lukashirsch.de.
 - Vaultwarden currently routes on both:
   - vaultwarden.mars.lukashirsch.de
   - vaultwarden.mercury.lukashirsch.de
 - Vaultwarden is intended to be publicly reachable via Traefik over HTTPS (not VPN-only).
 - Vaultwarden is currently not behind Authelia forward-auth (intentional for now).
-- SearXNG is behind Authelia forward-auth (the `authelia@file` Traefik middleware,
-  defined in `traefik.nix`'s dynamic config) since it has no native OIDC support.
+- SearXNG is behind Authelia forward-auth (the `authelia` Traefik middleware,
+  defined in `authelia.nix` through `services.traefik.dynamicConfigOptions`) since it has no
+  native OIDC support.
 - Traefik dashboard route exists and is restricted with an IP allowlist middleware.
 - ldr-connect broker: MQTTS on 8883 via Traefik TCP router (HostSNI on
   broker.ldr-connect.lukashirsch.de and
@@ -103,7 +112,8 @@ Backbone/admin plane
 
 ## Runtime Policy
 
-- Services are managed as Podman quadlets via NixOS.
+- Services are managed as Podman quadlets via NixOS, except Traefik, Gatus and Alloy, which are plain NixOS services.
+- Metrics are push-only: each service declares its scrape as an `/etc/alloy/<name>.alloy` file next to itself (explicit `instance = "mercury"`), and Prometheus on deimos only receives remote-write. Traefik and Gatus listen on `127.0.0.1`; the other metrics ports keep their `10.10.1.1` bind and are scraped locally by Alloy.
 - All containers use `autoUpdate = "registry"` except CrowdSec (pinned, manual bumps).
 - All service units use Restart = "always".
 
@@ -138,7 +148,9 @@ nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@m
 
 High-level, newest first. Details live in `git log -- hosts/mercury`.
 
-- 2026-10-04: **Metrics published on wg0 only** (`10.10.1.1`) for Prometheus on deimos: Traefik `:8082`, blocky `:4000`, Authelia `:9959`, NetBird `:9090`, CrowdSec `:6060`, Gatus `:8081`. Host metrics are pushed by Alloy.
+- 2026-11: **Observability cleanup** (server role `modules/nixos/server.nix`, shared by mercury, deimos and phobos; `modules/nixos/alloy.nix`). Alloy runs from `/etc/alloy/*.alloy` files on the upstream service, as root, reads container logs from the journal (`CONTAINER_NAME`, no longer the Podman socket) and scrapes cAdvisor; every scrape is pushed to Prometheus on deimos, which no longer pulls. The node series have `job="node"` (was `integrations/unix`). Traefik and Gatus listen on `127.0.0.1` (were `10.10.1.1`). Routes moved to `services.traefik.routes` with the pinned IPs in per-file `let` bindings (the `proxyIps` registry and its assertion are gone). Gatus also checks phobos, and the Authelia `gatus` client accepts phobos's callback URL.
+- 2026-11: **Native Traefik and Gatus** (`modules/nixos/traefik.nix`, `modules/nixos/gatus.nix`). Traefik's ACME state is seeded once from `/root/stacks/traefik/letsencrypt` into `/var/lib/traefik`; Gatus data is copied once from `/root/stacks/gatus/data` into `/var/lib/gatus`. Both copies ran; the one-time scripts are removed, and the old files stay until deleted by hand.
+- 2026-10-04: **Metrics published on wg0 only** (`10.10.1.1`) for Prometheus on deimos: Traefik `:8082`, blocky `:4000`, Authelia `:9959`, NetBird `:9090`, CrowdSec `:6060`, Gatus `:8081`. Host metrics are pushed by Alloy. Superseded by the 2026-11 observability cleanup above.
 - 2026-10-04: **Gatus added** (`stacks/monitoring.nix`); shared module `modules/nixos/gatus.nix`.
 - 2026-10-04: NetBird images pinned; CrowdSec WAL enabled.
 - 2026-10-04: **Mealie moved to deimos** (`mealie.deimos.mars.lukashirsch.de`).

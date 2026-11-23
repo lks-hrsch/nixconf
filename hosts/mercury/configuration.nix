@@ -12,9 +12,9 @@
     {
       imports = with config.flake.modules.nixos; [
         base
-        alloy
         podman
         netbird
+        server
         (modulesPath + "/installer/scan/not-detected.nix")
         (modulesPath + "/profiles/qemu-guest.nix")
       ];
