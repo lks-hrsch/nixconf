@@ -16,6 +16,7 @@
         git
         gpg
         latex
+        lazygit
         mcp
         opencode
         podman

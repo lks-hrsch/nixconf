@@ -16,6 +16,7 @@ in
         config.flake.modules.darwin.onepassword
         config.flake.modules.darwin.homebrew
         config.flake.modules.darwin.nixvim
+        config.flake.modules.darwin.lazygit
         config.flake.modules.darwin.time
         config.flake.modules.darwin.users
         config.flake.modules.darwin.sops
