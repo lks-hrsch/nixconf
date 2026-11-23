@@ -6,7 +6,6 @@
       imports = with config.flake.modules.nixos; [
         base
         podman
-        alloy
         netbird
         onepassword
         yubikey
