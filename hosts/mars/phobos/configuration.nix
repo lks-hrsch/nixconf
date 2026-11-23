@@ -9,7 +9,8 @@
       imports = with config.flake.modules.nixos; [
         base
         podman
-        alloy
+        netbird
+        server
         marsLxcBase
       ];
 

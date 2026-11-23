@@ -12,6 +12,7 @@ in
     { config, lib, ... }:
     {
       imports = [
+        top.flake.modules.nixos.alloy
         top.flake.modules.nixos.boot
         top.flake.modules.nixos.internationalisation
         top.flake.modules.nixos.lazygit

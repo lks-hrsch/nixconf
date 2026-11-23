@@ -1,6 +1,8 @@
-# Gatus uptime dashboard (OIDC via Authelia). One module, imported by the
-# hosts that run an instance. The check lists live in hosts/*/stacks/_gatus-checks.nix
-# (git-crypt) and are passed in via `gatus.endpoints`.
+# Gatus uptime dashboard (OIDC via Authelia) on the upstream services.gatus.
+# One module, imported by the hosts that run an instance. The check lists are
+# contributed per host via `gatusChecks`, each next to the service it checks
+# (hosts/*/**/stacks/*.nix, which git-crypt covers), and the instance probes
+# every host's checks, minus the `skip` pairs.
 # Deimos hostnames only resolve to wg0 IPs via blocky on mercury, so every
 # probe pins that resolver.
 { config, lib, ... }:
@@ -9,7 +11,9 @@ let
 in
 {
   # Per-host check lists (functions of the helpers below), contributed from
-  # hosts/*/**/monitoring.nix so hostnames stay in git-crypt'd files.
+  # the stack files so the per-service hostnames stay in git-crypt'd files (only
+  # the deimos domain and wg0 IP used by the helpers live here). Several files
+  # may set the same host; their lists concatenate.
   options.gatusChecks = lib.mkOption {
     type = lib.types.attrsOf (lib.types.functionTo (lib.types.listOf lib.types.attrs));
     default = { };
@@ -24,7 +28,8 @@ in
     }:
     let
       cfg = config.gatus;
-      inherit (config.virtualisation.quadlet) networks;
+      # Runs as the shared service account; owns the data dir and the secret.
+      owner = "apps";
 
       client = {
         dns-resolver = "udp://10.10.1.1:53";
@@ -68,6 +73,14 @@ in
         conditions = [ "[DNS_RCODE] == NOERROR" ];
       };
 
+      # Every deimos web UI is reached through Traefik (https://<name>.deimos…).
+      deimosIp = "10.10.1.18";
+      deimosDomain = "deimos.mars.lukashirsch.de";
+      deimosWeb =
+        group: name: path:
+        web group name "https://${name}.${deimosDomain}${path}";
+      deimosHttp = deimosWeb "deimos";
+
       helpers = {
         inherit
           mk
@@ -77,88 +90,41 @@ in
           ok
           reachable
           client
+          deimosIp
+          deimosWeb
+          deimosHttp
           ;
       };
 
-      settings = {
-        # /metrics is registered before the security gate (unauthenticated), so
-        # Traefik must not route it; Prometheus scrapes the container directly.
-        metrics = true;
-
-        storage = {
-          type = "sqlite";
-          path = "/data/data.db";
-        };
-
-        ui.title = "lukashirsch status";
-
-        security.oidc = {
-          issuer-url = "https://authelia.lukashirsch.de";
-          redirect-url = "https://${cfg.fqdn}/authorization-code/callback";
-          client-id = "gatus";
-          client-secret = "\${GATUS_OIDC_CLIENT_SECRET}";
-          scopes = [ "openid" ];
-        };
-
-        inherit (cfg) endpoints;
+      # Hosts whose checks this instance does not run: deimos and phobos cannot
+      # reach each other over wg0, and every probe resolves through the pinned
+      # 10.10.1.1 resolver, which answers with wg0 addresses.
+      skip = {
+        deimos = [ "phobos" ];
+        phobos = [ "deimos" ];
       };
-
-      gatusConfig = pkgs.writeText "gatus.yaml" (builtins.toJSON settings);
+      probed = lib.filter (h: !(lib.elem h (skip.${config.networking.hostName} or [ ]))) (
+        lib.attrNames top.gatusChecks
+      );
     in
     {
-      options.gatus = {
-        endpoints = lib.mkOption {
-          type = lib.types.listOf lib.types.attrs;
-          default = lib.concatMap (checks: checks helpers) (lib.attrValues top.gatusChecks);
-          description = "Gatus endpoints; defaults to every host's gatusChecks.";
-        };
-        helpers = lib.mkOption {
-          type = lib.types.attrs;
-          readOnly = true;
-          default = helpers;
-          description = "Endpoint constructors for check lists.";
-        };
-        fqdn = lib.mkOption {
-          type = lib.types.str;
-          description = "Public hostname of this instance, e.g. gatus.<host>.lukashirsch.de.";
-        };
-        dataDir = lib.mkOption {
-          type = lib.types.path;
-          description = "Host directory for the SQLite database.";
-        };
-        sopsFile = lib.mkOption {
-          type = lib.types.path;
-          description = "sops file holding gatus/oidc_client_secret.";
-        };
-        owner = lib.mkOption {
-          type = lib.types.str;
-          default = "root";
-          description = "User name owning the secret and data dir.";
-        };
-        metricsPublish = lib.mkOption {
-          type = lib.types.nullOr lib.types.str;
-          default = null;
-          example = "10.10.1.1:8081";
-          description = "host:port to publish the container's 8080 on for off-host Prometheus scrapes.";
-        };
-        uid = lib.mkOption {
-          type = lib.types.str;
-          default = "0";
-          description = "Numeric uid the container process runs as (must match owner).";
-        };
+      options.gatus.sopsFile = lib.mkOption {
+        type = lib.types.path;
+        description = "sops file holding gatus/oidc_client_secret.";
       };
 
       config = {
         sops = {
           secrets."gatus/oidc-client-secret" = {
-            inherit (cfg) sopsFile owner;
+            inherit (cfg) sopsFile;
+            inherit owner;
             key = "gatus/oidc_client_secret";
             mode = "0400";
             restartUnits = [ "gatus.service" ];
           };
 
           templates."gatus.env" = {
-            inherit (cfg) owner;
+            inherit owner;
             mode = "0400";
             restartUnits = [ "gatus.service" ];
             content = ''
@@ -167,35 +133,71 @@ in
           };
         };
 
-        systemd.tmpfiles.rules = [
-          "d ${dirOf cfg.dataDir} 0750 ${cfg.owner} ${cfg.owner} -"
-          "d ${cfg.dataDir} 0750 ${cfg.owner} ${cfg.owner} -"
-        ];
+        services.gatus = {
+          enable = true;
+          package = pkgs.unstable.gatus;
+          environmentFile = config.sops.templates."gatus.env".path;
+          settings = {
+            # /metrics is registered before the security gate (unauthenticated), so
+            # Traefik must not route it; Alloy scrapes the service directly.
+            metrics = true;
 
-        virtualisation.quadlet.containers.gatus = {
-          containerConfig = {
-            image = "ghcr.io/twin/gatus:v5.38.0";
-            autoUpdate = "registry";
-            user = cfg.uid;
-            environmentFiles = [ config.sops.templates."gatus.env".path ];
-            networks = [ networks.proxy.ref ];
-            networkAliases = [ "gatus" ];
-            publishPorts = lib.optional (cfg.metricsPublish != null) "${cfg.metricsPublish}:8080/tcp";
-            volumes = [
-              "/etc/localtime:/etc/localtime:ro"
-              "${gatusConfig}:/config/config.yaml:ro"
-              "${cfg.dataDir}:/data"
-            ];
-            podmanArgs = [
-              "--label=traefik.enable=true"
-              "--label=traefik.http.routers.gatus.rule=Host(`${cfg.fqdn}`) && !Path(`/metrics`)"
-              "--label=traefik.http.routers.gatus.entrypoints=websecure"
-              "--label=traefik.http.routers.gatus.tls=true"
-              "--label=traefik.http.routers.gatus.tls.certresolver=letsencrypt"
-              "--label=traefik.http.services.gatus.loadbalancer.server.port=8080"
-            ];
+            storage = {
+              type = "sqlite";
+              # Fixed by the upstream unit's StateDirectory = "gatus", which creates it.
+              path = "/var/lib/gatus/data.db";
+            };
+
+            web = {
+              address = "127.0.0.1";
+              port = 8081;
+            };
+
+            ui.title = "lukashirsch status";
+
+            security.oidc = {
+              issuer-url = "https://authelia.lukashirsch.de";
+              redirect-url = "https://gatus.${config.networking.fqdn}/authorization-code/callback";
+              client-id = "gatus";
+              client-secret = "\${GATUS_OIDC_CLIENT_SECRET}";
+              scopes = [ "openid" ];
+            };
+
+            endpoints = lib.concatMap (h: top.gatusChecks.${h} helpers) probed;
           };
-          serviceConfig.Restart = "always";
+        };
+
+        systemd.services.gatus = {
+          # At boot OIDC discovery via Traefik may not be up yet; keep retrying
+          # instead of hitting the start limit.
+          startLimitIntervalSec = 0;
+
+          # No tmpfiles rules: StateDirectory creates /var/lib/gatus owned by User.
+          serviceConfig = {
+            DynamicUser = lib.mkForce false;
+            User = lib.mkForce owner;
+            Group = lib.mkForce owner;
+            StateDirectoryMode = "0750";
+            # As the container did; nixpkgs only restarts on failure.
+            Restart = lib.mkForce "always";
+            RestartSec = 5;
+          };
+        };
+
+        # Pushed to the Prometheus on deimos; instance is set explicitly (host:port
+        # otherwise), 30s as the former pull job.
+        environment.etc."alloy/gatus.alloy".text = ''
+          prometheus.scrape "gatus" {
+            targets         = [{"__address__" = "127.0.0.1:8081", "instance" = "${config.networking.hostName}"}]
+            job_name        = "gatus"
+            scrape_interval = "30s"
+            forward_to      = [prometheus.remote_write.deimos.receiver]
+          }
+        '';
+
+        services.traefik.routes.gatus = {
+          rule = "Host(`gatus.${config.networking.fqdn}`) && !Path(`/metrics`)"; # /metrics is unauthenticated
+          url = "http://127.0.0.1:8081";
         };
       };
     };

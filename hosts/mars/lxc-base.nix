@@ -21,7 +21,22 @@ _: {
       config = {
         nix.settings.sandbox = false;
 
+        # LXC: these would report host-wide or bogus data.
+        services.alloy.disabledCollectors = [
+          "hwmon"
+          "thermal_zone"
+          "cpufreq"
+          "diskstats"
+          "zfs"
+          "rapl"
+          "edac"
+          "infiniband"
+          "nvme"
+        ];
+
         networking = {
+          # Names Gatus, Traefik and the dashboards; base.nix defaults to .lukashirsch.de.
+          fqdn = "${config.networking.hostName}.mars.lukashirsch.de";
           dhcpcd.enable = false;
           useDHCP = false;
           useHostResolvConf = false;
