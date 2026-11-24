@@ -57,6 +57,7 @@ _: {
         dynamicConfigOptions.http.middlewares.internal-ipallowlist.ipAllowList.sourceRange = [
           "192.168.1.0/24" # local
           "10.10.1.0/24" # wg0
+          "10.10.10.0/24" # wt0
           "172.30.0.0/24" # proxy bridge
         ];
       };
