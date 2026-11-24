@@ -29,6 +29,7 @@
             shell = pkgs.zsh;
             openssh.authorizedKeys.keys = [ config.repo.constants.sshPublicKey ];
             isNormalUser = true;
+            linger = true; # Keep the user manager (tmux, user units) alive with no session open.
             inherit (config.flake.users.owner) extraGroups uid;
           };
         };

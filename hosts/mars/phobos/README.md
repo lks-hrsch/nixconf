@@ -40,7 +40,7 @@ Incus disk devices (TrueNAS → container):
 
 | User | UID | Notes |
 | :--- | :--- | :--- |
-| `openvad` | 3005 | Normal user, group `users` (100), SSH key from `repo.constants.sshPublicKey` |
+| `openvad` | 3005 | Normal user, group `users` (100), SSH key from `repo.constants.sshPublicKey`, linger on (tmux survives logout) |
 
 `openvad` matches the TrueNAS user of the same name, which has
 `userns_idmap: DIRECT`, so files it owns on the NAS show up as `openvad`

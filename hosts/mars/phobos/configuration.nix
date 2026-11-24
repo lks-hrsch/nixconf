@@ -26,6 +26,7 @@
         isNormalUser = true;
         uid = 3005;
         group = "users";
+        linger = true; # Keep the user manager (and its tmux session) alive with no SSH login open.
         openssh.authorizedKeys.keys = [ config.repo.constants.sshPublicKey ];
       };
 
