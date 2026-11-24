@@ -79,7 +79,6 @@ _: {
           CLAUDE_MEM_DELIVERABLES_ENABLED = "false";
           CLAUDE_MEM_AUTO_UPDATE = "false";
           DISABLE_AUTOUPDATER = "1";
-          DISABLE_TELEMETRY = "1";
         };
 
         packages = with pkgs; [
@@ -146,6 +145,53 @@ _: {
             # caveman — ultra-compressed prose mode; /caveman, active by default
             caveman
           ];
+          # Written to the HM plugin's .lsp.json, a strict schema: an unknown key stops the whole
+          # plugin (and its MCP servers) from loading. Absolute paths, so nothing joins PATH.
+          # Servers start on the first edit of a matching file, one set per session.
+          lspServers = {
+            typescript = {
+              command = lib.getExe pkgs.unstable.typescript-language-server;
+              args = [ "--stdio" ];
+              # Prefers the project's typescript; TypeScript 7 ships no tsserver, so fall back to 5.
+              initializationOptions.tsserver.fallbackPath = "${pkgs.unstable.typescript_5}/lib/node_modules/typescript/lib/tsserver.js";
+              extensionToLanguage = {
+                ".ts" = "typescript";
+                ".tsx" = "typescriptreact";
+                ".mts" = "typescript";
+                ".cts" = "typescript";
+                ".js" = "javascript";
+                ".jsx" = "javascriptreact";
+                ".mjs" = "javascript";
+                ".cjs" = "javascript";
+              };
+            };
+            pyright = {
+              command = lib.getExe' pkgs.unstable.pyright "pyright-langserver";
+              args = [ "--stdio" ];
+              extensionToLanguage = {
+                ".py" = "python";
+                ".pyi" = "python";
+              };
+            };
+            # Uses the cargo/rustc on PATH (devshell or rustup) for the sysroot.
+            rust-analyzer = {
+              command = lib.getExe pkgs.unstable.rust-analyzer;
+              extensionToLanguage.".rs" = "rust";
+            };
+            # Same server as VS Code (vscode.nix).
+            nil = {
+              command = lib.getExe pkgs.unstable.nil;
+              extensionToLanguage.".nix" = "nix";
+            };
+          }
+          // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+            # Xcode's sourcekit-lsp, matching the selected toolchain.
+            sourcekit-lsp = {
+              command = "/usr/bin/xcrun";
+              args = [ "sourcekit-lsp" ];
+              extensionToLanguage.".swift" = "swift";
+            };
+          };
           settings = {
             outputStyle = "Concise";
             skillListingBudgetFraction = 0.05;
@@ -175,7 +221,6 @@ _: {
               CLAUDE_MEM_AUTO_UPDATE = "false"; # v15.14.0 auto-update rewrites ~/.claude/plugins behind the Nix pin.
               CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"; # Named subagents now launch as teammates.
               DISABLE_AUTOUPDATER = "1";
-              DISABLE_TELEMETRY = "1"; # Also stops feature-flag fetching, which keeps Code Mode (CLAUDE_CODE_EXPERIMENTAL_CODE_MODE) unavailable.
             };
             permissions = {
               allow = [
