@@ -17,7 +17,7 @@ in
 
       environment.systemPackages = with pkgs; [
         yubikey-manager # ykman: inspect applets, program OTP slots
-        libfido2 # fido2-token -L, to confirm both keys are seen
+        libfido2 # fido2-token -L, to confirm a key is seen
         pam_u2f # pamu2fcfg, to re-derive an entry below after adding a key
       ];
 
@@ -34,9 +34,20 @@ in
             appid = "pam://${username}";
             # Declarative mapping, public key material only — safe to commit, same trust as authorized_keys.
             # Deliberately NOT sops: login/greetd are `required`; coupling to decrypt success risks lockout for no secrecy gain.
-            authfile = pkgs.writeText "u2f-mappings" ''
-              ${username}:iBPqNL7isPeQMLTFTlUXFZIenV/o06K0zEOfnb3ZkBgnVf51MTdqOt8c6+pIAhXzDC1bySNUBQRczeGRK4TW/Q==,igqTqJNMseTBYp6yQ9OAo0V9w3CB1OADQHV7jDR5fHMWpf/DTdNwYzbIs+GZQbyjxyRkZ7DTIi2RhVOX+oc4+g==,es256,+presence:IGozUhEPNxA+hxIOxB09HyAXZXopTna79C/7xZD6GezG2CsUHYHNxCVJnZLT7KWzhUsyQbX9e6iTpzeBUkHNtg==,kBHEFlwIyBMAVUmpD2eGjdJv2cm4g3pmZmJrSabfsk8OfWw0TCr9tiCf3Pp6ch7xANL7ojAI8fs8weTdluKjkw==,es256,+presence
-            '';
+            # One credential per YubiKey (serial noted); pam_u2f wants them on one line, `:`-joined.
+            # Add a key: `pamu2fcfg -n -o pam://<username> -i pam://<username>`, drop the leading `:`.
+            authfile = pkgs.writeText "u2f-mappings" (
+              lib.concatStringsSep ":" [
+                username
+                # 39201887 — personal
+                "iBPqNL7isPeQMLTFTlUXFZIenV/o06K0zEOfnb3ZkBgnVf51MTdqOt8c6+pIAhXzDC1bySNUBQRczeGRK4TW/Q==,igqTqJNMseTBYp6yQ9OAo0V9w3CB1OADQHV7jDR5fHMWpf/DTdNwYzbIs+GZQbyjxyRkZ7DTIi2RhVOX+oc4+g==,es256,+presence"
+                # 15206955 — borrowed from a friend; delete this entry when returned
+                "IGozUhEPNxA+hxIOxB09HyAXZXopTna79C/7xZD6GezG2CsUHYHNxCVJnZLT7KWzhUsyQbX9e6iTpzeBUkHNtg==,kBHEFlwIyBMAVUmpD2eGjdJv2cm4g3pmZmJrSabfsk8OfWw0TCr9tiCf3Pp6ch7xANL7ojAI8fs8weTdluKjkw==,es256,+presence"
+                # 39202381 — work
+                "5gH9uCQrhJdZWJvMnX2VzTvPQZYXDoPKrjvoJQJJv6ByPKNqBfFibCRRx68rwvAxcGoYBDS8k06BJDhs5vwHgg==,DPr+Nr6hB3HYJSJtciAbJJDik4xjTeJCkzbJHSgleXmL8/Pj/Y3eO23eNKEHE3KtOZnqQpmCHUCIaCKUHmT/zg==,es256,+presence"
+              ]
+              + "\n"
+            );
           };
         };
         # Per-service, never security.pam.u2f.enable — that option defaults every

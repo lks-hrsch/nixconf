@@ -198,7 +198,7 @@ sudo reboot
 ### 5. First boot
 
 Unlock with the recovery passphrase from step 3. Log in at the greeter:
-touch a registered YubiKey, then enter the step-4 password. Both keys are
+touch a registered YubiKey, then enter the step-4 password. All three keys are
 already in the declarative `u2f-mappings` authfile. Confirm the machine is on the network (`ip -br addr`) and reachable
 over SSH before continuing.
 
