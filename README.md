@@ -63,10 +63,10 @@ build a nixos on darwin:
 nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@10.10.1.18 --target-host root@10.10.1.1 --use-substitutes --option sandbox false
 nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#mercury --build-host root@192.168.1.13 --target-host root@10.10.1.1 --use-substitutes --option sandbox false
 
-nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#phobos --build-host root@192.168.1.12 --target-host root@192.168.1.12 --use-substitutes --option sandbox false
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#phobos --build-host root@192.168.1.12 --target-host root@192.168.1.12 --use-substitutes
 
-nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@10.10.1.18 --target-host root@10.10.1.18 --use-substitutes --option sandbox false
-nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@192.168.1.13 --target-host root@192.168.1.13 --use-substitutes --option sandbox false
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@10.10.1.18 --target-host root@10.10.1.18 --use-substitutes
+nix run nixpkgs#nixos-rebuild-ng -- switch --flake .#deimos --build-host root@192.168.1.13 --target-host root@192.168.1.13 --use-substitutes
 ```
 
 ## working with git-crypt
