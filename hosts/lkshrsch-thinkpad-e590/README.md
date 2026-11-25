@@ -393,12 +393,10 @@ After install, on the laptop:
   only — swap is the only volume with a TPM2 slot.
 - **Add another YubiKey**: repeat step 8's enrollment command against
   `/dev/nvme0n1p3` for the new key; it gets its own FIDO2 slot alongside the
-  existing two.
-- **Revoke a lost YubiKey**: `sudo cryptsetup luksDump /dev/nvme0n1p3` to find
-  its slot number, then `sudo systemd-cryptenroll --wipe-slot=<n>
-  /dev/nvme0n1p3`. Also delete that key's line from the declarative `authfile`
-  in `modules/nixos/yubikey.nix` (PAM for `sudo`/`polkit-1`) and rebuild — LUKS
-  and PAM enrollments are tracked separately and both must be revoked.
+  existing ones. Add its PAM credential too: the comment above `authfile` in
+  `modules/nixos/yubikey.nix` gives the `pamu2fcfg` command.
+- **Retire or revoke a YubiKey**: see
+  [Decommission a YubiKey](#decommission-a-yubikey).
 - **Lost all YubiKeys**: boot to the recovery passphrase prompt for
   `cryptroot` (always a valid key slot); TPM2 still unlocks `cryptswap`.
 - **`sbctl` after a BIOS reset clears Secure Boot keys**: redo step 6's
@@ -407,6 +405,51 @@ After install, on the laptop:
   slots are untouched.
 - **RAM upgrade to 32 GB**: no config change needed — the 48G swap partition
   already covers hibernating at 32G RAM with headroom.
+
+### Decommission a YubiKey
+
+Use this checklist when returning, retiring or losing a key. LUKS and PAM
+enrollments are tracked separately, and both must be revoked. Keep the
+recovery passphrase to hand. Never use `--wipe-slot=fido2`: it removes every
+key's slot at once.
+
+- [ ] **Pre-check.** Confirm that a remaining key unlocks `cryptroot` and
+  passes `sudo -k; sudo true`.
+- [ ] **Find its LUKS slot.** `luksDump` does not say which key owns which
+  slot. Plug in only the key being retired (`ykman list --serials` to
+  confirm), then run this silent, no-touch check on the laptop:
+
+  ```bash
+  dev=$(fido2-token -L | head -1 | cut -d: -f1)
+  sudo cryptsetup luksDump --dump-json-metadata /dev/nvme0n1p3 \
+  | nix run nixpkgs#jq -- -r '.tokens[] | select(.type=="systemd-fido2")
+      | "\(.keyslots[0]) \(.["fido2-credential"]) \(.["fido2-rp"] // "io.systemd.cryptsetup")"' \
+  | while read -r slot cred rp; do
+      printf '%s\n%s\n%s\n' "$(head -c32 /dev/urandom | base64)" "$rp" "$cred" \
+        | fido2-assert -G -t up=false "$dev" >/dev/null 2>&1 \
+        && echo "keyslot $slot: OWNED" || echo "keyslot $slot: no"
+    done
+  ```
+
+  For a lost key, run the check with each remaining key instead. The slot
+  that none of them owns is the lost key's.
+- [ ] **Wipe the slot.** Run `sudo systemd-cryptenroll --wipe-slot=<n>
+  /dev/nvme0n1p3`, then `sudo cryptsetup luksDump /dev/nvme0n1p3`. Check that
+  one `systemd-fido2` token fewer is left. If the wrong slot was wiped, unlock
+  with the passphrase and re-enroll that key (step 8).
+- [ ] **Drop the PAM credential.** In `modules/nixos/yubikey.nix`, delete the
+  key's `# <serial>` comment and its credential string. Update the serial list
+  in step 8 and the key count in [Status](#status). Commit and push.
+- [ ] **Rebuild every host that imports the `yubikey` module** (workstation and
+  this laptop). Keep a root shell open: `login` and `greetd` require a key.
+- [ ] **Verify.** With only the retired key plugged in, `sudo -k; sudo true`
+  must ask for a password on each host, and boot must fall through to the
+  passphrase prompt. With a remaining key, both must still work with a touch.
+- [ ] **Off-repo.** Remove the key from web accounts that use it as a security
+  key (GitHub, Google, 1Password, …). Check data stored on the key itself:
+  `ykman oath accounts list` and `ykman fido credentials list` (needs the PIN).
+  The PAM and LUKS credentials are non-resident, so nothing of them is stored
+  on the key.
 
 ### Faster reinstalls
 
