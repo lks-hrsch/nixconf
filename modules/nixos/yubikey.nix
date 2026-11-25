@@ -41,8 +41,6 @@ in
                 username
                 # 39201887 — personal
                 "iBPqNL7isPeQMLTFTlUXFZIenV/o06K0zEOfnb3ZkBgnVf51MTdqOt8c6+pIAhXzDC1bySNUBQRczeGRK4TW/Q==,igqTqJNMseTBYp6yQ9OAo0V9w3CB1OADQHV7jDR5fHMWpf/DTdNwYzbIs+GZQbyjxyRkZ7DTIi2RhVOX+oc4+g==,es256,+presence"
-                # 15206955 — borrowed from a friend; delete this entry when returned
-                "IGozUhEPNxA+hxIOxB09HyAXZXopTna79C/7xZD6GezG2CsUHYHNxCVJnZLT7KWzhUsyQbX9e6iTpzeBUkHNtg==,kBHEFlwIyBMAVUmpD2eGjdJv2cm4g3pmZmJrSabfsk8OfWw0TCr9tiCf3Pp6ch7xANL7ojAI8fs8weTdluKjkw==,es256,+presence"
                 # 39202381 — work
                 "5gH9uCQrhJdZWJvMnX2VzTvPQZYXDoPKrjvoJQJJv6ByPKNqBfFibCRRx68rwvAxcGoYBDS8k06BJDhs5vwHgg==,DPr+Nr6hB3HYJSJtciAbJJDik4xjTeJCkzbJHSgleXmL8/Pj/Y3eO23eNKEHE3KtOZnqQpmCHUCIaCKUHmT/zg==,es256,+presence"
               ]

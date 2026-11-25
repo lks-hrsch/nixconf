@@ -16,7 +16,7 @@ root was built and then removed — see [Known issues](#known-issues).
 | Hyprland + Noctalia on the iGPU (`iHD`) | done |
 | Lanzaboote, keys enrolled, Secure Boot `enabled (user)` | done |
 | TPM2 unlock, PCR 7 | `cryptswap` only |
-| YubiKey FIDO2 unlock (touch, no PIN), three keys | `cryptroot` only — see [Boot chain](#boot-chain) |
+| YubiKey FIDO2 unlock (touch, no PIN), two keys | `cryptroot` only — see [Boot chain](#boot-chain) |
 | Hibernate/resume | **untested** — swap partition and `resumeDevice` are wired |
 | SATA SSD | plain ext4 scratchpad at `/mnt/scratchpad` — see [`sata-scratchpad.nix`](./sata-scratchpad.nix) |
 | Home NAS (`mars`) CIFS mounts | done — 7 shares under `/mnt/mars/*`, see [`home-nas-mounts.nix`](./home-nas-mounts.nix) |
@@ -198,7 +198,7 @@ sudo reboot
 ### 5. First boot
 
 Unlock with the recovery passphrase from step 3. Log in at the greeter:
-touch a registered YubiKey, then enter the step-4 password. All three keys are
+touch a registered YubiKey, then enter the step-4 password. Both keys are
 already in the declarative `u2f-mappings` authfile. Confirm the machine is on the network (`ip -br addr`) and reachable
 over SSH before continuing.
 
@@ -318,7 +318,7 @@ PCR 4/8/9. Re-enroll after a BIOS update or key rotation (see below).
 
 ### 8. YubiKey enrollment (root only)
 
-Enroll every YubiKey (personal 39201887, borrowed 15206955, work 39202381)
+Enroll every YubiKey (personal 39201887, work 39202381)
 before removing any TPM2 fallback — this is the only unlock path for
 `cryptroot` once step F below runs. Insert one key at a time: with two FIDO
 devices present, `--fido2-device=auto` fails with "More than one FIDO device
@@ -374,7 +374,7 @@ After install, on the laptop:
 | `sudo bootctl status` | `Secure Boot: enabled (user)` |
 | `sudo sbctl status` | `Setup Mode ✗ Disabled`, `Vendor Keys microsoft` |
 | `sudo sbctl verify` | every `EFI/Linux/*.efi` signed; `EFI/nixos/kernel-*.efi` unsigned is expected |
-| `sudo cryptsetup luksDump /dev/nvme0n1p3` | keyslots: passphrase, fido2 ×3 — no tpm2 |
+| `sudo cryptsetup luksDump /dev/nvme0n1p3` | keyslots: passphrase, fido2 ×2 — no tpm2 |
 | `sudo cryptsetup luksDump /dev/nvme0n1p2` | keyslots: passphrase, tpm2 |
 | reboot with a YubiKey inserted | root prompts for a touch (no PIN), unlocks; swap unlocks silently via TPM |
 | reboot with **no** YubiKey inserted | root falls through to the recovery passphrase prompt |
