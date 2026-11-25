@@ -16,7 +16,7 @@ root was built and then removed — see [Known issues](#known-issues).
 | Hyprland + Noctalia on the iGPU (`iHD`) | done |
 | Lanzaboote, keys enrolled, Secure Boot `enabled (user)` | done |
 | TPM2 unlock, PCR 7 | `cryptswap` only |
-| YubiKey FIDO2 unlock (touch, no PIN), two keys | `cryptroot` only — see [Boot chain](#boot-chain) |
+| YubiKey FIDO2 unlock (touch, no PIN), three keys | `cryptroot` only — see [Boot chain](#boot-chain) |
 | Hibernate/resume | **untested** — swap partition and `resumeDevice` are wired |
 | SATA SSD | plain ext4 scratchpad at `/mnt/scratchpad` — see [`sata-scratchpad.nix`](./sata-scratchpad.nix) |
 | Home NAS (`mars`) CIFS mounts | done — 7 shares under `/mnt/mars/*`, see [`home-nas-mounts.nix`](./home-nas-mounts.nix) |
@@ -318,16 +318,18 @@ PCR 4/8/9. Re-enroll after a BIOS update or key rotation (see below).
 
 ### 8. YubiKey enrollment (root only)
 
-Enroll **both** YubiKeys before removing any TPM2 fallback — this is the only
-unlock path for `cryptroot` once step F below runs.
+Enroll every YubiKey (personal 39201887, borrowed 15206955, work 39202381)
+before removing any TPM2 fallback — this is the only unlock path for
+`cryptroot` once step F below runs. Insert one key at a time: with two FIDO
+devices present, `--fido2-device=auto` fails with "More than one FIDO device
+found". In that case pass the path from `systemd-cryptenroll
+--fido2-device=list` instead of `auto`.
 
 ```bash
-# key A inserted; touch it when systemd-cryptenroll asks
+# one key inserted; give the recovery passphrase, touch when asked
 sudo systemd-cryptenroll --fido2-device=auto \
   --fido2-with-client-pin=no --fido2-with-user-presence=yes /dev/nvme0n1p3
-# swap to key B, repeat
-sudo systemd-cryptenroll --fido2-device=auto \
-  --fido2-with-client-pin=no --fido2-with-user-presence=yes /dev/nvme0n1p3
+# swap to the next key, repeat
 ```
 
 > **Security note.** `--fido2-with-client-pin=no` means unlocking `cryptroot`
@@ -372,11 +374,11 @@ After install, on the laptop:
 | `sudo bootctl status` | `Secure Boot: enabled (user)` |
 | `sudo sbctl status` | `Setup Mode ✗ Disabled`, `Vendor Keys microsoft` |
 | `sudo sbctl verify` | every `EFI/Linux/*.efi` signed; `EFI/nixos/kernel-*.efi` unsigned is expected |
-| `sudo cryptsetup luksDump /dev/nvme0n1p3` | keyslots: passphrase, fido2, fido2 — no tpm2 |
+| `sudo cryptsetup luksDump /dev/nvme0n1p3` | keyslots: passphrase, fido2 ×3 — no tpm2 |
 | `sudo cryptsetup luksDump /dev/nvme0n1p2` | keyslots: passphrase, tpm2 |
 | reboot with a YubiKey inserted | root prompts for a touch (no PIN), unlocks; swap unlocks silently via TPM |
 | reboot with **no** YubiKey inserted | root falls through to the recovery passphrase prompt |
-| `fido2-token -L` | both enrolled keys listed |
+| `fido2-token -L` | inserted key listed |
 | `sudo -k && sudo true` | "Please touch the device", no password needed |
 | `pamtester polkit-1 "$USER" authenticate` | touch prompt |
 | `swapon --show` | `/dev/mapper/cryptswap`, ~48G |
