@@ -149,6 +149,81 @@ Scrutiny URL or port changes, update both cron jobs in the TrueNAS UI
 (`System → Advanced → Cron Jobs`); they discard nothing now, so failures show
 in the job log.
 
+### Ports
+
+Port 8081 is taken by a `conmon` process (Podman's container monitor). Use 8082
+or another free port for new host services.
+
+### FileBrowser Quantum (`stacks/feuerwehr.nix`)
+
+- The image reads `/home/filebrowser/data/config.yaml` and exits if it is
+  missing, unless `FILEBROWSER_CONFIG` points at a valid file. Persist the
+  single `/home/filebrowser/data` directory (not the old `/database` and
+  `/config` split).
+- Mount the browsed tree at the path used in `server.sources` (photos at
+  `/srv`, source path `/srv`). A tree owned by `apps:apps` is readable by a
+  container running as `568:568`.
+- HEIC/HEIF previews need
+  `integrations.media.convert.imagePreview.heic: true` and FFmpeg, which the
+  `-slim` images lack: use the non-slim tag.
+
+### Media stack (`stacks/media.nix`)
+
+App data, databases and logs are on mars under `/mnt/nvme-pool/apps/<app>/`.
+Read them with `sqlite3 "file:<db>?mode=ro"` over `ssh root@192.168.1.16`:
+
+- Sonarr: `configuration-{original,german,anime}/sonarr.db`, logs in
+  `logs/sonarr*.txt` (CET). Trace "who added or deleted X" through the log's
+  `AddSeriesService`/`ImportListSyncService` lines and Seerr's
+  `[Sonarr] Removed series`.
+- Jellyseerr `configuration/db/db.sqlite3`, Houndarr `data/houndarr.db`
+  (`search_log`), SABnzbd `configuration/admin/` (`queue10.sab`,
+  `history1.db`), Reclaimerr `data/database/reclaimerr.db`
+  (`reclaim_rules.definition`, `lifecycle_events`).
+
+Gotchas:
+
+- **sonarr-german re-adds deleted series.** Its `SonarrImport` list
+  `sonarr-original` (profile 1, tag `2`, auto-add and search missing) re-adds a
+  tag-2 series deleted only in sonarr-german (or through Seerr "remove") within
+  about 5 minutes and re-grabs every episode. Delete with "Add List Exclusion"
+  ticked, or remove tag 2 in sonarr-original. sonarr-anime's `AniListImport`
+  list sets tag `anilist-lkshrsch`; radarr-anime has no list.
+- **Houndarr** searches show in Sonarr history as `UserInvokedSearch` and touch
+  no HDD; each grab ends in a full-copy import (NVMe to pool) plus an in-place
+  muxarr remux. Sonarr/Radarr task intervals (Refresh Series 12 h,
+  RefreshMovie 24 h) are hardcoded; "Rescan Series/Movie Folder after Refresh"
+  controls their disk reads.
+- **Reclaimerr API** has two auth tiers. `rcl_…` tokens work only as
+  `Authorization: Bearer` on `/api/v1/*` (read tasks, rules and candidates; run
+  tasks; postpone or protect candidates). Schedules and rules
+  (`PUT /api/tasks/tasks/{id}/schedule`, `POST /api/rules[/{id}]`,
+  `POST /api/rules/preview` with `per_page` <= 100) need the admin session
+  cookie `access_token`. Task cron runs in CET.
+- **Reclaimerr rule trees are nested.** Render the groups before judging a
+  rule (flattening made the 90-day rules look contradictory) and preview before
+  saving. Nothing without a Seerr request or the AniList tag is ever cleaned:
+  the user chose this.
+- **Jellyfin schedules** are set through
+  `GET/POST http://192.168.1.13:8096/ScheduledTasks[/<id>/Triggers]` with
+  `Authorization: MediaBrowser Token="<key>"`. A POST replaces the whole trigger
+  list (keep `MaxRuntimeTicks` and the StartupTrigger); 1 h is
+  `36000000000` ticks. Unverified whether triggers fire in CET or UTC. All
+  libraries set `SaveLocalMetadata` and `SaveSubtitlesWithMedia`, so those tasks
+  write to the HDD pool.
+- **Jellyfin hardware transcoding** shows in the first line of
+  `/mnt/nvme-pool/apps/jellyfin/log/FFmpeg.Transcode-*.log` on mars
+  (`-hwaccel vaapi`, `scale_vaapi`, `h264_vaapi` on `/dev/dri/renderD128` is the
+  full GPU path). ffmpeg only runs while transcoding.
+
+### Telemetry
+
+Nothing reports to stats.grafana.org: Alloy runs with `--disable-reporting`
+(`modules/nixos/alloy.nix`, every NixOS host), Loki sets
+`analytics.reporting_enabled = false` (`monitoring.nix`), and the NixOS Grafana
+module already defaults it to false. `check_for_updates` and
+`check_for_plugin_updates` stay on.
+
 ## Changelog
 
 High-level, newest first. Details live in `git log -- hosts/mars/deimos`.

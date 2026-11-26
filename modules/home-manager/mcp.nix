@@ -55,7 +55,10 @@ in
               type = "stdio";
               command = "npx";
               args = [
-                "@bitbonsai/mcpvault@latest"
+                # Exact version, same as the obsidian skill in skills/skills.nix. Not hash-pinned:
+                # both upstream lockfiles are stale (package-lock lacks resolved URLs, bun.lock
+                # fails --frozen-lockfile), so transitive deps still float.
+                "@bitbonsai/mcpvault@0.18.4"
                 # Private vault only — the work-develappers vault is not
                 # exposed via MCP.
                 "${config.home.homeDirectory}/${obsidianBasePath}/private"
@@ -64,8 +67,7 @@ in
             };
             nixos = {
               type = "stdio";
-              command = "uvx";
-              args = [ "mcp-nixos" ];
+              command = lib.getExe pkgs.unstable.mcp-nixos;
               description = "Real-time NixOS ecosystem search (130K+ packages, 23K+ system options)";
             };
           };

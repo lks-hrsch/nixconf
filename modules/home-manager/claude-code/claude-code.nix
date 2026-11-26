@@ -1,8 +1,4 @@
-{ config, ... }:
-let
-  inherit (config.repo.constants) obsidianBasePath;
-in
-{
+_: {
   flake.modules.homeManager.claude-code =
     {
       pkgs,
@@ -227,9 +223,6 @@ in
             caveman-customised
           ];
 
-          hooks.reflect = builtins.readFile ./hooks/reflect.sh;
-          hooks.obsidian = builtins.readFile ./hooks/obsidian.sh;
-
           lspServers = {
             typescript = {
               command = lib.getExe pkgs.unstable.typescript-language-server;
@@ -291,39 +284,6 @@ in
               "claude-fable-5-1".effortLevel = "high";
               "claude-fable-5-2".effortLevel = "high";
             };
-
-            # /reflect in a background fork before each compaction and at each session end.
-            hooks =
-              let
-                reflect = [
-                  {
-                    hooks = [
-                      {
-                        type = "command";
-                        command = "${config.home.homeDirectory}/.claude/hooks/reflect";
-                        timeout = 10;
-                      }
-                    ];
-                  }
-                ];
-              in
-              {
-                PreCompact = reflect;
-                SessionEnd = reflect;
-                # Names Obsidian notes whose filename matches the prompt; silent otherwise.
-                # Not an mcp_tool hook: only a command's stdout reaches Claude as context.
-                UserPromptSubmit = [
-                  {
-                    hooks = [
-                      {
-                        type = "command";
-                        command = "OBSIDIAN_VAULT=${config.home.homeDirectory}/${obsidianBasePath}/private ${config.home.homeDirectory}/.claude/hooks/obsidian";
-                        timeout = 5;
-                      }
-                    ];
-                  }
-                ];
-              };
 
             spinnerTipsEnabled = false;
             teammateMode = "auto";
@@ -402,7 +362,7 @@ in
                 "mcp__plugin_claude-code-home-manager_nixos__*"
                 "mcp__plugin_claude-code-home-manager_grep-app__*"
                 "mcp__plugin_claude-code-home-manager_websearch__*"
-                # obsidian: named read tools only (mcpvault is unpinned, a new write tool must not be auto-allowed)
+                # obsidian: named read tools only (a new mcpvault write tool must not be auto-allowed)
                 "mcp__plugin_claude-code-home-manager_obsidian__read_*"
                 "mcp__plugin_claude-code-home-manager_obsidian__list_*"
                 "mcp__plugin_claude-code-home-manager_obsidian__get_*"
@@ -438,6 +398,7 @@ in
                 "Bash(darwin-rebuild switch*)"
                 "Bash(darwin-rebuild activate*)"
                 "Bash(./rebuild-*)"
+                "Bash(nix run *rebuild*)"
                 "Bash(sudo *)"
                 # secret decryption
                 "Bash(sops -d*)"

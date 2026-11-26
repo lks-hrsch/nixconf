@@ -130,6 +130,15 @@ Backbone/admin plane
 - Use NetBird as the day-to-day user/device access plane.
 - Keep the public edge narrow: Traefik (including public Vaultwarden) + required VPN ports only.
 
+## Operational notes
+
+- The NetBird server, dashboard and proxy all run here; deimos only runs the
+  NetBird client. `netbird.lukashirsch.de` needs a manual Cloudflare A record to
+  mercury's public IP.
+- Old containers can survive a rebuild (a stale `netbird-server` once ran as
+  `brave_pare`). Find them with `podman ps --all --filter status=exited` and
+  remove them with `podman rm`.
+
 ## Deploy
 
 From `lkshrsch-workstation` (x86_64-linux, builds locally):
