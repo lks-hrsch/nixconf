@@ -19,6 +19,51 @@ _: {
         hash = "sha256-tG21jUglH8pac5VSDZN7f68vCwThl3GkBOnxz9T9VyE=";
       };
       inherit (import ../../../overlays/claude-plugin-sources.nix pkgs) superpowers ponytail caveman;
+      # Copy of a plugin without the skills it lists, which only fill the skill listing (unused in
+      # 90 days of transcripts, maintainer-only, or for services not run here). `rm` fails the build
+      # when an update renames or drops a listed skill, so the list cannot go stale silently.
+      # `extra` runs last, for any other patch. opencode and the marketplaces keep the full sources.
+      trimPlugin =
+        name: src: skills: extra:
+        pkgs.runCommand name { nativeBuildInputs = [ pkgs.jq ]; } ''
+          cp -r ${src} $out
+          chmod -R u+w $out
+          ${lib.concatMapStringsSep "\n" (s: "rm -r $out/skills/${s}") skills}
+          ${extra}
+        '';
+      # ponytail without its band mod: hiding the band (/ponytail band off) still writes the task
+      # ledger after every turn and warns "could not write the task ledger" when that fails.
+      ponytail-plugin =
+        trimPlugin "ponytail-plugin" ponytail
+          [
+            "ponytail-gain"
+            "ponytail-help"
+            "ponytail-review"
+            "ponytail-audit"
+          ]
+          ''
+            jq '.hooks -= ["./hooks/claude-band.json"]' ${ponytail}/.claude-plugin/plugin.json > $out/.claude-plugin/plugin.json
+          '';
+      # Keeps caveman, ultracave and megacave (its hooks read them), caveman-commit, caveman-review
+      # and cavecrew. Gone: Caveman Cloud skills, and workflow skills that superpowers covers.
+      caveman-plugin = trimPlugin "caveman-plugin" caveman [
+        "caveman-setup"
+        "caveman-discover"
+        "caveman-evidence-review"
+        "caveman-manage"
+        "caveman-optimize"
+        "caveman-learn"
+        "caveman-help"
+        "caveman-stats"
+        "caveman-compress"
+        "investigate-first"
+        "lean-build"
+        "migration"
+        "safe-refactor"
+        "surgical-patch"
+        "verify-and-stop"
+        "caveman-explore"
+      ] "";
 
       claude-mem = pkgs.fetchFromGitHub {
         owner = "thedotmack";
@@ -47,6 +92,38 @@ _: {
           }
           .${pkgs.stdenv.hostPlatform.system};
       };
+      # Trimmed after the fixed-output build, so its outputHash stays valid. Keeps mem-search,
+      # handoff, learn-codebase, smart-explore, backup-setup and mode-creator.
+      claude-mem-trimmed = trimPlugin "claude-mem-plugin-trimmed" claude-mem-plugin [
+        # maintainer or release workflows for the claude-mem repo itself
+        "version-bump"
+        "release"
+        "build-and-release"
+        "childhood"
+        "oh-my-issues"
+        "ccs-align"
+        # need cmem Pro or the Screenpipe app
+        "cloud-sync"
+        "screenpipe"
+        # duplicates of superpowers' plan/execute skills and the built-in /steward
+        "make-plan"
+        "do"
+        "build"
+        "babysit"
+        # never used
+        "wowerpoint"
+        "design-is"
+        "agent-cost-report"
+        "owner-goals"
+        "request-progress"
+        "timeline-report"
+        "weekly-digests"
+        "knowledge-agent"
+        "what-the"
+        "standup"
+        "pathfinder"
+        "how-it-works"
+      ] "";
     in
     {
       imports = [ ../../../overlays/uv-module.nix ];
@@ -65,8 +142,9 @@ _: {
         activation.claudeMemGatewaySettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           settings="$HOME/.claude-mem/settings.json"
           if [ -f "$settings" ]; then
+            # Tier models default to haiku/sonnet, which Claude Code expands to full Anthropic IDs the gateway rejects.
             run ${lib.getExe pkgs.jq} \
-              '.CLAUDE_MEM_PROVIDER = "claude" | .CLAUDE_MEM_CLAUDE_AUTH_METHOD = "gateway" | .CLAUDE_MEM_MODEL = "coding" | .CLAUDE_CODE_PATH = "${config.home.profileDirectory}/bin/claude"' \
+              '.CLAUDE_MEM_PROVIDER = "claude" | .CLAUDE_MEM_CLAUDE_AUTH_METHOD = "gateway" | .CLAUDE_MEM_MODEL = "coding" | .CLAUDE_MEM_TIER_SIMPLE_MODEL = "coding" | .CLAUDE_MEM_TIER_FAST_MODEL = "coding" | .CLAUDE_MEM_TIER_SMART_MODEL = "coding" | .CLAUDE_CODE_PATH = "${config.home.profileDirectory}/bin/claude"' \
               "$settings" > "$settings.tmp" && run mv "$settings.tmp" "$settings"
           fi
         '';
@@ -102,6 +180,7 @@ _: {
           # ~/.claude-work: CLAUDE_CONFIG_DIR for claude-work/-collana/-develappers — mirrors the
           # base setup so those sessions get the same settings, statusline and skills.
           ".claude-work/statusline-command.sh" = statusline;
+          ".claude-work/commands/reflect.md".source = ./commands/reflect.md;
           # Same settings, but work runs Sonnet with an Opus advisor.
           ".claude-work/settings.json".source =
             pkgs.runCommand "claude-work-settings.json" { nativeBuildInputs = [ pkgs.jq ]; }
@@ -139,12 +218,15 @@ _: {
             # superpowers is an external plugin referenced by the official marketplace
             superpowers
             # claude-mem
-            claude-mem-plugin
-            # ponytail — lazy-senior-dev ruleset; /ponytail{,-review,-audit,-debt,-gain,-help}
-            ponytail
+            claude-mem-trimmed
+            # ponytail: lazy-senior-dev ruleset; /ponytail, /ponytail-debt
+            ponytail-plugin
             # caveman — ultra-compressed prose mode; /caveman, active by default
-            caveman
+            caveman-plugin
           ];
+          # Global /reflect: appends to the repo's .claude/learned-facts.md and, past 40 facts,
+          # promotes lasting ones through claude-md-management. Mirrored to ~/.claude-work above.
+          commands.reflect = ./commands/reflect.md;
           # Written to the HM plugin's .lsp.json, a strict schema: an unknown key stops the whole
           # plugin (and its MCP servers) from loading. Absolute paths, so nothing joins PATH.
           # Servers start on the first edit of a matching file, one set per session.
@@ -207,6 +289,34 @@ _: {
               "claude-fable-5-1".effortLevel = "high";
               "claude-fable-5-2".effortLevel = "high";
             };
+            # /reflect in a background fork before each compaction and at each session end.
+            hooks =
+              let
+                reflect = [
+                  {
+                    hooks = [
+                      {
+                        type = "command";
+                        command = lib.getExe (
+                          pkgs.writeShellApplication {
+                            name = "claude-reflect-hook";
+                            runtimeInputs = [
+                              pkgs.jq
+                              pkgs.git
+                            ];
+                            text = builtins.readFile ./reflect-hook.sh;
+                          }
+                        );
+                        timeout = 10;
+                      }
+                    ];
+                  }
+                ];
+              in
+              {
+                PreCompact = reflect;
+                SessionEnd = reflect;
+              };
             spinnerTipsEnabled = false;
             teammateMode = "auto";
             preferredNotifChannel = "terminal_bell";
@@ -347,7 +457,7 @@ _: {
             promptSuggestionEnabled = false;
             autoMemoryEnabled = true;
             autoDreamEnabled = true;
-            remoteControlAtStartup = false;
+            remoteControlAtStartup = true;
             feedbackSurveyRate = 0;
             tui = "fullscreen";
           };
