@@ -21,8 +21,8 @@ _: {
       mattpocockSkills = {
         owner = "mattpocock";
         repo = "skills";
-        rev = "abeeaf95660ba9e8b7c753eb38f441ca707a8823";
-        hash = "sha256-fc5+qmchp1IQ/rQP1olWKC1eC4VdYhaB7YYzC3+JBe0=";
+        rev = "6f7f7831a625f040a8e06a0e7954826b87ce775a";
+        hash = "sha256-kM/OK6+kbTHzlN5d6wjL9hM80lolcSCoO8A1oRvEJEU=";
       };
 
       mattpocock =
@@ -63,8 +63,8 @@ _: {
           context7-mcp = {
             owner = "upstash";
             repo = "context7";
-            rev = "c36522f3d4446288a272aedd727d665f7b8175f2"; # ctx7@0.12.2
-            hash = "sha256-5xcJ2MXa0K5PFWJpB6EooMFk3k+EpIslcFWu4WUQb38=";
+            rev = "2c1e8641a99d344a2a016e9aaf4c5c1f4c5c6744"; # ctx7@0.13.0
+            hash = "sha256-JSlo9oqnbvG6lQUREY5PjuVYoDCB4cetld7llZ48m3c=";
             subdir = "skills/context7-mcp";
           };
           obsidian = {
@@ -95,7 +95,7 @@ _: {
       # graphify ships one SKILL.md per agent (skill.md, skill-opencode.md) plus per-agent references/,
       # so postFetch reshapes the repo into the layout `graphify install --platform <agent>` writes
       # (minus its .graphify_version stamp). Bump the version with its hash: it also pins the CLI below.
-      graphifyVersion = "0.9.118";
+      graphifyVersion = "0.9.120";
       graphify = pkgs.fetchFromGitHub {
         name = "graphify-skills-${graphifyVersion}";
         owner = "Graphify-Labs";
@@ -119,10 +119,12 @@ _: {
       programs = {
         claude-code.skills = skillPaths // {
           graphify = "${graphify}/claude";
+          reflect = ./reflect;
         };
         opencode.skills = skillPaths // {
           graphify = "${graphify}/opencode";
         };
+
         # graphify CLI the skill drives: PyPI package `graphifyy`, command `graphify`.
         # programs.uv.tool comes from overlays/uv-module.nix, imported by claude-code.nix.
         uv.tool.packages = [ "graphifyy==${graphifyVersion}" ];

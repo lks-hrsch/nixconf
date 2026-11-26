@@ -1,4 +1,8 @@
-_: {
+{ config, ... }:
+let
+  inherit (config.repo.constants) obsidianBasePath;
+in
+{
   flake.modules.homeManager.claude-code =
     {
       pkgs,
@@ -11,18 +15,15 @@ _: {
         text = builtins.readFile ./statusline-command.sh;
         executable = true;
       };
-      # anthropics/claude-plugins-official, pinned to latest main as of 2026-11-23
+      # anthropics/claude-plugins-official, pinned to latest main as of 2026-11-25
       official = pkgs.fetchFromGitHub {
         owner = "anthropics";
         repo = "claude-plugins-official";
-        rev = "73c8cf3ea7e296057b467990f2f5d61b4c922260";
-        hash = "sha256-tG21jUglH8pac5VSDZN7f68vCwThl3GkBOnxz9T9VyE=";
+        rev = "0fbfda5a91f4adc311daca25acc99132f40f0b6e";
+        hash = "sha256-J9pxacOMDz6wEHJHo5d0JhLfR/95hhJwUz1RmHqRvcI=";
       };
       inherit (import ../../../overlays/claude-plugin-sources.nix pkgs) superpowers ponytail caveman;
-      # Copy of a plugin without the skills it lists, which only fill the skill listing (unused in
-      # 90 days of transcripts, maintainer-only, or for services not run here). `rm` fails the build
-      # when an update renames or drops a listed skill, so the list cannot go stale silently.
-      # `extra` runs last, for any other patch. opencode and the marketplaces keep the full sources.
+      # Copy of a plugin without the skills it lists
       trimPlugin =
         name: src: skills: extra:
         pkgs.runCommand name { nativeBuildInputs = [ pkgs.jq ]; } ''
@@ -31,10 +32,10 @@ _: {
           ${lib.concatMapStringsSep "\n" (s: "rm -r $out/skills/${s}") skills}
           ${extra}
         '';
-      # ponytail without its band mod: hiding the band (/ponytail band off) still writes the task
-      # ledger after every turn and warns "could not write the task ledger" when that fails.
-      ponytail-plugin =
-        trimPlugin "ponytail-plugin" ponytail
+
+      # ponytail
+      ponytail-customised =
+        trimPlugin "ponytail-customised" ponytail
           [
             "ponytail-gain"
             "ponytail-help"
@@ -44,9 +45,9 @@ _: {
           ''
             jq '.hooks -= ["./hooks/claude-band.json"]' ${ponytail}/.claude-plugin/plugin.json > $out/.claude-plugin/plugin.json
           '';
-      # Keeps caveman, ultracave and megacave (its hooks read them), caveman-commit, caveman-review
-      # and cavecrew. Gone: Caveman Cloud skills, and workflow skills that superpowers covers.
-      caveman-plugin = trimPlugin "caveman-plugin" caveman [
+
+      # caveman
+      caveman-customised = trimPlugin "caveman-customised" caveman [
         "caveman-setup"
         "caveman-discover"
         "caveman-evidence-review"
@@ -65,15 +66,16 @@ _: {
         "caveman-explore"
       ] "";
 
+      # claude-mem
       claude-mem = pkgs.fetchFromGitHub {
         owner = "thedotmack";
         repo = "claude-mem";
-        rev = "febafe47c7db20dc4825f353231b56c62b3ab269"; # v16.1.0
-        hash = "sha256-qmJZy00HyGX+4HvfLWyPFgc32psH4Upwei/GeEOeLF8=";
+        rev = "94474143a3d5bb6f1f25d8049194d675d724310e"; # v17.0.0
+        hash = "sha256-zt7icqLVWPic95njXydN17N3vjBEvitrRAJqy7I7iH0=";
       };
       claude-mem-plugin = pkgs.stdenvNoCC.mkDerivation {
         pname = "claude-mem-plugin";
-        version = "16.1.0";
+        version = "17.0.0";
         src = "${claude-mem}/plugin";
         nativeBuildInputs = [ pkgs.unstable.bun ];
         nodeOs = pkgs.stdenv.hostPlatform.node.platform;
@@ -87,14 +89,12 @@ _: {
         outputHashMode = "recursive";
         outputHash =
           {
-            aarch64-darwin = "sha256-Wrf22x3IMbYG0UCxz6hYKpEZ7ROjbmi9A3wf1HuvYxs=";
-            x86_64-linux = "sha256-KUZRfxHd1eD+R2Zcw8EnQMLCGWnvAUPrcLrB65Z33Nc=";
+            aarch64-darwin = "sha256-1as5pVbV+EsG6pv2AI7e/QCdNse5AgyYnE3l9Ckulpo=";
+            x86_64-linux = "sha256-xaGeD8QM9JCHVznwAX2hhoGJnMLtSaN5C8fV4dmxPfM=";
           }
           .${pkgs.stdenv.hostPlatform.system};
       };
-      # Trimmed after the fixed-output build, so its outputHash stays valid. Keeps mem-search,
-      # handoff, learn-codebase, smart-explore, backup-setup and mode-creator.
-      claude-mem-trimmed = trimPlugin "claude-mem-plugin-trimmed" claude-mem-plugin [
+      claude-mem-customised = trimPlugin "claude-mem-plugin-trimmed" claude-mem-plugin [
         # maintainer or release workflows for the claude-mem repo itself
         "version-bump"
         "release"
@@ -180,7 +180,6 @@ _: {
           # ~/.claude-work: CLAUDE_CONFIG_DIR for claude-work/-collana/-develappers — mirrors the
           # base setup so those sessions get the same settings, statusline and skills.
           ".claude-work/statusline-command.sh" = statusline;
-          ".claude-work/commands/reflect.md".source = ./commands/reflect.md;
           # Same settings, but work runs Sonnet with an Opus advisor.
           ".claude-work/settings.json".source =
             pkgs.runCommand "claude-work-settings.json" { nativeBuildInputs = [ pkgs.jq ]; }
@@ -211,25 +210,26 @@ _: {
             inherit ponytail;
             inherit caveman;
           };
+
           plugins = [
             "${official}/plugins/claude-md-management"
             "${official}/plugins/claude-security"
+            "${official}/plugins/code-modernization"
+            "${official}/plugins/code-simplifier"
             "${official}/plugins/security-guidance"
             # superpowers is an external plugin referenced by the official marketplace
             superpowers
             # claude-mem
-            claude-mem-trimmed
+            claude-mem-customised
             # ponytail: lazy-senior-dev ruleset; /ponytail, /ponytail-debt
-            ponytail-plugin
+            ponytail-customised
             # caveman — ultra-compressed prose mode; /caveman, active by default
-            caveman-plugin
+            caveman-customised
           ];
-          # Global /reflect: appends to the repo's .claude/learned-facts.md and, past 40 facts,
-          # promotes lasting ones through claude-md-management. Mirrored to ~/.claude-work above.
-          commands.reflect = ./commands/reflect.md;
-          # Written to the HM plugin's .lsp.json, a strict schema: an unknown key stops the whole
-          # plugin (and its MCP servers) from loading. Absolute paths, so nothing joins PATH.
-          # Servers start on the first edit of a matching file, one set per session.
+
+          hooks.reflect = builtins.readFile ./hooks/reflect.sh;
+          hooks.obsidian = builtins.readFile ./hooks/obsidian.sh;
+
           lspServers = {
             typescript = {
               command = lib.getExe pkgs.unstable.typescript-language-server;
@@ -274,6 +274,7 @@ _: {
               extensionToLanguage.".swift" = "swift";
             };
           };
+
           settings = {
             outputStyle = "Concise";
             skillListingBudgetFraction = 0.05;
@@ -286,9 +287,11 @@ _: {
             modelSettings = {
               "claude-opus-5-5".effortLevel = "high";
               "claude-sonnet-5-5".effortLevel = "xhigh";
+              "claude-haiku-5-5".effortLevel = "xhigh";
               "claude-fable-5-1".effortLevel = "high";
               "claude-fable-5-2".effortLevel = "high";
             };
+
             # /reflect in a background fork before each compaction and at each session end.
             hooks =
               let
@@ -297,16 +300,7 @@ _: {
                     hooks = [
                       {
                         type = "command";
-                        command = lib.getExe (
-                          pkgs.writeShellApplication {
-                            name = "claude-reflect-hook";
-                            runtimeInputs = [
-                              pkgs.jq
-                              pkgs.git
-                            ];
-                            text = builtins.readFile ./reflect-hook.sh;
-                          }
-                        );
+                        command = "${config.home.homeDirectory}/.claude/hooks/reflect";
                         timeout = 10;
                       }
                     ];
@@ -316,11 +310,26 @@ _: {
               {
                 PreCompact = reflect;
                 SessionEnd = reflect;
+                # Names Obsidian notes whose filename matches the prompt; silent otherwise.
+                # Not an mcp_tool hook: only a command's stdout reaches Claude as context.
+                UserPromptSubmit = [
+                  {
+                    hooks = [
+                      {
+                        type = "command";
+                        command = "OBSIDIAN_VAULT=${config.home.homeDirectory}/${obsidianBasePath}/private ${config.home.homeDirectory}/.claude/hooks/obsidian";
+                        timeout = 5;
+                      }
+                    ];
+                  }
+                ];
               };
+
             spinnerTipsEnabled = false;
             teammateMode = "auto";
             preferredNotifChannel = "terminal_bell";
             cleanupPeriodDays = 30;
+
             # Claude Code's macOS system-store lookup fails on this machine (no TLS interception;
             # Apple curl + bundled store verify fine). Remove once the bug is fixed.
             env = {
@@ -332,6 +341,7 @@ _: {
               CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"; # Named subagents now launch as teammates.
               DISABLE_AUTOUPDATER = "1";
             };
+
             permissions = {
               allow = [
                 # file metadata (no content)

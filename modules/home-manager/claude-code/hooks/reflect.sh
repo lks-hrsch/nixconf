@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+set -o errexit -o nounset -o pipefail
 # Claude Code PreCompact and SessionEnd hook: runs /reflect in a detached headless fork of the
 # session, so learned facts are saved before compaction drops detail or the session ends.
 # A hook cannot make the live session run a command, and at exit there is no turn left.

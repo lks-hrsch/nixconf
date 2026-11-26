@@ -1,5 +1,7 @@
 ---
+name: reflect
 description: Reflect on this session to extract and store learned facts about the codebase
+model: sonnet
 ---
 
 Analyze the current conversation to extract useful facts that should be remembered for future sessions. Focus on:
