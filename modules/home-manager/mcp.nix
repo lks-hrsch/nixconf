@@ -55,12 +55,8 @@ in
               type = "stdio";
               command = "npx";
               args = [
-                # Exact version, same as the obsidian skill in skills/skills.nix. Not hash-pinned:
-                # both upstream lockfiles are stale (package-lock lacks resolved URLs, bun.lock
-                # fails --frozen-lockfile), so transitive deps still float.
                 "@bitbonsai/mcpvault@0.18.4"
-                # Private vault only — the work-develappers vault is not
-                # exposed via MCP.
+                # Private vault only — the work-develappers vault is not exposed via MCP.
                 "${config.home.homeDirectory}/${obsidianBasePath}/private"
               ];
               description = "Secure access to local Obsidian vault for notes management";
