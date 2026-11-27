@@ -115,25 +115,6 @@
           # of just the bare essentials.
           powerManagement.enable = true;
 
-          # nixpkgs 26.05 defaults this to true for the open driver >= 595, which
-          # drops the nvidia-suspend/resume/hibernate systemd units in favor of the
-          # new kernel suspend-notifier path - that path hung S3 suspend on first
-          # use (2026-06-10, journal ends at "PM: suspend entry (deep)").
-          # NOTE: not proven that the notifier path alone caused the hang - the GPU
-          # was already wedged by the Hyprland v0.55.3 monitor-disconnect SEGV 30s
-          # earlier. External reports of standalone notifier hangs on 595 exist
-          # though (open-gpu-kernel-modules#1157), so we keep the proven path.
-          # Re-checked 2026-08-16 (Hyprland now 0.56.2, noctalia v5): driver is
-          # still 595.71.05, same as the hang - no bump happened, so the SEGV
-          # confounder being gone proves nothing about the notifier path itself.
-          # Upstream #1157 is still open with no fix version. Units-based path
-          # confirmed working since (clean suspend/resume 2026-07-12, journal).
-          # Retry condition, not a date: drop this line once
-          # `hardware.nvidia.package.version` moves past 595.71.05, then verify
-          # via /proc/driver/nvidia/params and a real `systemctl suspend` test
-          # before trusting it unattended.
-          powerManagement.kernelSuspendNotifier = false;
-
           # Use the NVidia open source kernel module (not to be confused with the
           # independent third-party "nouveau" open source driver).
           # Support is limited to the Turing and later architectures. Full list of
@@ -164,8 +145,8 @@
       # systemd >= 256 freezes user sessions before sleep, which can deadlock
       # against nvidia-suspend saving VRAM (see nixpkgs#371058); boot -1 on
       # 2026-06-10 froze user.slice right before the suspend hang.
-      # NOTE: belt-and-braces, added together with kernelSuspendNotifier=false -
-      # the two were not tested independently.
+      # NOTE: belt-and-braces, added together with the (since removed)
+      # kernelSuspendNotifier=false pin - the two were not tested independently.
       # TODO(2026-Q3): once suspend has been stable for a while, try removing
       # this and verify suspend still works (isolates which fix was load-bearing);
       # drop entirely when nixpkgs#371058 is resolved.
